@@ -1,2 +1,2 @@
-# rw-offthedialbot
-A polished (rewritten) bot for the Off the Dial discord server.
+# `offthedialbot`
+> A polished bot for the Off the Dial discord server.
