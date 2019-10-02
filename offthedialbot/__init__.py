@@ -15,3 +15,4 @@ class Client(commands.Bot):
 
 
 client = Client(command_prefix='$')
+import commands
