@@ -1,7 +1,8 @@
+import sys
 from offthedialbot import client
 
 
 @client.command()
-async def ping(ctx, *, arg):
-    from . import ping
-    await ping.main(ctx, arg)
+async def ping(ctx, *, arg=None):
+    from .ping import main
+    await main(ctx, arg)

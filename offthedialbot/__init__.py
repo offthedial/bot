@@ -1,7 +1,7 @@
-from discord.ext import commands
+from discord.ext import commands as ext
 
 
-class Client(commands.Bot):
+class Client(ext.Bot):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -15,4 +15,4 @@ class Client(commands.Bot):
 
 
 client = Client(command_prefix='$')
-import commands
+from . import commands
