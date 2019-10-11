@@ -1,2 +1,2 @@
-async def main(ctx, arg):
-    await ctx.send(f"Pong! (You sent: `{arg}`)")
+async def main(ctx, content):
+    await ctx.send(f"Pong! (You sent: `{content}`)")
