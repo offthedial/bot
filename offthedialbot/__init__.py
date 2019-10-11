@@ -1,4 +1,5 @@
 from discord.ext import commands as ext
+from offthedialbot.commands import register_commands
 
 
 class Client(ext.Bot):
@@ -8,11 +9,10 @@ class Client(ext.Bot):
 
     async def on_ready(self):
         print(f'Logged in as `{self.user.name}`')
-        pass
 
     async def on_message(self, message):
         await self.process_commands(message)
 
 
 client = Client(command_prefix='$')
-from . import commands
+register_commands(client)
