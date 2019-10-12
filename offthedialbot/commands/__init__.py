@@ -82,7 +82,7 @@ def process_commands(data, parent):
 
 
 def derive_command(func):
-    """@wraps(func)"""
+    """Workaround odd scope behavior."""
 
     async def _(ctx, *, content=None):
         await func(ctx, content)
