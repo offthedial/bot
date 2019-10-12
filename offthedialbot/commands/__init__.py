@@ -1,3 +1,4 @@
+"""Dynamically import and generate discord.ext commands."""
 import inspect
 import pkgutil
 import sys
@@ -6,15 +7,13 @@ from discord.ext import commands
 
 
 def register_commands(bot):
+    """Register the commands in the package."""
     command_dict = find_commands()
     process_commands(command_dict, bot)
 
 
 def find_commands(module=sys.modules[__name__]):
-    """ Recursively traverse submodules in search of coroutines.
-
-        Any coroutines found are returned as a list.
-    """
+    """Recursively traverse submodules in search of coroutines."""
     data = {}
 
     def recursive_get(mapping, key, *args):
@@ -56,6 +55,7 @@ def find_commands(module=sys.modules[__name__]):
 
 
 def process_commands(data, parent):
+    """Extract main function and convert into an ext command."""
     for name, cmd_dict in data.items():
 
         func = derive_command(cmd_dict['func'])
@@ -82,7 +82,8 @@ def process_commands(data, parent):
 
 
 def derive_command(func):
-    # @wraps(func)
+    """@wraps(func)"""
+
     async def _(ctx, *, content=None):
         await func(ctx, content)
 
