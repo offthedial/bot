@@ -53,9 +53,7 @@ def _find_commands(module=sys.modules[__name__]):
 def _process_commands(data, parent):
     for name, cmd_dict in data.items():
 
-        async def func(ctx, *, content=None):
-            await cmd_dict['func'](ctx, content)
-
+        func = _derive_command(cmd_dict['func'])
         subcommands = cmd_dict['subcommands']
 
         # If no "main" function was provided, skip
@@ -76,6 +74,14 @@ def _process_commands(data, parent):
             cmd = commands.Command(func, name=name)
 
         parent.add_command(cmd)
+
+
+def _derive_command(func):
+    # @wraps(func)
+    async def _(ctx, *, content=None):
+        await func(ctx, content)
+
+    return _
 
 
 def register_commands(bot):
