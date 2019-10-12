@@ -5,30 +5,35 @@ import sys
 from discord.ext import commands
 
 
-def _find_commands(module=sys.modules[__name__]):
+def register_commands(bot):
+    command_dict = find_commands()
+    process_commands(command_dict, bot)
+
+
+def find_commands(module=sys.modules[__name__]):
     """ Recursively traverse submodules in search of coroutines.
 
         Any coroutines found are returned as a list.
     """
     data = {}
 
-    def _nested_get(mapping, key, *args):
+    def recursive_get(mapping, key, *args):
         value = mapping[key]
         if not args:
             return value
-        return _nested_get(value['subcommands'], *args)
+        return recursive_get(value['subcommands'], *args)
 
     # Adjust the name of the current module for submodule compatibility
     path = module.__file__
     if path.endswith('/__init__.py'):
         path, _, _ = module.__file__.rpartition('/')
+
     # Iterate over all modules
     for loader, module_name, _ in pkgutil.walk_packages([path]):
         hierarchy = module_name.split('.')
 
         # Load the module
         sub_module = loader.find_module(module_name).load_module(module_name)
-
         sub_dict = {'func': None, 'subcommands': {}}
 
         # Get the current node in the tree
@@ -38,7 +43,7 @@ def _find_commands(module=sys.modules[__name__]):
         else:
             # Retrieve the direct parent
             # print(f'Sub-module found: "{module_name}"')  # TODO: Use debug log
-            parent = _nested_get(data, *hierarchy[:-1])
+            parent = recursive_get(data, *hierarchy[:-1])
             parent['subcommands'][hierarchy[-1]] = sub_dict
 
         # Iterate over its contents
@@ -50,10 +55,10 @@ def _find_commands(module=sys.modules[__name__]):
     return data
 
 
-def _process_commands(data, parent):
+def process_commands(data, parent):
     for name, cmd_dict in data.items():
 
-        func = _derive_command(cmd_dict['func'])
+        func = derive_command(cmd_dict['func'])
         subcommands = cmd_dict['subcommands']
 
         # If no "main" function was provided, skip
@@ -67,7 +72,7 @@ def _process_commands(data, parent):
         if subcommands:
             cmd = commands.Group(func, name=name, invoke_without_command=True)
             # Re-run this function for all of the subcommands
-            _process_commands(subcommands, cmd)
+            process_commands(subcommands, cmd)
 
         # Otherwise, create a normal command
         else:
@@ -76,14 +81,9 @@ def _process_commands(data, parent):
         parent.add_command(cmd)
 
 
-def _derive_command(func):
+def derive_command(func):
     # @wraps(func)
     async def _(ctx, *, content=None):
         await func(ctx, content)
 
     return _
-
-
-def register_commands(bot):
-    command_dict = _find_commands()
-    _process_commands(command_dict, bot)
