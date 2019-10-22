@@ -17,11 +17,9 @@ This bot was created to help format Off The Dial's tournaments easier and faster
 
 ## Development Enviroment
 1. Clone the repo `git clone https://github.com/LeptoSpira/rw-offthedialbot.git`
-2. Create a `config.json` with your discord bot token:
+2. Create a `.env` with your discord bot token:
    ```
-   {
-      "token": "Your Discord Bot Token"
-   }
+   token=90c3f4ce...d3123c42
    ```
 
 ## Footnote
