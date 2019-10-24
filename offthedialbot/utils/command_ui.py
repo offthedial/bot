@@ -28,7 +28,7 @@ class CommandUI:
         """Passively wait for the user to cancel the command."""
         reply, _ = await self.ctx.bot.wait_for(
             'reaction_add',
-            check=lambda r: utils.checks.react(r, self.ctx),
+            check=lambda r, u: utils.checks.react((r, u), self.ctx),
         )
         await self.end(status=False)
 
@@ -50,7 +50,7 @@ class CommandUI:
 
         check = {
             'message': lambda m: utils.checks.msg(m, self.ctx),
-            'reaction_add': lambda r: utils.checks.react(r, self.ctx, valids=valids)
+            'reaction_add': lambda r, u: utils.checks.react((r, u), self.ctx, valids=valids)
         }
         try:
             reply = await self.ctx.bot.wait_for(
