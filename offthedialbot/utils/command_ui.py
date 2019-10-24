@@ -20,7 +20,8 @@ class CommandUI:
         ui = await self.ctx.send(embed=self.embed)
         await ui.add_reaction('❌')
 
-        task = await asyncio.create_task(self.wait_cancel_task())
+        task = asyncio.create_task(self.wait_cancel_task())
+        await asyncio.wait(task)
         return ui, task
 
     async def wait_cancel_task(self):
