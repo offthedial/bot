@@ -12,4 +12,3 @@ async def main(ctx, content):
     reply = await ui.get_reply()
     ui.embed.add_field(name="ign", value=reply.content)
     await ui.update()
-    await ui.get_reply()
