@@ -11,42 +11,42 @@ class CommandUI:
 
         self.ctx = ctx
         self.embed = embed
-        self.ui, self.cancel_task = await self.create_ui()
+        self.cancel_task = await self.create_ui()
 
         return self
 
     async def create_ui(self):
         """Create and return the discord embed UI."""
-        ui = await self.ctx.send(embed=self.embed)
-        await ui.add_reaction('❌')
+        self.ctx.ui = await self.ctx.send(embed=self.embed)
+        await self.ctx.ui.add_reaction('❌')
 
         task = asyncio.create_task(self.wait_cancel_task())
-        await asyncio.wait(task)
-        return ui, task
+        await task
+        return task
 
     async def wait_cancel_task(self):
         """Passively wait for the user to cancel the command."""
         reply, _ = await self.ctx.bot.wait_for(
             'reaction_add',
-            check=lambda r, u: utils.checks.react((r, u), self.ctx),
+            check=lambda r, u: utils.checks.react((r, u), self.ctx, valids='❌'),
         )
         await self.end(status=False)
 
     async def update(self):
         """Update the ui with new information."""
-        await self.ui.edit(embed=self.embed)
+        await self.ctx.ui.edit(embed=self.embed)
 
     async def end(self, status: bool):
         """End UI interaction and display status."""
         key = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED}
         self.cancel_task.cancel()
-        await self.ui.edit(embed=key[status])
-        await self.ui.clear_reactions()
+        await self.ctx.ui.edit(embed=key[status])
+        await self.ctx.ui.clear_reactions()
 
     async def get_reply(self, event: str = 'message', *, timeout: int = 120, valids: list = None):
         """Get the reply from the user."""
         for react in (valids if valids else []):
-            await self.ui.add_reaction(react)
+            await self.ctx.ui.add_reaction(react)
 
         check = {
             'message': lambda m: utils.checks.msg(m, self.ctx),
