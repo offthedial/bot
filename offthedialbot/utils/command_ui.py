@@ -5,30 +5,37 @@ import asyncio
 
 class CommandUI:
 
-    async def __new__(cls, ctx, embed):
-        """Create command embed with async on class creation."""
-        self = super().__new__(cls)
-
+    def __init__(self, ctx, embed):
+        """Initilize command UI and declare self variables."""
         self.ctx = ctx
         self.embed = embed
-        self.cancel_task = await self.create_ui()
+        self.reply_task = None
+
+    async def __new__(cls, ctx, embed):
+        """Use async to create embed and passive task on class creation."""
+        self = super().__new__(cls)
+
+        await self.create_ui(ctx, embed)
+        self.passive_task = await self.create_passive_task(ctx)
 
         return self
 
-    async def create_ui(self):
+    @staticmethod
+    async def create_ui(ctx, embed):
         """Create and return the discord embed UI."""
-        self.ctx.ui = await self.ctx.send(embed=self.embed)
-        await self.ctx.ui.add_reaction('❌')
+        ctx.ui = await ctx.send(embed=embed)
+        await ctx.ui.add_reaction('❌')
 
-        task = asyncio.create_task(self.wait_cancel_task())
+    async def create_passive_task(self, ctx):
+        task = asyncio.create_task(self.passive_wait(ctx))
         await task
         return task
 
-    async def wait_cancel_task(self):
+    async def passive_wait(self, ctx):
         """Passively wait for the user to cancel the command."""
-        reply, _ = await self.ctx.bot.wait_for(
+        reply, _ = await ctx.bot.wait_for(
             'reaction_add',
-            check=lambda r, u: utils.checks.react((r, u), self.ctx, valids='❌'),
+            check=lambda r, u: utils.checks.react((r, u), ctx, valids='❌'),
         )
         await self.end(status=False)
 
