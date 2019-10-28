@@ -46,7 +46,8 @@ class CommandUI:
     async def end(self, status: bool):
         """End UI interaction and display status."""
         key = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED}
-        self.cancel_task.cancel()
+        # self.cancel_task.cancel()
+        # self.reply_task.cancel()
         await self.ctx.ui.edit(embed=key[status])
         await self.ctx.ui.clear_reactions()
 
@@ -54,19 +55,18 @@ class CommandUI:
         """Get the reply from the user."""
         for react in (valids if valids else []):
             await self.ctx.ui.add_reaction(react)
-
         check = {
             'message': lambda m: utils.checks.msg(m, self.ctx),
             'reaction_add': lambda r, u: utils.checks.react((r, u), self.ctx, valids=valids)
         }
+        self.reply_task = self.ctx.bot.wait_for(
+            event,
+            check=check[event],
+            timeout=timeout,
+        )
         try:
-            reply = await self.ctx.bot.wait_for(
-                event,
-                check=check[event],
-                timeout=timeout,
-            )
+            reply = await self.reply_task
             await reply.delete()
-
         except asyncio.TimeoutError:
             await self.end(status=False)
             reply = None
