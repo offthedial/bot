@@ -2,6 +2,7 @@
 import inspect
 import pkgutil
 import sys
+import utils
 
 from discord.ext import commands
 
@@ -63,9 +64,7 @@ def process_commands(data, parent):
 
         # If no "main" function was provided, skip
         if not func:
-            print(
-                f"Cannot register command '{name}': Missing `main`"
-            )  # TODO: Use warning log
+            print(f"Cannot register command '{name}': Missing `main`")  # TODO: Use warning log
             continue
 
         # If subcommands were found, create a command group
@@ -82,9 +81,12 @@ def process_commands(data, parent):
 
 
 def derive_command(func):
-    """Workaround odd scope behavior."""
+    """Wrap command in another function to parse arguments and exceptions."""
 
     async def _(ctx, *, content=None):
-        await func(ctx, content)
+        try:
+            await func(ctx, content)
+        except utils.exc.CommandCancel:
+            return
 
     return _

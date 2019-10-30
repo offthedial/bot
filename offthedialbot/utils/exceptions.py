@@ -1,0 +1,2 @@
+class CommandCancel(Exception):
+    pass
