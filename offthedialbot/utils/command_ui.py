@@ -42,6 +42,9 @@ class CommandUI:
     async def get_reply(self, event: str = 'message', *, timeout: int = 120, valids: list = None):
         """Get the reply from the user."""
 
+        # First update embed
+        await self.update()
+
         # Add valid reactions if valids are specified
         for react in (valids if valids else []):
             await self.ctx.ui.add_reaction(react)
