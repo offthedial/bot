@@ -13,6 +13,6 @@ async def main(ctx, content):
     ui.embed.add_field(name="ign", value=reply.content)
     await ui.update()
 
-    reply = await ui.get_reply('reaction_add', valids={"\U0001f69b", "\u2702"})
+    reply = await ui.get_reply('reaction_add', valids=["\U0001f69b", "\u2702"])
     ui.embed.add_field(name="reaction", value=reply[0].emoji)
     await ui.update()

@@ -39,11 +39,11 @@ class CommandUI:
         # Raise exception to cancel command
         raise utils.exc.CommandCancel
 
-    async def get_reply(self, event: str = 'message', *, timeout: int = 120, valids: set = None):
+    async def get_reply(self, event: str = 'message', *, timeout: int = 120, valids: list = None):
         """Get the reply from the user."""
 
         # Add valid reactions if valids are specified
-        for react in (valids if valids else set()):
+        for react in (valids if valids else []):
             await self.ctx.ui.add_reaction(react)
 
         # Key that determines which check to use for the event
