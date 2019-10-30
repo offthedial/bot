@@ -10,14 +10,15 @@ class CommandUI:
 
     def __init__(self, ctx, embed):
         """Initilize command UI and declare self variables."""
+        self.ctx = ctx
+        self.embed = embed
         self.reply_task = None
+        self.error = None
 
     async def __new__(cls, ctx, embed):
         """Use async to create embed and passive task on class creation."""
         self = super().__new__(cls)
-
-        self.ctx = ctx
-        self.embed = embed
+        self.__init__(ctx, embed)
 
         ctx.ui = await self.create_ui(ctx, embed)
         return self
@@ -38,6 +39,7 @@ class CommandUI:
         key = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED}
         await self.ctx.ui.edit(embed=key[status])
         await self.ctx.ui.clear_reactions()
+        await self.delete_error()
 
         # Raise exception to cancel command
         raise utils.exc.CommandCancel
@@ -46,11 +48,11 @@ class CommandUI:
         """Get message reply with validity checks."""
         # Check if it's the function's first run
         if _error_params is None:  # Initilize error params
-            _error_params = {"new": False, "error": None, "embed": error_embed}
+            _error_params = {"embed": error_embed, "new": False}
         else:
             await self.update()
 
-        _error_params["error"] = await self.delete_error(**_error_params)
+        await self.delete_error(**_error_params)
 
         # Get message and check if it's valid
         reply = await self.get_reply('message')
@@ -109,13 +111,12 @@ class CommandUI:
 
         return reply
 
-    async def delete_error(self, error, embed=None, new=False):
+    async def delete_error(self, embed=None, new=False):
         """Delete the error and create a new one if specified."""
-        if error:  # Delete the error, if it exists
-            await error.delete()
-            error = None
-        if new: error = await self.ctx.send(embed=embed)
-        return error
+        if self.error:  # Delete the error, if it exists
+            await self.error.delete()
+            self.error = None
+        if new: self.error = await self.ctx.send(embed=embed)
 
     @staticmethod
     async def wait_tasks(tasks: set):
