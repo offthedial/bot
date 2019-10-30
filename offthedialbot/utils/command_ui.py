@@ -36,20 +36,29 @@ class CommandUI:
         await self.ctx.ui.edit(embed=key[status])
         await self.ctx.ui.clear_reactions()
 
-    async def get_reply(self, event: str = 'message', *, timeout: int = 120, valids: list = None):
+        # Raise exception to cancel command
+        raise utils.exc.CommandCancel
+
+    async def get_reply(self, event: str = 'message', *, timeout: int = 120, valids: set = None):
         """Get the reply from the user."""
 
         # Add valid reactions if valids are specified
-        for react in (valids if valids else []):
+        for react in (valids if valids else set()):
             await self.ctx.ui.add_reaction(react)
 
         # Key that determines which check to use for the event
-        check = {
-            'message': lambda m: utils.checks.msg(m, self.ctx),
-            'reaction_add': lambda r, u: utils.checks.react((r, u), self.ctx, valids=valids)
+        key = {
+            'message': {
+                "check": lambda m: utils.checks.msg(m, self.ctx),
+                "delete": lambda r: r.delete()
+            },
+            'reaction_add': {
+                "check": lambda r, u: utils.checks.react((r, u), self.ctx, valids=valids),
+                "delete": lambda r: self.ctx.ui.remove_reaction(r[0].emoji, r[1])
+            }
         }
         # Create Tasks
-        reply_task = asyncio.create_task(self.ctx.bot.wait_for(event, check=check[event]))
+        reply_task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]))
         cancel_task = asyncio.create_task(
             self.ctx.bot.wait_for('reaction_add', check=lambda r, u: utils.checks.react((r, u), self.ctx, valids='❌'))
         )
@@ -64,13 +73,12 @@ class CommandUI:
         else:
             reply = wait_result[0]
 
-            # Once tasks are waited
-            if event == 'message':
-                await reply.delete()
+            # Delete reply
+            await key[event]["delete"](reply)
 
             # Remove valid reactions if valids are specified
             for react in (valids if valids else []):
-                await self.ctx.ui.remove_reaction(react)
+                await self.ctx.ui.remove_reaction(react, self.ctx.me)
 
         return reply
 
