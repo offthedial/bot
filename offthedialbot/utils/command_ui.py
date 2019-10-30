@@ -41,13 +41,14 @@ class CommandUI:
         raise utils.exc.CommandCancel
 
     async def get_reply(self, event: str = 'message', *, timeout: int = 120, valids: list = None):
+    async def get_reply(self, event: str = 'message', *, timeout: int = 120, valid_reactions: list = None):
         """Get the reply from the user."""
 
         # First update embed
         await self.update()
 
         # Add valid reactions if valids are specified
-        for react in (valids if valids else []):
+        for react in (valid_reactions if valid_reactions else []):
             await self.ctx.ui.add_reaction(react)
 
         # Key that determines which check to use for the event
@@ -57,7 +58,7 @@ class CommandUI:
                 "delete": lambda r: r.delete()
             },
             'reaction_add': {
-                "check": lambda r, u: utils.checks.react((r, u), self.ctx, valids=valids),
+                "check": lambda r, u: utils.checks.react((r, u), self.ctx, valids=valid_reactions),
                 "delete": lambda r: self.ctx.ui.remove_reaction(r[0].emoji, r[1])
             }
         }
@@ -81,7 +82,7 @@ class CommandUI:
             await key[event]["delete"](reply)
 
             # Remove valid reactions if valids are specified
-            for react in (valids if valids else []):
+            for react in (valid_reactions if valid_reactions else []):
                 await self.ctx.ui.remove_reaction(react, self.ctx.me)
 
         return reply
