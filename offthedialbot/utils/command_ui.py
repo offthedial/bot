@@ -43,6 +43,26 @@ class CommandUI:
         raise utils.exc.CommandCancel
 
     async def get_valid_message(self, r: str, error_embed=None, *, _error_params=None):
+        """Get message reply with validity checks."""
+        # Check if it's the function's first run
+        if _error_params is None:  # Initilize error params
+            _error_params = {"new": False, "error": None, "embed": error_embed}
+        else:
+            await self.update()
+
+        _error_params["error"] = await self.delete_error(**_error_params)
+
+        # Get message and check if it's valid
+        reply = await self.get_reply('message')
+        if re.search(r, reply.content):
+            _error_params["new"] = False
+            await self.delete_error(**_error_params)
+        else:
+            _error_params["new"] = True
+            reply = await self.get_valid_message(r=r, _error_params=_error_params)
+
+        return reply
+
     async def get_reply(self, event: str = 'message', *, timeout: int = 120, valid_reactions: list = None):
         """Get the reply from the user."""
         await self.update()  # First update embed
@@ -88,6 +108,14 @@ class CommandUI:
                 await self.ctx.ui.remove_reaction(react, self.ctx.me)
 
         return reply
+
+    async def delete_error(self, error, embed=None, new=False):
+        """Delete the error and create a new one if specified."""
+        if error:  # Delete the error, if it exists
+            await error.delete()
+            error = None
+        if new: error = await self.ctx.send(embed=embed)
+        return error
 
     @staticmethod
     async def wait_tasks(tasks: set):

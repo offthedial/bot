@@ -12,7 +12,12 @@ async def main(ctx, content):
     ui = await utils.CommandUI(ctx, embed)
 
     # wait for ign
-    reply = await ui.get_reply()
+    embed = discord.Embed(
+        title="Error: **Invalid IGN**",
+        description="Your string must be `1` to `10` characters",
+        color=utils.colors.ALERT
+    )
+    reply = await ui.get_valid_message(r"^.{1,10}$", error_embed=embed)
     ui.embed.add_field(name="ign", value=reply.content)
 
     # wait for reaction
