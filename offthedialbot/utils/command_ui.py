@@ -120,6 +120,7 @@ class CommandUI:
     @staticmethod
     async def wait_tasks(tasks: set):
         """Try statement to asyncio.wait a set of tasks, and return the first completed."""
+        pending = {}
         try:
             done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
 
@@ -130,11 +131,12 @@ class CommandUI:
 
         # If task completes
         else:
+            task = done.pop()
+            reply = task.result()
+
+        finally:
             # Cancel pending tasks
             for rest in pending:
                 rest.cancel()
-
-            task = done.pop()
-            reply = task.result()
 
         return reply, task
