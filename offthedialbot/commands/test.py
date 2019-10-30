@@ -1,7 +1,6 @@
 """Contains code for $test."""
 
 import discord
-
 from offthedialbot import utils
 
 
@@ -12,10 +11,8 @@ async def main(ctx, content):
     ui = await utils.CommandUI(ctx, embed)
 
     # wait for ign
-    embed = discord.Embed(
-        title="Error: **Invalid IGN**",
-        description="Your string must be `1` to `10` characters",
-        color=utils.colors.ALERT
+    embed = utils.embeds.create_error_embed(
+        error="Invalid IGN", description="**Please type your __IGN__** `(in-game name)`"
     )
     reply = await ui.get_valid_message(r"^.{1,10}$", error_embed=embed)
     ui.embed.add_field(name="ign", value=reply.content)
