@@ -12,6 +12,13 @@ async def main(ctx, content):
     reply = await ui.get_reply()
     ui.embed.add_field(name="ign", value=reply.content)
 
+    # wait for reaction
     reply = await ui.get_reply('reaction_add', valids=["\U0001f69b", "\u2702"])
     ui.embed.add_field(name="reaction", value=reply[0].emoji)
 
+    # confirm happy
+    ui.embed.add_field(name="Is this good?", value="Hit that '\u2705' to say so.", inline=False)
+    reply = await ui.get_reply('reaction_add', valids=['\u2705'])
+
+    # End
+    await ui.end(status=True)
