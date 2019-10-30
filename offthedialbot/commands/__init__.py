@@ -2,9 +2,10 @@
 import inspect
 import pkgutil
 import sys
-import utils
 
 from discord.ext import commands
+
+import utils
 
 
 def register_commands(bot):

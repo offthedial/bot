@@ -1,7 +1,9 @@
 """Holds api for working with a custom command ui."""
 
-import utils
 import asyncio
+import re
+
+import utils
 
 
 class CommandUI:
@@ -40,12 +42,10 @@ class CommandUI:
         # Raise exception to cancel command
         raise utils.exc.CommandCancel
 
-    async def get_reply(self, event: str = 'message', *, timeout: int = 120, valids: list = None):
+    async def get_valid_message(self, r: str, error_embed=None, *, _error_params=None):
     async def get_reply(self, event: str = 'message', *, timeout: int = 120, valid_reactions: list = None):
         """Get the reply from the user."""
-
-        # First update embed
-        await self.update()
+        await self.update()  # First update embed
 
         # Add valid reactions if valids are specified
         for react in (valid_reactions if valid_reactions else []):
@@ -65,7 +65,9 @@ class CommandUI:
         # Create Tasks
         reply_task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]))
         cancel_task = asyncio.create_task(
-            self.ctx.bot.wait_for('reaction_add', check=lambda r, u: utils.checks.react((r, u), self.ctx, valids='❌'))
+            self.ctx.bot.wait_for(
+                'reaction_add', check=lambda r, u: utils.checks.react((r, u), self.ctx, valids='❌'), timeout=timeout
+            )
         )
         # asyncio.wait the set of tasks
         wait_result = await self.wait_tasks({reply_task, cancel_task})
