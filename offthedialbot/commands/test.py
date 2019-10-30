@@ -1,3 +1,5 @@
+"""Contains code for $test."""
+
 import discord
 from offthedialbot import utils
 

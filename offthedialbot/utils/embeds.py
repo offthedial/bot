@@ -1,3 +1,5 @@
+"""Holds the static embeds used."""
+
 import discord
 import utils
 
