@@ -45,7 +45,7 @@ class CommandUI:
         # Raise exception to cancel command
         raise utils.exc.CommandCancel
 
-    async def get_valid_message(self, r: str, error_embed=None, *, _error_params=None):
+    async def get_valid_message(self, valid, error_embed=None, *, _error_params=None):
         """Get message reply with validity checks."""
         # Check if it's the function's first run
         if _error_params is None:  # Initilize error params
@@ -57,12 +57,12 @@ class CommandUI:
 
         # Get message and check if it's valid
         reply = await self.get_reply('message')
-        if re.search(r, reply.content):
+        if self.check_valid(valid, reply.content):
             _error_params["new"] = False
             await self.delete_error(**_error_params)
         else:
             _error_params["new"] = True
-            reply = await self.get_valid_message(r=r, _error_params=_error_params)
+            reply = await self.get_valid_message(valid=valid, _error_params=_error_params)
 
         return reply
 
@@ -118,6 +118,17 @@ class CommandUI:
             await self.error.delete()
             self.error = None
         if new: self.error = await self.ctx.send(embed=embed)
+
+    @staticmethod
+    def check_valid(valid, reply):
+        """Check if a user's reply is valid."""
+        if isinstance(valid, str):
+            return re.search(valid, reply)
+        else:
+            try:
+                return valid(reply)
+            except ValueError:
+                return False
 
     @staticmethod
     async def wait_tasks(tasks: set):
