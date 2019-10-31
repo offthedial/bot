@@ -7,6 +7,7 @@ import utils
 
 
 class CommandUI:
+    """Class containing the command UI used in each command."""
 
     def __init__(self, ctx, embed):
         """Initilize command UI and declare self variables."""

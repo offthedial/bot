@@ -5,6 +5,7 @@ from offthedialbot import utils
 
 
 async def main(ctx, content):
+    """$test command."""
 
     # create embed
     embed = discord.Embed(title=content, description="`IGN:`")
