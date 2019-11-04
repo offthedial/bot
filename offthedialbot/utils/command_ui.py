@@ -66,7 +66,7 @@ class CommandUI:
 
         return reply
 
-    async def get_reply(self, event: str = 'message', *, timeout: int = 120, valid_reactions: list = None):
+    async def get_reply(self, event: str = 'message', *, valid_reactions: list = None):
         """Get the reply from the user."""
         await self.update()  # First update embed
 
@@ -89,7 +89,7 @@ class CommandUI:
         reply_task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]))
         cancel_task = asyncio.create_task(
             self.ctx.bot.wait_for(
-                'reaction_add', check=lambda r, u: utils.checks.react((r, u), self.ctx, valids='❌'), timeout=timeout
+                'reaction_add', check=lambda r, u: utils.checks.react((r, u), self.ctx, valids='❌'), timeout=120
             )
         )
         # asyncio.wait the set of tasks
