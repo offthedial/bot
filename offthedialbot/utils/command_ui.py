@@ -96,7 +96,7 @@ class CommandUI:
         wait_result = await self.wait_tasks({reply_task, cancel_task})
 
         # Get result
-        if wait_result[1] == cancel_task:
+        if wait_result[1] in (cancel_task,q` None):
             await self.end(status=False)
             reply = False
 
@@ -133,19 +133,17 @@ class CommandUI:
     @staticmethod
     async def wait_tasks(tasks: set):
         """Try statement to asyncio.wait a set of tasks, and return the first completed."""
-        pending = {}
+        done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+
+        # Attempt to get result
         try:
-            done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+            task = done.pop()
+            reply = task.result()
 
         # If timeout occurs
         except asyncio.TimeoutError:
             task = None
             reply = None
-
-        # If task completes
-        else:
-            task = done.pop()
-            reply = task.result()
 
         finally:
             # Cancel pending tasks
