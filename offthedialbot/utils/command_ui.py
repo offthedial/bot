@@ -134,15 +134,14 @@ class CommandUI:
     async def wait_tasks(tasks: set):
         """Try block to asyncio.wait a set of tasks with timeout handling, and return the first completed."""
         done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+        task = done.pop()
 
         # Attempt to get result
         try:
-            task = done.pop()
             reply = task.result()
 
         # If timeout occurred
         except asyncio.TimeoutError:
-            task = None
             reply = None
 
         finally:
