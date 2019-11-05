@@ -132,7 +132,7 @@ class CommandUI:
 
     @staticmethod
     async def wait_tasks(tasks: set):
-        """Try statement to asyncio.wait a set of tasks, and return the first completed."""
+        """Try block to asyncio.wait a set of tasks with timeout handling, and return the first completed."""
         done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
 
         # Attempt to get result
