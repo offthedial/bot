@@ -150,4 +150,4 @@ class CommandUI:
             for rest in pending:
                 rest.cancel()
 
-        return reply, task
+        return {"reply": reply, "task": task}
