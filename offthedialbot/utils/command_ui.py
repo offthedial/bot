@@ -140,7 +140,7 @@ class CommandUI:
             task = done.pop()
             reply = task.result()
 
-        # If timeout occurs
+        # If timeout occurred
         except asyncio.TimeoutError:
             task = None
             reply = None
