@@ -96,12 +96,12 @@ class CommandUI:
         wait_result = await self.wait_tasks({reply_task, cancel_task})
 
         # Get result
-        if wait_result[1] in (cancel_task, None):
+        if wait_result["task"] != reply_task:
             await self.end(status=False)
             reply = False
 
         else:
-            reply = wait_result[0]
+            reply = wait_result["reply"]
 
             # Delete reply
             await key[event]["delete"](reply)
