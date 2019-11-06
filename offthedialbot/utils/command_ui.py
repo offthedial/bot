@@ -136,17 +136,14 @@ class CommandUI:
         done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
         task = done.pop()
 
-        # Attempt to get result
+        # Get reply
         try:
             reply = task.result()
-
-        # If timeout occurred
         except asyncio.TimeoutError:
             reply = None
 
-        finally:
-            # Cancel pending tasks
-            for rest in pending:
-                rest.cancel()
+        # Cancel the other still pending tasks
+        for rest in pending:
+            rest.cancel()
 
         return {"reply": reply, "task": task}
