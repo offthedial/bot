@@ -98,19 +98,14 @@ class CommandUI:
         # Get result
         if wait_result["task"] != reply_task:
             await self.end(status=False)
-            reply = False
-
         else:
-            reply = wait_result["reply"]
-
-            # Delete reply
-            await key[event]["delete"](reply)
+            await key[event]["delete"](wait_result["reply"])
 
             # Remove valid reactions if valids are specified
             for react in (valid_reactions if valid_reactions else []):
                 await self.ctx.ui.remove_reaction(react, self.ctx.me)
 
-        return reply
+        return wait_result["reply"]
 
     async def delete_error(self, embed=None, new=False):
         """Delete the error and create a new one if specified."""
