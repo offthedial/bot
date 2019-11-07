@@ -7,13 +7,13 @@ class DatabaseHandler:
 
     empty_profile = {
         "status": {
-            "ign": None,
-            "sw": None,
-            "rank": {
-                "cb": None,
-                "rm": None,
-                "sz": None,
-                "tc": None
+            "IGN": None,
+            "SW": None,
+            "Ranks": {
+                "Splat Zones": None,
+                "Rainmaker": None,
+                "Tower Control": None,
+                "Clam Blitz": None,
             },
         },
         "meta": {
