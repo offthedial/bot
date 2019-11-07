@@ -4,9 +4,9 @@ import os
 
 
 def main():
+    """Run Off the Dial Bot."""
     load_dotenv()
-    token = os.getenv("TOKEN")
-    client.run(token)
+    client.run(os.getenv("TOKEN"))
 
 
 if __name__ == '__main__':
