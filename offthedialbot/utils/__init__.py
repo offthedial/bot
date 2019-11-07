@@ -5,3 +5,6 @@ from . import colors
 from . import embeds
 from . import exceptions as exc
 from .command_ui import CommandUI
+
+from .db import DatabaseHandler
+dbh = DatabaseHandler()
