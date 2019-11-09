@@ -39,8 +39,8 @@ class CommandUI:
 
     async def end(self, status):
         """End UI interaction and display status."""
-        key = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED, None: None}
-        await self.ctx.ui.edit(embed=key[status])
+        status_key = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED, None: None}
+        await self.ctx.ui.edit(embed=status_key[status])
         await self.ctx.ui.clear_reactions()
         await self.create_alert(create_new=False)
 
