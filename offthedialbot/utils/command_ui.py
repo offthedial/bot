@@ -16,7 +16,7 @@ class CommandUI:
         self.ctx = ctx
         self.embed = embed
         self.reply_task = None
-        self.error = None
+        self.alert = None
 
     async def __new__(cls, ctx, embed):
         """Use async to create embed and passive task on class creation."""
@@ -122,13 +122,13 @@ class CommandUI:
                 utils.colors.WARN: lambda t: f'\u26a0 Warning: **{t}**'
             }
             embed = Embed(title=title_key[color](title), description=description, color=color)
-            self.error = await self.ctx.send(embed=embed)
+            self.alert = await self.ctx.send(embed=embed)
 
     async def delete_alert(self):
         """Delete an alert, ensures message is removed once deleted, and that message exists."""
-        if self.error:
-            await self.error.delete()
-            self.error = None
+        if self.alert:
+            await self.alert.delete()
+            self.alert = None
 
     @staticmethod
     def check_valid(valid, reply):
