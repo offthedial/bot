@@ -3,6 +3,8 @@
 import asyncio
 import re
 
+from discord import Embed
+
 import utils
 
 
@@ -40,28 +42,28 @@ class CommandUI:
         key = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED, None: None}
         await self.ctx.ui.edit(embed=key[status])
         await self.ctx.ui.clear_reactions()
-        await self.delete_error()
+        await self.create_alert(create_new=False)
 
         # Raise exception to cancel command
         raise utils.exc.CommandCancel
 
-    async def get_valid_message(self, valid, error_embed=None, *, _error_params=None):
+    async def get_valid_message(self, valid, error_fields: dict = None, *, _error_params=None):
         """Get message reply with validity checks."""
         # Check if it's the function's first run
         if _error_params is None:  # Initilize error params
-            _error_params = {"embed": error_embed, "new": False}
+            _error_params = {**error_fields, "create_new": False}
         else:
             await self.update()
 
-        await self.delete_error(**_error_params)
+        await self.create_alert(utils.colors.ALERT, **_error_params)
 
         # Get message and check if it's valid
         reply = await self.get_reply('message')
         if self.check_valid(valid, reply.content):
-            _error_params["new"] = False
-            await self.delete_error(**_error_params)
+            _error_params["create_new"] = False
+            await self.create_alert(utils.colors.ALERT, **_error_params)
         else:
-            _error_params["new"] = True
+            _error_params["create_new"] = True
             reply = await self.get_valid_message(valid=valid, _error_params=_error_params)
 
         return reply
@@ -107,12 +109,26 @@ class CommandUI:
 
         return wait_result["reply"]
 
-    async def delete_error(self, embed=None, new=False):
-        """Delete the error and create a new one if specified."""
-        if self.error:  # Delete the error, if it exists
+    async def create_alert(
+        self, color: utils.colors = None, title: str = None, description: str = None, *, replace=True, create_new=True
+    ):
+        """Create an alert with a given color to determine the style."""
+        if replace:
+            await self.delete_alert()
+
+        if create_new:
+            title_key = {
+                utils.colors.ALERT: lambda t: f'\U0001f6ab Error: **{t}**',
+                utils.colors.WARN: lambda t: f'\u26a0 Warning: **{t}**'
+            }
+            embed = Embed(title=title_key[color](title), description=description, color=color)
+            self.error = await self.ctx.send(embed=embed)
+
+    async def delete_alert(self):
+        """Delete an alert, ensures message is removed once deleted, and that message exists."""
+        if self.error:
             await self.error.delete()
             self.error = None
-        if new: self.error = await self.ctx.send(embed=embed)
 
     @staticmethod
     def check_valid(valid, reply):

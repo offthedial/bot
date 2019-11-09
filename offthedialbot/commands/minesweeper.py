@@ -15,7 +15,7 @@ async def main(ctx, content):
     )
     ui = await utils.CommandUI(ctx, embed)
 
-    # Keys used by the for loop to avoid repeated code by holding the unique data.
+    # Keys used by the for loop to hold the unique data per loop.
     keys = [
         {
             "type": "Size",
@@ -33,7 +33,10 @@ async def main(ctx, content):
     for key in keys:
         embed.description = key["desc"]
         key["out"] = await ui.get_valid_message(
-            valid=key["valid"], error_embed=utils.embeds.create_error_embed(f"Invalid {key['type']}", key["desc"])
+            valid=key["valid"], error_fields={
+                "title": f"Invalid {key['type']}",
+                "description": key["desc"]
+            }
         )
     # Create minesweeper
     mines = Map(int(keys[0]["out"].content), int(keys[1]["out"].content))
