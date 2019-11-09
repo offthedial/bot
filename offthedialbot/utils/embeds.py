@@ -6,9 +6,3 @@ import utils
 
 SUCCESS = discord.Embed(title="Success!", color=utils.colors.GOOD)
 CANCELED = discord.Embed(title="Canceled.", color=utils.colors.ALERT)
-
-
-def create_error_embed(error: str, description: str):
-    """Create an error embed to display when reply is invalid."""
-    embed = discord.Embed(title=f"\U0001f6ab Error: **{error}**", description=description, color=utils.colors.ALERT)
-    return embed
