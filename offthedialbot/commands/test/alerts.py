@@ -5,7 +5,7 @@ import discord
 async def main(ctx, arg):
     """Test command to test each of the alerts."""
     embed = discord.Embed(title="Testing: Alerts")
-    ui = utils.CommandUI(ctx, embed)
+    ui = await utils.CommandUI(ctx, embed)
 
     alert_styles = (utils.AlertStyle.DANGER, utils.AlertStyle.WARNING, utils.AlertStyle.INFO, utils.AlertStyle.SUCCESS)
 

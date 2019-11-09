@@ -37,12 +37,12 @@ class CommandUI:
         """Update the ui with new information."""
         await self.ctx.ui.edit(embed=self.embed)
 
-    async def end(self, status):
+    async def end(self, status, keep_alert=False):
         """End UI interaction and display status."""
         status_key = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED, None: None}
         await self.ctx.ui.edit(embed=status_key[status])
         await self.ctx.ui.clear_reactions()
-        await self.create_alert(create_new=False)
+        await self.create_alert(create_new=False, replace=not keep_alert)
 
         # Raise exception to cancel command
         raise utils.exc.CommandCancel
@@ -121,6 +121,7 @@ class CommandUI:
                 utils.AlertStyle.DANGER: lambda t: f'\U0001f6ab Error: **{t}**',
                 utils.AlertStyle.WARNING: lambda t: f'\u26a0 Warning: **{t}**',
                 utils.AlertStyle.INFO: lambda t: f'\u2139 Info: **{t}**',
+                utils.AlertStyle.SUCCESS: lambda t: f'\u2705 Success: **{t}**',
             }
             embed = Embed(title=title_key[color](title), description=description, color=color)
             self.alert = await self.ctx.send(embed=embed)
