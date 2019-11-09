@@ -119,7 +119,8 @@ class CommandUI:
         if create_new:
             title_key = {
                 utils.AlertStyle.DANGER: lambda t: f'\U0001f6ab Error: **{t}**',
-                utils.AlertStyle.WARNING: lambda t: f'\u26a0 Warning: **{t}**'
+                utils.AlertStyle.WARNING: lambda t: f'\u26a0 Warning: **{t}**',
+                utils.AlertStyle.INFO: lambda t: f'\u2139 Info: **{t}**',
             }
             embed = Embed(title=title_key[color](title), description=description, color=color)
             self.alert = await self.ctx.send(embed=embed)
