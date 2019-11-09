@@ -47,24 +47,24 @@ class CommandUI:
         # Raise exception to cancel command
         raise utils.exc.CommandCancel
 
-    async def get_valid_message(self, valid, error_fields: dict = None, *, _error_params=None):
+    async def get_valid_message(self, valid, error_fields: dict = None, *, _alert_params=None):
         """Get message reply with validity checks."""
         # Check if it's the function's first run
-        if _error_params is None:  # Initilize error params
-            _error_params = {**error_fields, "create_new": False}
+        if _alert_params is None:  # Initilize error params
+            _alert_params = {**error_fields, "create_new": False}
         else:
             await self.update()
 
-        await self.create_alert(utils.colors.ALERT, **_error_params)
+        await self.create_alert(utils.AlertStyle.DANGER, **_alert_params)
 
         # Get message and check if it's valid
         reply = await self.get_reply('message')
         if self.check_valid(valid, reply.content):
-            _error_params["create_new"] = False
-            await self.create_alert(utils.colors.ALERT, **_error_params)
+            _alert_params["create_new"] = False
+            await self.create_alert(utils.AlertStyle.DANGER, **_alert_params)
         else:
-            _error_params["create_new"] = True
-            reply = await self.get_valid_message(valid=valid, _error_params=_error_params)
+            _alert_params["create_new"] = True
+            reply = await self.get_valid_message(valid=valid, _alert_params=_alert_params)
 
         return reply
 
@@ -110,7 +110,7 @@ class CommandUI:
         return wait_result["reply"]
 
     async def create_alert(
-        self, color: utils.colors = None, title: str = None, description: str = None, *, replace=True, create_new=True
+        self, color: utils.AlertStyle = None, title: str = None, description: str = None, replace=True, create_new=True
     ):
         """Create an alert with a given color to determine the style."""
         if replace:
@@ -118,8 +118,8 @@ class CommandUI:
 
         if create_new:
             title_key = {
-                utils.colors.ALERT: lambda t: f'\U0001f6ab Error: **{t}**',
-                utils.colors.WARN: lambda t: f'\u26a0 Warning: **{t}**'
+                utils.AlertStyle.DANGER: lambda t: f'\U0001f6ab Error: **{t}**',
+                utils.AlertStyle.WARNING: lambda t: f'\u26a0 Warning: **{t}**'
             }
             embed = Embed(title=title_key[color](title), description=description, color=color)
             self.alert = await self.ctx.send(embed=embed)
