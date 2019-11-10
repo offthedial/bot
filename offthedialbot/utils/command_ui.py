@@ -80,7 +80,7 @@ class CommandUI:
                 "delete": lambda r: r.delete()
             },
             'reaction_add': {
-                "check": lambda r, u: utils.checks.react((r, u), self.ctx, valids=valid_reactions),
+                "check": lambda r, u: utils.checks.react((r, u), self.ctx, self.ui, valids=valid_reactions),
                 "delete": lambda r: self.ui.remove_reaction(r[0].emoji, r[1])
             }
         }
@@ -88,7 +88,9 @@ class CommandUI:
         reply_task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]))
         cancel_task = asyncio.create_task(
             self.ctx.bot.wait_for(
-                'reaction_add', check=lambda r, u: utils.checks.react((r, u), self.ctx, valids='❌'), timeout=120
+                'reaction_add',
+                check=lambda r, u: utils.checks.react((r, u), self.ctx, self.ui, valids='❌'),
+                timeout=120
             )
         )
         # asyncio.wait the set of tasks
