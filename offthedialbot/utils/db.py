@@ -34,18 +34,6 @@ class DatabaseHandler:
         # Collections
         self.profiles = self.db["profiles"]
 
-    def create_mock_data(self):
-        """Create mock data to test on."""
-        profile = self.empty_profile.copy()
-        profile["status"]["IGN"] = "LeptoSpira"
-        profile["status"]["SW"] = 123412341342
-        profile["status"]["Ranks"]["Clam Blitz"] = "S"
-        profile["status"]["Ranks"]["Splat Zones"] = "S"
-        profile["status"]["Ranks"]["Rainmaker"] = "S"
-        profile["status"]["Ranks"]["Tower Control"] = "S"
-        profile["_id"] = 571494333090496514
-        return self.profiles.insert_one(profile)
-
     def find_profile(self, id):
         """Find a document in the profiles collection by id."""
         return self.profiles.find_one({"_id": id})
