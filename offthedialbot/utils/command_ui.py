@@ -23,7 +23,7 @@ class CommandUI:
         self = super().__new__(cls)
         self.__init__(ctx, embed)
 
-        ctx.ui = await self.create_ui(ctx, embed)
+        self.ui = await self.create_ui(ctx, embed)
         return self
 
     @staticmethod
@@ -35,13 +35,13 @@ class CommandUI:
 
     async def update(self):
         """Update the ui with new information."""
-        await self.ctx.ui.edit(embed=self.embed)
+        await self.ui.edit(embed=self.embed)
 
     async def end(self, status):
         """End UI interaction and display status."""
         status_key = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED, None: None}
-        await self.ctx.ui.edit(embed=status_key[status])
-        await self.ctx.ui.clear_reactions()
+        await self.ui.edit(embed=status_key[status])
+        await self.ui.clear_reactions()
         await self.delete_alert()
 
         # Raise exception to cancel command
@@ -71,7 +71,7 @@ class CommandUI:
 
         # Add valid reactions if valids are specified
         for react in (valid_reactions if valid_reactions else []):
-            await self.ctx.ui.add_reaction(react)
+            await self.ui.add_reaction(react)
 
         # Key that determines which check to use for the event
         key = {
@@ -81,7 +81,7 @@ class CommandUI:
             },
             'reaction_add': {
                 "check": lambda r, u: utils.checks.react((r, u), self.ctx, valids=valid_reactions),
-                "delete": lambda r: self.ctx.ui.remove_reaction(r[0].emoji, r[1])
+                "delete": lambda r: self.ui.remove_reaction(r[0].emoji, r[1])
             }
         }
         # Create Tasks
@@ -102,7 +102,7 @@ class CommandUI:
 
             # Remove valid reactions if valids are specified
             for react in (valid_reactions if valid_reactions else []):
-                await self.ctx.ui.remove_reaction(react, self.ctx.me)
+                await self.ui.remove_reaction(react, self.ctx.me)
 
         return wait_result["reply"]
 
