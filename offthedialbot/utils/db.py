@@ -16,8 +16,14 @@ class DatabaseHandler:
                 "Clam Blitz": None,
             },
         },
+        "style_points": [0, 0, 0],  # Groups A, B, and C.
+        "competitive_exp": 0,
         "meta": {
             "competing": False,
+        },
+        "elo": {
+            "base": 1000,
+            "tournament_exp": 0,
         }
     }
 
@@ -31,17 +37,25 @@ class DatabaseHandler:
     def create_mock_data(self):
         """Create mock data to test on."""
         profile = self.empty_profile.copy()
-        profile["ign"] = "LeptoSpira"
-        profile["sw"] = 123412341342
-        profile["cb"] = "S"
+        profile["status"]["IGN"] = "LeptoSpira"
+        profile["status"]["SW"] = 123412341342
+        profile["status"]["Ranks"]["Clam Blitz"] = "S"
+        profile["status"]["Ranks"]["Splat Zones"] = "S"
+        profile["status"]["Ranks"]["Rainmaker"] = "S"
+        profile["status"]["Ranks"]["Tower Control"] = "S"
         profile["_id"] = 571494333090496514
         return self.profiles.insert_one(profile)
 
-    def find_profile(self, *, id):
+    def find_profile(self, id):
         """Find a document in the profiles collection by id."""
         return self.profiles.find_one({"_id": id})
 
-    def new_profile(self, *, profile, id):
+    def new_profile(self, profile, id):
         """Insert a new profile into the profiles collection with id."""
         profile["_id"] = id
         return self.profiles.insert_one(profile)
+
+    def edit_profile(self, profile, id):
+        """Update an existing profile in the profiles collection by id."""
+        profile["_id"] = id
+        return self.profiles.update_one(profile)
