@@ -109,21 +109,13 @@ class CommandUI:
 
         return wait_result["reply"]
 
-    async def create_alert(
-        self, color: utils.AlertStyle = None, title: str = None, description: str = None, replace=True, create_new=True
-    ):
+    async def create_alert(self, style: utils.AlertStyle, title: str, description: str, replace=True, create_new=True):
         """Create an alert with a given color to determine the style."""
         if replace:
             await self.delete_alert()
 
         if create_new:
-            title_key = {
-                utils.AlertStyle.DANGER: lambda t: f'\U0001f6ab Error: **{t}**',
-                utils.AlertStyle.WARNING: lambda t: f'\u26a0 Warning: **{t}**',
-                utils.AlertStyle.INFO: lambda t: f'\u2139 Info: **{t}**',
-                utils.AlertStyle.SUCCESS: lambda t: f'\u2705 Success: **{t}**',
-            }
-            embed = Embed(title=title_key[color](title), description=description, color=color)
+            embed = utils.embeds.alert(style, title, description)
             self.alert = await self.ctx.send(embed=embed)
 
     async def delete_alert(self):
