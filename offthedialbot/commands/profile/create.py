@@ -8,7 +8,7 @@ async def main(ctx, arg):
     """This is all a test."""
     if utils.dbh.find_profile(id=ctx.author.id):  # If profile already exists
         alert = utils.embeds.alert(
-            utils.AlertStyle.DANGER, "Profile already exists", "Your profile already exists you dumb fuck"
+            utils.AlertStyle.DANGER, "Existing profile found.", "You have already created a profile!"
         )
         await ctx.send(embed=alert)
         raise utils.exc.CommandCancel
