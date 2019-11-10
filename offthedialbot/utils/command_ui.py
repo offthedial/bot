@@ -51,17 +51,17 @@ class CommandUI:
         """Get message reply with validity checks."""
         # Check if it's the function's first run
         if _alert_params is None:  # Initilize error params
-            _alert_params = {**error_fields, "create_new": False}
+            _alert_params = {**error_fields, "create_new": False, "color": utils.AlertStyle.DANGER}
         else:
             await self.update()
 
-        await self.create_alert(utils.AlertStyle.DANGER, **_alert_params)
+        await self.create_alert(**_alert_params)
 
         # Get message and check if it's valid
         reply = await self.get_reply('message')
         if self.check_valid(valid, reply.content):
             _alert_params["create_new"] = False
-            await self.create_alert(utils.AlertStyle.DANGER, **_alert_params)
+            await self.create_alert(**_alert_params)
         else:
             _alert_params["create_new"] = True
             reply = await self.get_valid_message(valid=valid, _alert_params=_alert_params)
