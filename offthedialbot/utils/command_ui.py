@@ -94,19 +94,19 @@ class CommandUI:
             )
         )
         # asyncio.wait the set of tasks
-        wait_result = await self.wait_tasks({reply_task, cancel_task})
+        task, reply = await self.wait_tasks({reply_task, cancel_task})
 
         # Get result
-        if wait_result["task"] != reply_task:
+        if task != reply_task:
             await self.end(status=False)
         else:
-            await key[event]["delete"](wait_result["reply"])
+            await key[event]["delete"](reply)
 
             # Remove valid reactions if valids are specified
             for react in (valid_reactions if valid_reactions else []):
                 await self.ui.remove_reaction(react, self.ctx.me)
 
-        return wait_result["reply"]
+        return reply
 
     async def create_alert(self, style: utils.AlertStyle, title: str, description: str):
         """Create an alert with a given color to determine the style."""
@@ -147,4 +147,4 @@ class CommandUI:
         for rest in pending:
             rest.cancel()
 
-        return {"reply": reply, "task": task}
+        return task, reply
