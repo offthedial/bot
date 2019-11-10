@@ -43,9 +43,10 @@ async def main(ctx, content):
     map_list = mines.create_mines()
 
     # Send minesweeper
-    await ctx.trigger_typing()
     for message in map_list:
         await ctx.send(message)
+        if map_list[-1] != message:  # If message is not the last one
+            await ctx.trigger_typing()
 
     # Remove embed
     await ui.end(status=None)
