@@ -37,12 +37,12 @@ class CommandUI:
         """Update the ui with new information."""
         await self.ctx.ui.edit(embed=self.embed)
 
-    async def end(self, status, keep_alert=False):
+    async def end(self, status):
         """End UI interaction and display status."""
         status_key = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED, None: None}
         await self.ctx.ui.edit(embed=status_key[status])
         await self.ctx.ui.clear_reactions()
-        await self.create_alert(create_new=False, replace=not keep_alert)
+        await self.delete_alert()
 
         # Raise exception to cancel command
         raise utils.exc.CommandCancel
@@ -51,19 +51,16 @@ class CommandUI:
         """Get message reply with validity checks."""
         # Check if it's the function's first run
         if _alert_params is None:  # Initilize error params
-            _alert_params = {**error_fields, "create_new": False, "color": utils.AlertStyle.DANGER}
+            _alert_params = {**error_fields, "style": utils.AlertStyle.DANGER}
         else:
             await self.update()
-
-        await self.create_alert(**_alert_params)
+            await self.create_alert(**_alert_params)
 
         # Get message and check if it's valid
-        reply = await self.get_reply('message')
+        reply = await self.get_reply()
         if self.check_valid(valid, reply.content):
-            _alert_params["create_new"] = False
-            await self.create_alert(**_alert_params)
+            await self.delete_alert()
         else:
-            _alert_params["create_new"] = True
             reply = await self.get_valid_message(valid=valid, _alert_params=_alert_params)
 
         return reply
@@ -109,14 +106,11 @@ class CommandUI:
 
         return wait_result["reply"]
 
-    async def create_alert(self, style: utils.AlertStyle, title: str, description: str, replace=True, create_new=True):
+    async def create_alert(self, style: utils.AlertStyle, title: str, description: str):
         """Create an alert with a given color to determine the style."""
-        if replace:
-            await self.delete_alert()
-
-        if create_new:
-            embed = utils.embeds.alert(style, title, description)
-            self.alert = await self.ctx.send(embed=embed)
+        await self.delete_alert()
+        embed = utils.embeds.alert(style, title, description)
+        self.alert = await self.ctx.send(embed=embed)
 
     async def delete_alert(self):
         """Delete an alert, ensures message is removed once deleted, and that message exists."""
