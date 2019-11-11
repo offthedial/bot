@@ -20,7 +20,7 @@ async def main(ctx, arg):
 
     ui = await utils.CommandUI(ctx, embed)
 
-    await get_user_status(ctx, ui, profile)
+    # await get_user_status(ctx, ui, profile)
     await get_user_playstyles(ctx, ui, profile)
 
     # utils.dbh.new_profile(profile, ctx.author.id)
@@ -56,11 +56,11 @@ async def get_user_playstyles(ctx, ui, profile):
     ui.embed.add_field(name="Playstyles", value="\n".join([playstyle.capitalize() for playstyle in playstyles]))
     error_fields = {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}
 
-    tasks = [
-        asyncio.create_task(ui.get_valid_message(lambda r: r.lower() in playstyles.keys(), error_fields)),
-        asyncio.create_task(ui.get_reply('reaction_add', valid_reactions='\u2705'))
+    coros = [
+        lambda: ui.get_valid_message(lambda r: r.lower() in playstyles.keys(), error_fields),
+        lambda: ui.get_reply('reaction_add', valid_reactions='\u2705', cancel=False)
     ]
-    user_playstyles = await wait_user_playstyles(ctx, ui, tasks)
+    user_playstyles = await wait_user_playstyles(ctx, ui, coros)
     profile["style_points"] = await calculate_style_points(user_playstyles, playstyles)
 
 
@@ -99,12 +99,13 @@ async def get_rank_field(ui, profile):
         ui.embed.add_field(name=key, value=f'`{profile["status"]["Ranks"][key]}`', inline=True)
 
 
-async def wait_user_playstyles(ctx, ui, tasks):
+async def wait_user_playstyles(ctx, ui, coros):
     """Constantly wait for the user to input playstyles."""
     user_playstyles = []
 
     complete = False
     while not complete:
+        tasks = [asyncio.create_task(coro()) for coro in coros]
         task, reply = await ui.wait_tasks(tasks)
 
         if task == tasks[0]:
