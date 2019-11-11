@@ -65,7 +65,7 @@ class CommandUI:
 
         return reply
 
-    async def get_reply(self, event: str = 'message', *, valid_reactions: list = None):
+    async def get_reply(self, event: str = 'message', *, valid_reactions: list = None, cancel=True):
         """Get the reply from the user."""
         await self.update()  # First update embed
 
@@ -84,20 +84,18 @@ class CommandUI:
                 "delete": lambda r: self.ui.remove_reaction(r[0].emoji, r[1])
             }
         }
-        # Create Tasks
+        # Create tasks
         reply_task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]))
-        cancel_task = asyncio.create_task(
-            self.ctx.bot.wait_for(
-                'reaction_add',
-                check=lambda r, u: utils.checks.react((r, u), self.ctx, self.ui, valids='❌'),
-                timeout=120
-            )
-        )
-        # asyncio.wait the set of tasks
-        task, reply = await self.wait_tasks({reply_task, cancel_task})
+        cancel_task = self.create_cancel_task()
+
+        # Await tasks
+        if cancel:
+            task, reply = await self.wait_tasks({reply_task, cancel_task})
+        else:
+            task, reply = reply_task, await reply_task
 
         # Get result
-        if task != reply_task:
+        if task == cancel_task:
             await self.end(status=False)
         else:
             await key[event]["delete"](reply)
@@ -148,3 +146,13 @@ class CommandUI:
             rest.cancel()
 
         return task, reply
+
+    def create_cancel_task(self):
+        """Create a task that checks if the user canceled the command."""
+        return asyncio.create_task(
+            self.ctx.bot.wait_for(
+                'reaction_add',
+                check=lambda r, u: utils.checks.react((r, u), self.ctx, self.ui, valids='❌'),
+                timeout=120
+            )
+        )
