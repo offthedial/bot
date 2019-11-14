@@ -126,6 +126,7 @@ async def calculate_style_points(user_playstyles, playstyles):
     style_points = [0, 0, 0]
     for playstyle in user_playstyles:
         style_points += [*playstyles[playstyle]]
+        style_points = list(map(int.__add__, playstyles[playstyle], style_points))
 
     return style_points
 
