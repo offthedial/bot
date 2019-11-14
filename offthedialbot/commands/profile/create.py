@@ -20,7 +20,7 @@ async def main(ctx, arg):
 
     ui = await utils.CommandUI(ctx, embed)
 
-    # await get_user_status(ctx, ui, profile)
+    await get_user_status(ctx, ui, profile)
     await get_user_playstyles(ctx, ui, profile)
 
     # utils.dbh.new_profile(profile, ctx.author.id)
