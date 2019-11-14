@@ -61,7 +61,7 @@ async def get_user_playstyles(ctx, ui, profile):
         lambda: ui.get_reply('reaction_add', valid_reactions='\u2705', cancel=False)
     ]
     user_playstyles = await wait_user_playstyles(ctx, ui, coros)
-    profile["style_points"] = await calculate_style_points(user_playstyles, playstyles)
+    profile["style_points"] = calculate_style_points(user_playstyles, playstyles)
 
 
 async def get_profile_field(ui, profile, key):
@@ -121,7 +121,7 @@ async def wait_user_playstyles(ctx, ui, coros):
     return user_playstyles
 
 
-async def calculate_style_points(user_playstyles, playstyles):
+def calculate_style_points(user_playstyles, playstyles):
     """Calculate a user's style points given their playstyles."""
     style_points = [0, 0, 0]
     for playstyle in user_playstyles:
