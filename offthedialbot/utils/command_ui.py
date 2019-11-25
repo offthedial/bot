@@ -3,8 +3,6 @@
 import asyncio
 import re
 
-from discord import Embed
-
 import utils
 
 
@@ -39,9 +37,12 @@ class CommandUI:
 
     async def end(self, status):
         """End UI interaction and display status."""
-        status_key = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED, None: None}
-        await self.ui.edit(embed=status_key[status])
-        await self.ui.clear_reactions()
+        status_key = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED}
+        if status_key.get(status):
+            await self.ui.edit(embed=status_key[status])
+            await self.ui.clear_reactions()
+        else:
+            await self.ui.delete()
         await self.delete_alert()
 
         # Raise exception to cancel command
@@ -51,9 +52,10 @@ class CommandUI:
         """Get message reply with validity checks."""
         # Check if it's the function's first run
         if _alert_params is None:  # Initilize error params
-            _alert_params = {**error_fields, "style": utils.AlertStyle.DANGER}
+            _alert_params = {**error_fields, "style": utils.Alert.Colors.DANGER}
         else:
             await self.update()
+            await self.delete_alert()
             await self.create_alert(**_alert_params)
 
         # Get message and check if it's valid
@@ -106,14 +108,12 @@ class CommandUI:
 
         return reply
 
-    async def create_alert(self, style: utils.AlertStyle, title: str, description: str):
+    async def create_alert(self, style: utils.Alert.Colors, title: str, description: str):
         """Create an alert with a given color to determine the style."""
-        await self.delete_alert()
-        embed = utils.embeds.alert(style, title, description)
-        self.alert = await self.ctx.send(embed=embed)
+        self.alert = await utils.Alert(self.ctx, style, title=title, description=description)
 
     async def delete_alert(self):
-        """Delete an alert, ensures message is removed once deleted, and that message exists."""
+        """Delete an alert associated with the command ui if it exists."""
         if self.alert:
             await self.alert.delete()
             self.alert = None

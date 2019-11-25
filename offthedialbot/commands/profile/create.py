@@ -9,10 +9,12 @@ import utils
 async def main(ctx, arg):
     """This is all a test."""
     if utils.dbh.find_profile(id=ctx.author.id):  # If profile already exists
-        alert = utils.embeds.alert(
-            utils.AlertStyle.DANGER, "Existing profile found.", "You have already created a profile!"
+        await utils.Alert(
+            ctx,
+            utils.Alert.Colors.DANGER,
+            title="Existing profile found.",
+            description="You have already created a profile!"
         )
-        await ctx.send(embed=alert)
         raise utils.exc.CommandCancel
 
     profile = utils.dbh.empty_profile.copy()
