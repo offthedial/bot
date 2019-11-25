@@ -7,7 +7,7 @@ import numpy as np
 import utils
 
 
-async def main(ctx, content):
+async def main(ctx):
     """$minesweeper command."""
     embed = discord.Embed(color=0x1c2a32)
     embed.set_author(

@@ -3,7 +3,7 @@ import discord
 import utils
 
 
-async def main(ctx, arg):
+async def main(ctx):
     """$profile command."""
     profile = utils.dbh.find_profile(id=ctx.author.id)
     if profile is None:

@@ -19,6 +19,7 @@ def find_commands(module=sys.modules[__name__]):
     data = {}
 
     def recursive_get(mapping, key, *args):
+        """Recursively get."""
         value = mapping[key]
         if not args:
             return value
@@ -84,9 +85,9 @@ def process_commands(data, parent):
 def derive_command(func):
     """Wrap command in another function to parse arguments and exceptions."""
 
-    async def _(ctx, *, content=None):
+    async def _(ctx):
         try:
-            await func(ctx, content)
+            await func(ctx)
         except utils.exc.CommandCancel:
             return
 

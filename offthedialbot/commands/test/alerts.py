@@ -1,8 +1,9 @@
-import utils
 import discord
 
+import utils
 
-async def main(ctx, arg):
+
+async def main(ctx):
     """Test command to test each of the alerts."""
     embed = discord.Embed(title="Testing: Alerts")
     ui = await utils.CommandUI(ctx, embed)

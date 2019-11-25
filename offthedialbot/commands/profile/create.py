@@ -6,7 +6,7 @@ import discord
 import utils
 
 
-async def main(ctx, arg):
+async def main(ctx):
     """This is all a test."""
     if utils.dbh.find_profile(id=ctx.author.id):  # If profile already exists
         await utils.Alert(
@@ -64,6 +64,11 @@ async def get_user_playstyles(ui, profile):
     ]
     user_playstyles = await wait_user_playstyles(ui, coros)
     profile["style_points"] = calculate_style_points(user_playstyles, playstyles)
+
+
+# def get_user_cxp(ctx, ui, profile):
+#     """Get the user's playstyle and calculate their, style points."""
+#     ui.embed = discord.Embed(title=f"{ctx.author.display_name}'s Competitive Experience", description=f".")
 
 
 async def get_profile_field(ui, profile, key):
