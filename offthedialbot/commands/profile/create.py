@@ -18,18 +18,18 @@ async def main(ctx, arg):
         raise utils.exc.CommandCancel
 
     profile = utils.dbh.empty_profile.copy()
-    embed = create_status_embed(ctx, profile)
+    embed = create_status_embed(ctx)
 
     ui = await utils.CommandUI(ctx, embed)
 
-    await get_user_status(ctx, ui, profile)
-    await get_user_playstyles(ctx, ui, profile)
+    await get_user_status(ui, profile)
+    await get_user_playstyles(ui, profile)
 
     # utils.dbh.new_profile(profile, ctx.author.id)
     await ui.end(status=True)
 
 
-async def get_user_status(ctx, ui, profile):
+async def get_user_status(ui, profile):
     """Get valid message for each rank."""
     for key in profile["status"].keys():
 
@@ -39,7 +39,7 @@ async def get_user_status(ctx, ui, profile):
             await get_rank_field(ui, profile)
 
 
-async def get_user_playstyles(ctx, ui, profile):
+async def get_user_playstyles(ui, profile):
     """Get the user's playstyle and calculate their, style points."""
     playstyles = {
         "frontline": (9, 0, 0),
@@ -52,7 +52,7 @@ async def get_user_playstyles(ctx, ui, profile):
         "flex": (1, 1, 1),
     }
     ui.embed = discord.Embed(
-        title=f"{ctx.author.display_name}'s Style Points",
+        title=f"{ui.ctx.author.display_name}'s Style Points",
         description=f"Please type all of the playstyles that apply to you, click the \u2705 when done."
     )
     ui.embed.add_field(name="Playstyles", value="\n".join([playstyle.capitalize() for playstyle in playstyles]))
@@ -62,7 +62,7 @@ async def get_user_playstyles(ctx, ui, profile):
         lambda: ui.get_valid_message(lambda r: r.lower() in playstyles.keys(), error_fields),
         lambda: ui.get_reply('reaction_add', valid_reactions='\u2705', cancel=False)
     ]
-    user_playstyles = await wait_user_playstyles(ctx, ui, coros)
+    user_playstyles = await wait_user_playstyles(ui, coros)
     profile["style_points"] = calculate_style_points(user_playstyles, playstyles)
 
 
@@ -101,7 +101,7 @@ async def get_rank_field(ui, profile):
         ui.embed.add_field(name=key, value=f'`{profile["status"]["Ranks"][key]}`', inline=True)
 
 
-async def wait_user_playstyles(ctx, ui, coros):
+async def wait_user_playstyles(ui, coros):
     """Constantly wait for the user to input playstyles."""
     user_playstyles = []
 
@@ -133,7 +133,7 @@ def calculate_style_points(user_playstyles, playstyles):
     return style_points
 
 
-def create_status_embed(ctx, profile):
+def create_status_embed(ctx):
     """Create embed for displaying user profile."""
     embed = discord.Embed(title=f"{ctx.author.display_name}'s Status:")
     return embed
