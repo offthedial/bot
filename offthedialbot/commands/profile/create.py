@@ -45,10 +45,10 @@ async def get_user_playstyles(ui, profile):
         "frontline": (9, 0, 0),
         "midline": (0, 9, 0),
         "backline": (0, 0, 9),
-        "aggressive/slayer": (2, 0, 0),
+        "slayer": (2, 0, 0),
         "defensive": (0, 1, 2),
         "objective": (1, 1, 0),
-        "support": (9, 1, 1),
+        "support": (0, 1, 1),
         "flex": (1, 1, 1),
     }
     ui.embed = discord.Embed(
