@@ -11,7 +11,7 @@ async def main(ctx):
     if utils.dbh.find_profile(id=ctx.author.id):  # If profile already exists
         await utils.Alert(
             ctx,
-            utils.Alert.Colors.DANGER,
+            utils.Alert.Style.DANGER,
             title="Existing profile found.",
             description="You have already created a profile!"
         )

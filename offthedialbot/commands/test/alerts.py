@@ -9,7 +9,7 @@ async def main(ctx):
     ui = await utils.CommandUI(ctx, embed)
 
     alert_styles = (
-        utils.Alert.Colors.DANGER, utils.Alert.Colors.WARNING, utils.Alert.Colors.INFO, utils.Alert.Colors.SUCCESS
+        utils.Alert.Style.DANGER, utils.Alert.Style.WARNING, utils.Alert.Style.INFO, utils.Alert.Style.SUCCESS
     )
 
     for style in alert_styles:

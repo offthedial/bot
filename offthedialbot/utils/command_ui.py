@@ -52,7 +52,7 @@ class CommandUI:
         """Get message reply with validity checks."""
         # Check if it's the function's first run
         if _alert_params is None:  # Initilize error params
-            _alert_params = {**error_fields, "style": utils.Alert.Colors.DANGER}
+            _alert_params = {**error_fields, "style": utils.Alert.Style.DANGER}
         else:
             await self.update()
             await self.delete_alert()
@@ -108,7 +108,7 @@ class CommandUI:
 
         return reply
 
-    async def create_alert(self, style: utils.Alert.Colors, title: str, description: str):
+    async def create_alert(self, style: utils.Alert.Style, title: str, description: str):
         """Create an alert with a given color to determine the style."""
         self.alert = await utils.Alert(self.ctx, style, title=title, description=description)
 
