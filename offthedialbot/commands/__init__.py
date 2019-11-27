@@ -71,7 +71,7 @@ def process_commands(data, parent):
 
         # If subcommands were found, create a command group
         if subcommands:
-            cmd = commands.Group(func, name=name, invoke_without_command=True)
+            cmd = commands.Group(func, name=name, invoke_without_command=True, ignore_extra=False)
             # Re-run this function for all of the subcommands
             process_commands(subcommands, cmd)
 
