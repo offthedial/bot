@@ -1,14 +1,6 @@
-import discord
-
-import utils
+from . import status
 
 
 async def main(ctx):
     """$profile command."""
-    profile = utils.dbh.find_profile(id=ctx.author.id)
-    if profile is None:
-        await utils.Alert(
-            ctx, utils.Alert.Style.DANGER, title="No profile found.", description="You don't have a profile."
-        )
-        raise utils.exc.CommandCancel
-
+    await status.main(ctx)
