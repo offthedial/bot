@@ -7,7 +7,7 @@ import utils
 
 
 async def main(ctx):
-    """This is all a test."""
+    """Run command for $profile create."""
     if utils.dbh.find_profile(id=ctx.author.id):  # If profile already exists
         await utils.Alert(
             ctx,

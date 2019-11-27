@@ -1,3 +1,4 @@
+"""Script to run Off the Dial bot."""
 from offthedialbot import client
 from dotenv import load_dotenv
 import os
