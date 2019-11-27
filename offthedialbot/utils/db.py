@@ -17,14 +17,11 @@ class DatabaseHandler:
             },
         },
         "style_points": [0, 0, 0],  # Groups A, B, and C.
-        "competitive_exp": 0,
+        "cxp": 0,
         "meta": {
-            "competing": False,
+            "currently_competing": False,
+            "previous_tourneys": [],
         },
-        "elo": {
-            "base": 1000,
-            "tournament_exp": 0,
-        }
     }
 
     def __init__(self):
