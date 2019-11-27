@@ -18,14 +18,15 @@ async def main(ctx):
         raise utils.exc.CommandCancel
 
     profile = utils.dbh.empty_profile.copy()
-    embed = create_status_embed(ctx)
 
+    embed = discord.Embed(title=f"{ctx.author.display_name}'s Status:")
     ui = await utils.CommandUI(ctx, embed)
 
     await set_user_status(ui, profile)
     profile["style_points"] = await get_user_playstyles(ui)
+    profile["cxp"] = await get_user_cxp(ui)
 
-    # utils.dbh.new_profile(profile, ctx.author.id)
+    utils.dbh.new_profile(profile, ctx.author.id)
     await ui.end(status=True)
 
 
@@ -66,9 +67,15 @@ async def get_user_playstyles(ui):
     return calculate_style_points(user_playstyles, playstyles)
 
 
-# def get_user_cxp(ctx, ui, profile):
-#     """Get the user's playstyle and calculate their, style points."""
-#     ui.embed = discord.Embed(title=f"{ctx.author.display_name}'s Competitive Experience", description=f".")
+async def get_user_cxp(ui):
+    """Get the user's playstyle and calculate their, style points."""
+    ui.embed = discord.Embed(
+        title=f"{ui.ctx.author.display_name}'s Competitive Experience",
+        description=f"How many tournaments with >= 16 teams have your competed in?"
+    )
+    error_fields = {"title": "Invalid number.", "description": "Please enter a valid number of tournaments."}
+    reply = await ui.get_valid_message(r'^\d+$', error_fields)
+    return int(reply.content)
 
 
 async def set_profile_field(ui, profile, key):
@@ -136,12 +143,6 @@ def calculate_style_points(user_playstyles, playstyles):
         style_points = list(map(int.__add__, playstyles[playstyle], style_points))
 
     return style_points
-
-
-def create_status_embed(ctx):
-    """Create embed for displaying user profile."""
-    embed = discord.Embed(title=f"{ctx.author.display_name}'s Status:")
-    return embed
 
 
 def parse_reply(key, value):
