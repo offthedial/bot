@@ -5,7 +5,7 @@ class Alert:
     """An alert API."""
 
     class Style:
-        """Class holding specifically alert style colors."""
+        """Class holding specifically alert styles and their colors."""
         DANGER = 0xf50206
         WARNING = 0xffbe00
         SUCCESS = 0x63ae33
