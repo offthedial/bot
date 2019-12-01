@@ -87,7 +87,8 @@ async def get_user_playstyles(ui):
     ui.embed = discord.Embed(
         title=f"{ui.ctx.author.display_name}'s Style Points",
         description=
-        f"Type all of the playstyles below that apply to you, Type it again to remove it.\nClick the \u23ed\ufe0f when done."
+        f"Type all of the playstyles below that apply to you, Type it again to remove it.\nClick the \u23ed\ufe0f when done.",
+        color=utils.colors.Roles.DIALER
     )
     ui.embed.add_field(name="Playstyles", value=create_playstyle_list(playstyles))
     error_fields = {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}
@@ -103,7 +104,8 @@ async def get_user_cxp(ui):
     """Get the user's playstyle and calculate their, style points."""
     ui.embed = discord.Embed(
         title=f"{ui.ctx.author.display_name}'s Competitive Experience",
-        description=f"How many tournaments with >= 16 teams have your competed in?"
+        description=f"How many tournaments with >= 16 teams have your competed in?",
+        color=utils.colors.Roles.DIALER
     )
     error_fields = {"title": "Invalid number.", "description": "Please enter a valid number of tournaments."}
     reply = await ui.get_valid_message(r'^\d+$', error_fields)
