@@ -17,7 +17,25 @@ async def main(ctx):
         )
         raise utils.exc.CommandCancel
 
-    profile = utils.dbh.empty_profile.copy()
+    profile = {
+        "status": {
+            "IGN": None,
+            "SW": None,
+            "Ranks": {
+                "Splat Zones": None,
+                "Rainmaker": None,
+                "Tower Control": None,
+                "Clam Blitz": None,
+            },
+        },
+        "style_points": [],  # Groups A, B, and C.
+        "cxp": 0,
+        "meta": {
+            "currently_competing": False,
+            "previous_tourneys": [],
+            # "dropout_ban": None,
+        }
+    }
 
     embed = create_embed(ctx.author.display_name, profile)
     ui = await utils.CommandUI(ctx, embed)
@@ -57,28 +75,28 @@ async def set_user_status(ui, profile):
 async def get_user_playstyles(ui):
     """Get the user's playstyle and calculate their, style points."""
     playstyles = {
-        "frontline": (9, 0, 0),
-        "midline": (0, 9, 0),
-        "backline": (0, 0, 9),
-        "flex": (3, 3, 3),
-        "slayer": (2, 0, 0),
-        "support": (0, 2, 0),
-        "anchor": (0, 0, 2),
+        "frontline": (0, 0, 0),
+        "midline": (0, 0, 0),
+        "backline": (0, 0, 0),
+        "flex": (0, 0, 0),
+        "slayer": (0, 0, 0),
+        "defensive": (0, 0, 0),
+        "objective": (0, 0, 0),
+        "support": (0, 0, 0),
     }
     ui.embed = discord.Embed(
         title=f"{ui.ctx.author.display_name}'s Style Points",
         description=
-        f"Enter all of the playstyles that apply to you, select atleast one of the first 3, click the \u2705 when done."
+        f"Type all of the playstyles below that apply to you, Type it again to remove it.\nClick the \u23ed\ufe0f when done."
     )
-    ui.embed.add_field(name="Playstyles", value="\n".join([playstyle.capitalize() for playstyle in playstyles]))
+    ui.embed.add_field(name="Playstyles", value=create_playstyle_list(playstyles))
     error_fields = {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}
 
     coros = [
         lambda: ui.get_valid_message(lambda r: r.lower() in playstyles.keys(), error_fields),
-        lambda: ui.get_reply('reaction_add', valid_reactions='\u2705', cancel=False)
+        lambda: ui.get_reply('reaction_add', valid_reactions=['\u23ed\ufe0f'], cancel=False)
     ]
-    user_playstyles = await wait_user_playstyles(ui, coros)  # Check if user has selected atleast 1 of the 3
-    return calculate_style_points(user_playstyles, playstyles)
+    return await wait_user_playstyles(ui, coros, playstyles)  # Check if user has selected atleast 1 of the 3
 
 
 async def get_user_cxp(ui):
@@ -136,7 +154,13 @@ async def set_rank_field(ui, profile):
         )
 
 
-async def wait_user_playstyles(ui, coros):
+def create_playstyle_list(playstyles, profile_playstyles=()):
+    """Create the list of playstyles based on the current profiles."""
+    _ = lambda p: '\u2705' if p in profile_playstyles else '\U0001f7e9'
+    return "\n".join([f'{_(playstyle)} {playstyle.capitalize()}' for playstyle in playstyles])
+
+
+async def wait_user_playstyles(ui, coros, playstyles):
     """Constantly wait for the user to input playstyles."""
     user_playstyles = []
 
@@ -154,6 +178,7 @@ async def wait_user_playstyles(ui, coros):
                 user_playstyles.remove(content)
         else:
             complete = True
+        ui.embed.set_field_at(0, name="Playstyles", value=create_playstyle_list(playstyles, user_playstyles))
 
     return user_playstyles
 
