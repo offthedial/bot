@@ -67,7 +67,7 @@ async def set_user_status(ui, profile):
     for key in profile["status"].keys():
 
         if key != "Ranks":
-            await set_profile_field(ui, profile, key)
+            await set_status_field(ui, profile, key)
         else:
             await set_rank_field(ui, profile)
 
@@ -112,7 +112,7 @@ async def get_user_cxp(ui):
     return int(reply.content)
 
 
-async def set_profile_field(ui, profile, key):
+async def set_status_field(ui, profile, key):
     """Prompt the user for a standard user profile field."""
     instructions = {
         "IGN": 'Please type a valid **IGN**, `(WP*Zada, Lepto)`',
