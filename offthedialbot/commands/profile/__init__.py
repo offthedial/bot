@@ -25,8 +25,43 @@ def create_status_embed(name, profile):
             value = f"`{value}`"
         else:  # key == "Ranks":
             value = "\n".join(
-                [f'**{subkey}:** `{subvalue}`' for subkey, subvalue in profile["status"]["Ranks"].items()]
+                [f'**{subkey}:** `{convert_rank_power(subvalue)}`' for subkey, subvalue in
+                 profile["status"]["Ranks"].items()]
             )
         embed.add_field(name=key, value=value, inline=True if key != "Ranks" else False)
 
     return embed
+
+
+def convert_rank_power(value):
+    """Convert ranks to corresponding powers, and vice versa."""
+    ranks = {
+        "C-": 1000,
+        "C": 1100,
+        "C+": 1200,
+        "B-": 1250,
+        "B": 1450,
+        "B+": 1550,
+        "A-": 1650,
+        "A": 1700,
+        "A+": 1800,
+        "S": 1900,
+        "S+0": 2000,
+        "S+1": 2080,
+        "S+2": 2120,
+        "S+3": 2160,
+        "S+4": 2200,
+        "S+5": 2230,
+        "S+6": 2260,
+        "S+7": 2290,
+        "S+8": 2320,
+        "S+9": 2350,
+    }
+    ranks.update({v: k for k, v in ranks.items()})
+
+    if isinstance(value, float):
+        return "X" + str(value)
+    elif rank := ranks.get(value, None):
+        return rank
+    elif isinstance(value, str):
+        return float(value[1:])

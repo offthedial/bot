@@ -4,6 +4,7 @@ import re
 import discord
 
 import utils
+from . import convert_rank_power
 
 
 async def main(ctx):
@@ -132,7 +133,7 @@ async def set_status_field(ui, profile, key):
 
 async def set_rank_field(ui, profile):
     """Prompt the user for each of the rank fields."""
-    create_instructions = lambda k: f'Please type a valid **__{k}__ Rank**, `(C, A-, S+0, X2350)`'
+    create_instructions = lambda k: f'Please type a valid **__{k}__ Rank**, `(C, A-, S+0, X2350.0)`'
     for key in profile["status"]["Ranks"].keys():
         ui.embed.description = create_instructions(key)
         reply = await ui.get_valid_message(
@@ -148,7 +149,7 @@ async def set_rank_field(ui, profile):
             name="Ranks",
             value="\n".join(
                 [
-                    f"**{subkey}:** {(f'`{subvalue}`' if subvalue else '*`pending`*')}"
+                    f"**{subkey}:** {(f'`{convert_rank_power(subvalue)}`' if subvalue else '*`pending`*')}"
                     for subkey, subvalue in profile["status"]["Ranks"].items()
                 ]
             ),
@@ -185,16 +186,6 @@ async def wait_user_playstyles(ui, coros, playstyles):
     return user_playstyles
 
 
-def calculate_style_points(user_playstyles, playstyles):
-    """Calculate a user's style points given their playstyles."""
-    style_points = [0, 0, 0]
-    for playstyle in user_playstyles:
-        style_points += [*playstyles[playstyle]]
-        style_points = list(map(int.__add__, playstyles[playstyle], style_points))
-
-    return style_points
-
-
 def parse_reply(key, value):
     """Check if reply is valid for the key, return cleaned reply, or false in invalid."""
     if key == "IGN":
@@ -203,13 +194,10 @@ def parse_reply(key, value):
         value = re.sub(r"[\D]", "", value)
         return value if len(value) == 12 else False
     elif key == "Ranks":
-        # Standard rank, or default X
-        if value.upper() in {"C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+", "S", "X"}:
-            if value.upper() == "X":
-                value = "X2000"
-            return value.upper()
-        # S+ or X(power)
-        elif re.search(r"(^S\+\d$)|(^X[1-9]\d{3}$)", value.upper()):
-            return value.upper()
+        value = value.upper()
+        if value in {"C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+", "S", "X"}:  # Standard rank, or default X
+            return convert_rank_power(value) if value != "X" else 2000.0
+        elif re.search(r"(^S\+\d$)|(^X[1-9]\d{3}$)", value.upper()):  # S+ or X(power)
+            return convert_rank_power(value)
 
     return False
