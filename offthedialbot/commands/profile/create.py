@@ -157,10 +157,21 @@ async def set_rank_field(ui, profile):
         )
 
 
-def create_playstyle_list(playstyles, profile_playstyles=()):
-    """Create the list of playstyles based on the current profiles."""
-    _ = lambda p: '\u2705' if p in profile_playstyles else '\U0001f7e9'
-    return "\n".join([f'{_(playstyle)} {playstyle.capitalize()}' for playstyle in playstyles])
+def parse_reply(key, value):
+    """Check if reply is valid for the key, return cleaned reply, or false in invalid."""
+    if key == "IGN":
+        return value if 1 <= len(value) <= 10 else False
+    elif key == "SW":
+        value = re.sub(r"[\D]", "", value)
+        return value if len(value) == 12 else False
+    elif key == "Ranks":
+        value = value.upper()
+        if value in {"C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+", "S", "X"}:  # Standard rank, or default X
+            return convert_rank_power(value) if value != "X" else 2000.0
+        elif re.search(r"(^S\+\d$)|(^X[1-9]\d{3}$)", value.upper()):  # S+ or X(power)
+            return convert_rank_power(value)
+
+    return False
 
 
 async def wait_user_playstyles(ui, coros, playstyles):
@@ -186,18 +197,17 @@ async def wait_user_playstyles(ui, coros, playstyles):
     return user_playstyles
 
 
-def parse_reply(key, value):
-    """Check if reply is valid for the key, return cleaned reply, or false in invalid."""
-    if key == "IGN":
-        return value if 1 <= len(value) <= 10 else False
-    elif key == "SW":
-        value = re.sub(r"[\D]", "", value)
-        return value if len(value) == 12 else False
-    elif key == "Ranks":
-        value = value.upper()
-        if value in {"C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+", "S", "X"}:  # Standard rank, or default X
-            return convert_rank_power(value) if value != "X" else 2000.0
-        elif re.search(r"(^S\+\d$)|(^X[1-9]\d{3}$)", value.upper()):  # S+ or X(power)
-            return convert_rank_power(value)
+def create_playstyle_list(playstyles, profile_playstyles=()):
+    """Create the list of playstyles based on the current profiles."""
+    set_checkmark = lambda p: '\u2705' if p in profile_playstyles else '\U0001f7e9'
+    return "\n".join([f'{set_checkmark(playstyle)} {playstyle.capitalize()}' for playstyle in playstyles])
 
-    return False
+
+def calculate_style_points(user_playstyles, playstyles):  # A stub
+    """Calculate a user's style points given their playstyles."""
+    style_points = [0, 0, 0]
+    for playstyle in user_playstyles:
+        style_points += [*playstyles[playstyle]]
+        style_points = list(map(int.__add__, playstyles[playstyle], style_points))
+
+    return style_points
