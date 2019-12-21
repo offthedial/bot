@@ -22,7 +22,7 @@ def create_status_embed(name, profile):
 
     for key, value in profile["status"].items():
         if key != "Ranks":
-            value = f"`{value}`"
+            value = f'`{(value if key != "SW" else display_sw(value))}`'
         else:  # key == "Ranks":
             value = "\n".join(
                 [f'**{subkey}:** `{convert_rank_power(subvalue)}`' for subkey, subvalue in
@@ -31,6 +31,11 @@ def create_status_embed(name, profile):
         embed.add_field(name=key, value=value, inline=True if key != "Ranks" else False)
 
     return embed
+
+
+def display_sw(sw):
+    """Displays 12-digit integer in neat SW format."""
+    return f"SW-{sw[:4]}-{sw[4:8]}-{sw[8:]}"
 
 
 def convert_rank_power(value):

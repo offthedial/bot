@@ -4,7 +4,7 @@ import re
 import discord
 
 import utils
-from . import convert_rank_power
+from . import convert_rank_power, display_sw
 
 
 async def main(ctx):
@@ -117,7 +117,7 @@ async def set_status_field(ui, profile, key):
     """Prompt the user for a standard user profile field."""
     instructions = {
         "IGN": 'Please type a valid **IGN**, `(WP*Zada, Lepto)`',
-        "SW": 'Please type a valid **SW**, `(0000-0000-0000)`',
+        "SW": 'Please type a valid **SW**, `(SW-0000-0000-0000)`',  
     }
     field_index = {"IGN": 0, "SW": 1}
     ui.embed.description = instructions[key]
@@ -128,7 +128,7 @@ async def set_status_field(ui, profile, key):
         }
     )
     profile["status"][key] = parse_reply(key, reply.content)
-    ui.embed.set_field_at(field_index[key], name=key, value=f'`{profile["status"][key]}`')
+    ui.embed.set_field_at(field_index[key], name=key, value=f'`{(profile["status"][key] if key != "SW" else display_sw(profile["status"][key]))}`')
 
 
 async def set_rank_field(ui, profile):
