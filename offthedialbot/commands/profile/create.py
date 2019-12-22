@@ -140,7 +140,7 @@ def parse_reply(key, value):
         value = value.upper()
         if value in {"C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+", "S", "X"}:  # Standard rank, or default X
             return convert_rank_power(value) if value != "X" else 2000.0
-        elif re.search(r"(^S\+\d$)|(^X[1-9]\d{3}$)", value.upper()):  # S+ or X(power)
+        elif re.search(r"(^S\+\d$)|(^X[1-9]\d{3}(\.\d)?$)", value.upper()):  # S+ or X(power)
             return convert_rank_power(value)
 
     return False
