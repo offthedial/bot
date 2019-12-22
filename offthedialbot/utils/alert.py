@@ -13,14 +13,8 @@ class Alert:
 
     def __init__(self, ctx, style, *, title, description):
         """Create alert embed."""
-        title_key = {
-            self.Style.DANGER: lambda t: f'\U0001f6ab Error: **{t}**',
-            self.Style.WARNING: lambda t: f'\u26a0 Warning: **{t}**',
-            self.Style.INFO: lambda t: f'\u2139 Info: **{t}**',
-            self.Style.SUCCESS: lambda t: f'\u2705 Success: **{t}**',
-        }
         self.ctx = ctx
-        self.embed = discord.Embed(title=title_key[style](title), description=description, color=style)
+        self.embed = self.create_embed(style, title, description)
         self.alert = None
 
     async def __new__(cls, *args, **kwargs):
@@ -30,6 +24,17 @@ class Alert:
 
         self.alert = await self.ctx.send(embed=self.embed)
         return self
+
+    @classmethod
+    def create_embed(cls, style, title: str, description: str = None):
+        """Creates alert embed."""
+        title_key = {
+            cls.Style.DANGER: lambda t: f'\U0001f6ab Error: **{t}**',
+            cls.Style.WARNING: lambda t: f'\u26a0 Warning: **{t}**',
+            cls.Style.INFO: lambda t: f'\u2139 Info: **{t}**',
+            cls.Style.SUCCESS: lambda t: f'\u2705 Success: **{t}**',
+        }
+        return discord.Embed(title=title_key[style](title), description=description, color=style)
 
     async def delete(self):
         """Remove alert."""
