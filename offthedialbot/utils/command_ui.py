@@ -27,7 +27,7 @@ class CommandUI:
         return self
 
     @staticmethod
-    async def create_ui(ctx, embed):
+    async def create_ui(ctx: context, embed: Embed):
         """Create and return the discord embed UI."""
         ui = await ctx.send(embed=embed)
         await ui.add_reaction('❌')
