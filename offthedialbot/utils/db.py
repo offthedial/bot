@@ -21,7 +21,7 @@ class DatabaseHandler:
         profile["_id"] = id
         return self.profiles.insert_one(profile)
 
-    def edit_profile(self, profile, id):
+    def update_profile(self, profile, id):
         """Update an existing profile in the profiles collection by id."""
         profile["_id"] = id
-        return self.profiles.update_one(profile)
+        return self.profiles.replace_one({"_id": id}, profile)
