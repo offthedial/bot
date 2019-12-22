@@ -34,11 +34,11 @@ async def main(ctx):
     ui = await utils.CommandUI(ctx, embed)
 
     await set_user_status(ui, profile)
+    await confirm_profile(ui)
     profile["style_points"] = await get_user_playstyles(ui)
     profile["cxp"] = await get_user_cxp(ui)
-
-    utils.dbh.new_profile(profile, ctx.author.id)
-    await ui.end(status=True)
+    utils.dbh.new_profile(profile, ui.ctx.author.id)
+    await ui.end(True)
 
 
 async def set_user_status(ui, profile):
@@ -167,6 +167,14 @@ async def wait_user_playstyles(ui, coros, playstyles):
         ui.embed.set_field_at(0, name="Playstyles", value=create_playstyle_list(playstyles, user_playstyles))
 
     return user_playstyles
+
+
+async def confirm_profile(ui):
+    """Confirms user profile and returns status."""
+    alert_embed = utils.Alert.create_embed(utils.Alert.Style.WARNING, title="Confirm?", description="Please confirm your profile.")
+    ui.embed.title, ui.embed.description, ui.embed.color = alert_embed.title, alert_embed.description, alert_embed.color
+    reply = await ui.get_reply("reaction_add", valid_reactions=['\u2611\ufe0f'])
+    return reply[0].emoji == '\u2611\ufe0f'
 
 
 def create_playstyle_list(playstyles, profile_playstyles=()):
