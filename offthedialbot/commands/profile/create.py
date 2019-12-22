@@ -9,7 +9,7 @@ from . import convert_rank_power, display_sw
 
 async def main(ctx):
     """Run command for $profile create."""
-    if utils.dbh.find_profile(id=ctx.author.id):  # If profile already exists
+    await check_for_profile(ctx, reverse=True)
         await utils.Alert(
             ctx,
             utils.Alert.Style.DANGER,

@@ -5,15 +5,21 @@ import utils
 
 async def main(ctx):
     """Run command for $profile."""
-    profile = utils.dbh.find_profile(id=ctx.author.id)
-    if profile is None:
-        await utils.Alert(
-            ctx, utils.Alert.Style.DANGER, title="No profile found.", description="You don't have a profile."
-        )
-        raise utils.exc.CommandCancel
-
+    profile = await check_for_profile(ctx)
     embed = create_status_embed(ctx.author.display_name, profile)
     await ctx.send(embed=embed)
+
+
+async def check_for_profile(ctx, reverse=False):
+    """Returns profile if it exists, otherwise cancels command."""
+    profile = utils.dbh.find_profile(id=ctx.author.id)
+    if (result := {
+        False: lambda p: (p is None, {"title": "No profile found.", "description": "You can create one using `$profile create`."}),
+        True: lambda p: (p, {"title": "Existing profile found.", "description": "You can view your profile with `$profile`."}),
+    }[reverse](profile))[0]:
+        await utils.Alert(ctx, utils.Alert.Style.DANGER, **result[1])
+        raise utils.exc.CommandCancel
+    return profile
 
 
 def create_status_embed(name, profile):
