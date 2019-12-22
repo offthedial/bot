@@ -95,7 +95,7 @@ async def set_status_field(ui, profile, key, field_index):
     """Prompt the user for a standard user profile field."""
     instructions = {
         "IGN": 'Please type a valid **IGN**, `(WP*Zada, Lepto)`',
-        "SW": 'Please type a valid **SW**, `(SW-0000-0000-0000)`',  
+        "SW": 'Please type a valid **SW**, `(SW-1111-1111-1111)`',
     }
     ui.embed.description = instructions[key]
     reply = await ui.get_valid_message(
@@ -135,7 +135,7 @@ def parse_reply(key, value):
         return value if 1 <= len(value) <= 10 else False
     elif key == "SW":
         value = re.sub(r"[\D]", "", value)
-        return value if len(value) == 12 else False
+        return int(value) if len(value) == 12 and value[0] != "0" else False
     elif key == "Ranks":
         value = value.upper()
         if value in {"C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+", "S", "X"}:  # Standard rank, or default X

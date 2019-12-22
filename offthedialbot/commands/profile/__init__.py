@@ -37,7 +37,7 @@ def display_field(key, field):
     """Displays each field in displayable format."""
     return {
         "IGN": lambda: f'`{field}`' if field else '*`pending`*',
-        "SW": lambda: f"`SW-{field[:4]}-{field[4:8]}-{field[8:]}`" if field else '*`pending`*',
+        "SW": lambda: f"`SW-{str(field)[:4]}-{str(field)[4:8]}-{str(field)[8:]}`" if field is not None else '*`pending`*',
         "Ranks": lambda: "\n".join([f"**{k}:** {(f'`{convert_rank_power(v)}`' if v else '*`pending`*')}" for k, v in field.items()])
     }[key]()
 
