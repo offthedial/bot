@@ -1,5 +1,7 @@
 """Holds api for working with a custom command ui."""
 
+from discord import Embed
+from discord.ext.commands import context
 import asyncio
 import re
 
@@ -9,14 +11,14 @@ import utils
 class CommandUI:
     """Class containing the command UI used in each command."""
 
-    def __init__(self, ctx, embed):
+    def __init__(self, ctx: context, embed: Embed):
         """Initilize command UI and declare self variables."""
         self.ctx = ctx
         self.embed = embed
         self.reply_task = None
         self.alert = None
 
-    async def __new__(cls, ctx, embed):
+    async def __new__(cls, ctx: context, embed: Embed):
         """Use async to create embed and passive task on class creation."""
         self = super().__new__(cls)
         self.__init__(ctx, embed)
@@ -35,7 +37,7 @@ class CommandUI:
         """Update the ui with new information."""
         await self.ui.edit(embed=self.embed)
 
-    async def end(self, status):
+    async def end(self, status: bool):
         """End UI interaction and display status."""
         status_key = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED}
         if status_key.get(status):
