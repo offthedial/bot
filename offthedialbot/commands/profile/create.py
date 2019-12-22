@@ -4,20 +4,12 @@ import re
 import discord
 
 import utils
-from . import convert_rank_power, display_sw
+from . import create_status_embed, check_for_profile, display_field, convert_rank_power
 
 
 async def main(ctx):
     """Run command for $profile create."""
     await check_for_profile(ctx, reverse=True)
-        await utils.Alert(
-            ctx,
-            utils.Alert.Style.DANGER,
-            title="Existing profile found.",
-            description="You have already created a profile!"
-        )
-        raise utils.exc.CommandCancel
-
     profile = {
         "status": {
             "IGN": None,
@@ -34,11 +26,11 @@ async def main(ctx):
         "meta": {
             "currently_competing": False,
             "previous_tourneys": [],
-            # "dropout_ban": None,
+            "dropout_ban": None,
         }
     }
 
-    embed = create_embed(ctx.author.display_name, profile)
+    embed = create_status_embed(ctx.author.display_name, profile)
     ui = await utils.CommandUI(ctx, embed)
 
     await set_user_status(ui, profile)
@@ -49,28 +41,14 @@ async def main(ctx):
     await ui.end(status=True)
 
 
-def create_embed(name, profile):
-    """Create profile embed to display user profile."""
-    embed = discord.Embed(title=f"{name}'s Status", color=utils.colors.Roles.DIALER)
-
-    for key in profile["status"].keys():
-        if key != "Ranks":
-            value = f"*`pending`*"
-        else:  # key == "Ranks":
-            value = "\n".join([f'**{subkey}:** *`pending`*' for subkey in profile["status"]["Ranks"].keys()])
-        embed.add_field(name=key, value=value, inline=True if key != "Ranks" else False)
-
-    return embed
-
-
 async def set_user_status(ui, profile):
     """Get valid message for each rank."""
-    for key in profile["status"].keys():
+    for index, key in enumerate(profile["status"].keys()):
 
         if key != "Ranks":
-            await set_status_field(ui, profile, key)
+            await set_status_field(ui, profile, key, index)
         else:
-            await set_rank_field(ui, profile)
+            await set_rank_field(ui, profile, index)
 
 
 async def get_user_playstyles(ui):
@@ -113,13 +91,12 @@ async def get_user_cxp(ui):
     return int(reply.content)
 
 
-async def set_status_field(ui, profile, key):
+async def set_status_field(ui, profile, key, field_index):
     """Prompt the user for a standard user profile field."""
     instructions = {
         "IGN": 'Please type a valid **IGN**, `(WP*Zada, Lepto)`',
         "SW": 'Please type a valid **SW**, `(SW-0000-0000-0000)`',  
     }
-    field_index = {"IGN": 0, "SW": 1}
     ui.embed.description = instructions[key]
     reply = await ui.get_valid_message(
         valid=lambda r: parse_reply(key, r), error_fields={
@@ -128,10 +105,10 @@ async def set_status_field(ui, profile, key):
         }
     )
     profile["status"][key] = parse_reply(key, reply.content)
-    ui.embed.set_field_at(field_index[key], name=key, value=f'`{(profile["status"][key] if key != "SW" else display_sw(profile["status"][key]))}`')
+    ui.embed.set_field_at(field_index, name=key, value=display_field(key, profile["status"][key]))
 
 
-async def set_rank_field(ui, profile):
+async def set_rank_field(ui, profile, field_index):
     """Prompt the user for each of the rank fields."""
     create_instructions = lambda k: f'Please type a valid **__{k}__ Rank**, `(C, A-, S+0, X2350.0)`'
     for key in profile["status"]["Ranks"].keys():
@@ -145,14 +122,9 @@ async def set_rank_field(ui, profile):
         )
         profile["status"]["Ranks"][key] = parse_reply("Ranks", reply.content)
         ui.embed.set_field_at(
-            2,
+            field_index,
             name="Ranks",
-            value="\n".join(
-                [
-                    f"**{subkey}:** {(f'`{convert_rank_power(subvalue)}`' if subvalue else '*`pending`*')}"
-                    for subkey, subvalue in profile["status"]["Ranks"].items()
-                ]
-            ),
+            value=display_field("Ranks", profile["status"]["Ranks"]),
             inline=False
         )
 

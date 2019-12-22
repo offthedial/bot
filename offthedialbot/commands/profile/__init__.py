@@ -27,21 +27,19 @@ def create_status_embed(name, profile):
     embed = discord.Embed(title=f"{name}'s Status", color=utils.colors.Roles.DIALER)
 
     for key, value in profile["status"].items():
-        if key != "Ranks":
-            value = f'`{(value if key != "SW" else display_sw(value))}`'
-        else:  # key == "Ranks":
-            value = "\n".join(
-                [f'**{subkey}:** `{convert_rank_power(subvalue)}`' for subkey, subvalue in
-                 profile["status"]["Ranks"].items()]
-            )
+        value = display_field(key, value)
         embed.add_field(name=key, value=value, inline=True if key != "Ranks" else False)
 
     return embed
 
 
-def display_sw(sw):
-    """Displays 12-digit integer in neat SW format."""
-    return f"SW-{sw[:4]}-{sw[4:8]}-{sw[8:]}"
+def display_field(key, field):
+    """Displays each field in displayable format."""
+    return {
+        "IGN": lambda: f'`{field}`',
+        "SW": lambda: f"`SW-{field[:4]}-{field[4:8]}-{field[8:]}`",
+        "Ranks": lambda: "\n".join([f"**{k}:** {(f'`{convert_rank_power(v)}`' if v else '*`pending`*')}" for k, v in field.items()])
+    }[key]()
 
 
 def convert_rank_power(value):
