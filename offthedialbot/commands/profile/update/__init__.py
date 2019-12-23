@@ -1,7 +1,5 @@
-import discord
-
 import utils
-from . import create, check_for_profile, display_field, create_status_embed
+from .. import create, check_for_profile, display_field, create_status_embed
 
 
 async def main(ctx):
