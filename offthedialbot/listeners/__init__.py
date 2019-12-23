@@ -9,7 +9,7 @@ def register_listeners(bot):
     files = import_modules()
     listeners = get_listeners(files)
     for listener in listeners:
-        setattr(bot, listener.__name__, listener)
+        bot.add_listener(listener)
 
 
 def import_modules():
