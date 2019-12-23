@@ -35,7 +35,7 @@ async def main(ctx):
 
     await set_user_status(ui, profile)
     await confirm_profile(ui)
-    profile["style_points"] = await get_user_playstyles(ui)
+    profile["style_points"] = await get_user_stylepoints(ui)
     profile["cxp"] = await get_user_cxp(ui)
     utils.dbh.new_profile(profile, ui.ctx.author.id)
     await ui.end(True)
@@ -51,44 +51,57 @@ async def set_user_status(ui, profile):
             await set_rank_field(ui, profile, index)
 
 
-async def get_user_playstyles(ui):
+playstyles = {
+    "frontline": (0, 0, 0),
+    "midline": (0, 0, 0),
+    "backline": (0, 0, 0),
+    "flex": (0, 0, 0),
+    "slayer": (0, 0, 0),
+    "defensive": (0, 0, 0),
+    "objective": (0, 0, 0),
+    "support": (0, 0, 0),
+}
+
+
+async def get_user_stylepoints(ui):
     """Get the user's playstyle and calculate their, style points."""
-    playstyles = {
-        "frontline": (0, 0, 0),
-        "midline": (0, 0, 0),
-        "backline": (0, 0, 0),
-        "flex": (0, 0, 0),
-        "slayer": (0, 0, 0),
-        "defensive": (0, 0, 0),
-        "objective": (0, 0, 0),
-        "support": (0, 0, 0),
-    }
-    ui.embed = discord.Embed(
-        title=f"{ui.ctx.author.display_name}'s Style Points",
-        description=
-        f"Type all of the playstyles below that apply to you, Type it again to remove it.\nClick the \u23ed\ufe0f when done.",
-        color=utils.colors.Roles.DIALER
-    )
-    ui.embed.add_field(name="Playstyles", value=create_playstyle_list(playstyles))
+    ui.embed = create_stylepoints_embed(ui.ctx)
     error_fields = {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}
 
     coros = [
         lambda: ui.get_valid_message(lambda r: r.lower() in playstyles.keys(), error_fields),
         lambda: ui.get_reply('reaction_add', valid_reactions=['\u23ed\ufe0f'], cancel=False)
     ]
-    return await wait_user_playstyles(ui, coros, playstyles)  # Check if user has selected atleast 1 of the 3
+    return await wait_user_playstyles(ui, coros)  # Check if user has selected atleast 1 of the 3
+
+
+def create_stylepoints_embed(ctx):
+    """Create embed for asking stylepoints."""
+    embed = discord.Embed(
+        title=f"{ctx.author.display_name}'s Style Points",
+        description=
+        f"Type all of the playstyles below that apply to you, Type it again to remove it.\nClick the \u23ed\ufe0f when done.",
+        color=utils.colors.Roles.DIALER
+    )
+    embed.add_field(name="Playstyles", value=create_playstyle_list())
+    return embed
 
 
 async def get_user_cxp(ui):
     """Get the user's playstyle and calculate their, style points."""
-    ui.embed = discord.Embed(
-        title=f"{ui.ctx.author.display_name}'s Competitive Experience",
-        description=f"How many tournaments with >= 16 teams have your competed in?",
-        color=utils.colors.Roles.DIALER
-    )
+    ui.embed = create_cxp_embed(ui.ctx)
     error_fields = {"title": "Invalid number.", "description": "Please enter a valid number of tournaments."}
     reply = await ui.get_valid_message(r'^\d+$', error_fields)
     return int(reply.content)
+
+
+def create_cxp_embed(ctx):
+    """Create embed for asking competitive experience."""
+    return discord.Embed(
+        title=f"{ctx.author.display_name}'s Competitive Experience",
+        description=f"How many tournaments with >= 16 teams have your competed in?",
+        color=utils.colors.Roles.DIALER
+    )
 
 
 async def set_status_field(ui, profile, key, field_index):
@@ -146,7 +159,7 @@ def parse_reply(key, value):
     return False
 
 
-async def wait_user_playstyles(ui, coros, playstyles):
+async def wait_user_playstyles(ui, coros):
     """Constantly wait for the user to input playstyles."""
     user_playstyles = []
 
@@ -164,7 +177,7 @@ async def wait_user_playstyles(ui, coros, playstyles):
                 user_playstyles.remove(content)
         else:
             complete = True
-        ui.embed.set_field_at(0, name="Playstyles", value=create_playstyle_list(playstyles, user_playstyles))
+        ui.embed.set_field_at(0, name="Playstyles", value=create_playstyle_list(user_playstyles))
 
     return user_playstyles
 
@@ -177,13 +190,13 @@ async def confirm_profile(ui):
     return reply[0].emoji == '\u2611\ufe0f'
 
 
-def create_playstyle_list(playstyles, profile_playstyles=()):
+def create_playstyle_list(profile_playstyles=()):
     """Create the list of playstyles based on the current profiles."""
     set_checkmark = lambda p: '\u2705' if p in profile_playstyles else '\U0001f7e9'
     return "\n".join([f'{set_checkmark(playstyle)} {playstyle.capitalize()}' for playstyle in playstyles])
 
 
-def calculate_style_points(user_playstyles, playstyles):  # A stub
+def calculate_style_points(user_playstyles):  # A stub
     """Calculate a user's style points given their playstyles."""
     style_points = [0, 0, 0]
     for playstyle in user_playstyles:
