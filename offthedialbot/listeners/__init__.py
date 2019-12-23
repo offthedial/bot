@@ -1,4 +1,4 @@
-"""Dynamically import and generate discord.ext cogs."""
+"""Dynamically import and generate discord.ext listeners."""
 import os
 import inspect
 import importlib
@@ -25,7 +25,7 @@ def import_modules(package):
 
 
 def get_listeners(modules):
-    """Imports the cogs from each module."""
+    """Imports the listener functions from each module."""
     return [get_function(module) for module in modules]
 
 
