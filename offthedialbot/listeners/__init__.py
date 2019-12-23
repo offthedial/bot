@@ -6,19 +6,19 @@ import importlib
 
 def register_listeners(bot):
     """Registers listeners as part of the bot."""
-    files = import_modules("listeners")
+    files = import_modules()
     listeners = get_listeners(files)
     for listener in listeners:
         setattr(bot, listener.__name__, listener)
 
 
-def import_modules(package):
+def import_modules():
     """Imports all of the modules."""
     modules = []
     for module in os.listdir(os.path.dirname(__file__)):
         if module == '__init__.py' or module[-3:] != '.py':
             continue
-        modules.append(importlib.import_module(f".{module[:-3]}", package=package))
+        modules.append(importlib.import_module(f".{module[:-3]}", package="listeners"))
     del module
 
     return modules
