@@ -2,12 +2,12 @@
 
 from discord.ext.commands import Bot
 
+from offthedialbot import listeners
 from offthedialbot import commands
 from offthedialbot import cogs
-from offthedialbot import listeners
 
 client = Bot(command_prefix='$')
 
+listeners.register_listeners(client)
 commands.register_commands(client)
 cogs.register_cogs(client)
-listeners.register_listeners(client)
