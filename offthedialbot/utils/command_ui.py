@@ -105,8 +105,12 @@ class CommandUI:
             await key[event]["delete"](reply)
 
             # Remove valid reactions if valids are specified
-            await self.ui.clear_reactions()
-            await self.ui.add_reaction('❌')
+            if len(valid_reactions := valid_reactions if valid_reactions else []) < 3:
+                for react in valid_reactions:
+                    await self.ui.remove_reaction(react, self.ctx.me)
+            else:
+                await self.ui.clear_reactions()
+                await self.ui.add_reaction('❌')
 
         return reply
 
