@@ -1,21 +1,13 @@
 """Holds client subclass of discord.ext.Bot, and registeres commands."""
 
-from discord.ext import commands as ext
+from discord.ext.commands import Bot
 
-from offthedialbot.commands import register_commands
+from offthedialbot import commands
+from offthedialbot import cogs
+from offthedialbot import listeners
 
+client = Bot(command_prefix='$')
 
-class Client(ext.Bot):
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    async def on_ready(self):
-        print(f'Logged in as `{self.user.name}`')
-
-    async def on_message(self, message):
-        await self.process_commands(message)
-
-
-client = Client(command_prefix='$')
-register_commands(client)
+commands.register_commands(client)
+cogs.register_cogs(client)
+listeners.register_listeners(client)
