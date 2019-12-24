@@ -34,6 +34,6 @@ class GetStatusField(commands.Cog, command_attrs=dict(hidden=True)):
 
         await utils.Alert(
             ctx, utils.Alert.Style.INFO,
-            title=f"`{profile['status']['IGN']}`'s Ranks    :",
+            title=f"`{profile['status']['IGN']}`'s Ranks:",
             description=f"{display_field('Ranks', profile['status']['Ranks'])}"
         )
