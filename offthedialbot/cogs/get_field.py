@@ -9,5 +9,8 @@ class GetField(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.command(aliases=["fc"])
     async def sw(self, ctx):
         """Quickly gets SW profile field."""
-        profile = await check_for_profile(ctx)
-        await utils.Alert(ctx, utils.Alert.Style.INFO, title=f"**{ctx.author.display_name}'s Friend-Code:**", description=f"`{display_field('SW', profile['status']['SW'])}`")
+        try:
+            profile = await check_for_profile(ctx)
+        except utils.exc.CommandCancel:
+            return
+        await utils.Alert(ctx, utils.Alert.Style.INFO, title=f"`{profile['status']['IGN']}`'s Friend Code:", description=f"`{display_field('SW', profile['status']['SW'])}`")
