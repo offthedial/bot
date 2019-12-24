@@ -9,7 +9,7 @@ def register_listeners(bot):
     files = import_modules()
     listeners = get_listeners(files)
     for listener in listeners:
-        bot.add_listener(listener)
+        setattr(bot, listener.__name__, derive_listener(listener, bot))
 
 
 def import_modules():
@@ -34,3 +34,12 @@ def get_function(module):
     for name, obj in inspect.getmembers(module):
         if inspect.isfunction(obj):
             return obj
+
+
+def derive_listener(func, bot):
+    """Derive listener from function."""
+    async def _(*args, **kwargs):
+        return await func(bot, *args, **kwargs)
+
+    return _
+
