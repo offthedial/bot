@@ -1,3 +1,6 @@
+from typing import Union
+
+
 class Profile:
     """User profile class."""
     playstyles = {
@@ -38,57 +41,57 @@ class Profile:
         self.profile["status"][key] = value
         return self.profile["status"][key]
 
-    def set_rank(self, key, rank):
+    def set_rank(self, key: str, rank: Union[str, int, float]):
         """Set rank at specified key."""
         self.profile["status"]["Ranks"][key] = (self.convert_rank_power(rank) if isinstance(rank, str) else rank)
         return self.profile["status"]["Ranks"][key]
 
-    def set_stylepoints(self, stylepoints: list):
+    def set_stylepoints(self, stylepoints: list) -> list:
         """Sets stylepoints."""
         self.profile["stylepoints"] = stylepoints
         return self.profile["stylepoints"]
 
-    def set_cxp(self, cxp: int):
+    def set_cxp(self, cxp: int) -> int:
         """Sets competitive experience"""
         self.profile["cxp"] = cxp
         return self.profile["cxp"]
 
     # Getters
-    def get_status(self):
+    def get_status(self) -> dict:
         """Returns profile status."""
         return self.profile["status"]
 
-    def get_ranks(self):
+    def get_ranks(self) -> dict:
         """Returns profile ranks."""
         return self.profile["status"]["Ranks"]
 
-    def get_stylepoints(self):
+    def get_stylepoints(self) -> list:
         """Returns stylepoints"""
         return self.profile["stylepoints"]
 
-    def get_cxp(self):
+    def get_cxp(self) -> int:
         """Returns competitive experience."""
         return self.profile["cxp"]
 
-    def calculate_elo(self):
+    def calculate_elo(self) -> int:
         """Calculate the user's points."""
         pass
 
-    def calculate_stylepoints(self, user_playstyles):
+    def calculate_stylepoints(self, user_playstyles: list):
         """Calculate a user's stylepoints given their playstyles."""
-        stylepoints = [0, 0, 0]
+        stylepoints: list = [0, 0, 0]
         for playstyle in user_playstyles:
             stylepoints += [self.playstyles[playstyle]]
-            stylepoints = [group + add for group, add in zip(stylepoints, self.playstyles[playstyle])]
+            stylepoints: list = [group + add for group, add in zip(stylepoints, self.playstyles[playstyle])]
 
         return stylepoints
 
-    def dict(self):
+    def dict(self) -> dict:
         """Returns the dictionary representation of a profile."""
         return self.profile
 
     @staticmethod
-    def convert_rank_power(value):
+    def convert_rank_power(value: Union[str, int, float]) -> Union[str, int, float]:
         """Convert ranks to corresponding powers, and vice versa."""
         ranks = {
             "C-": 1000,
@@ -120,4 +123,3 @@ class Profile:
             return rank
         elif isinstance(value, str):
             return float(value[1:])
-        return None

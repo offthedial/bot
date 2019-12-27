@@ -10,19 +10,19 @@ from . import create_status_embed, check_for_profile, display_field
 async def main(ctx):
     """Run command for $profile create."""
     await check_for_profile(ctx, reverse=True)
-    profile = utils.Profile()
+    profile: utils.Profile = utils.Profile()
 
-    embed = create_status_embed(ctx.author.display_name, profile)
-    ui = await utils.CommandUI(ctx, embed)
+    embed: discord.Embed = create_status_embed(ctx.author.display_name, profile)
+    ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
 
-    await set_user_status(ui, profile)
+    profile = await set_user_status(ui, profile)
     profile.set_stylepoints(await get_user_stylepoints(ui))
     profile.set_cxp(await get_user_cxp(ui))
     utils.dbh.new_profile(profile.dict(), ui.ctx.author.id)
     await ui.end(True)
 
 
-async def set_user_status(ui, profile):
+async def set_user_status(ui: utils.CommandUI, profile: utils.Profile) -> utils.Profile:
     """Get valid message for each rank."""
     for index, key in enumerate(profile.get_status().keys()):
         clean_status_key(profile, key)
@@ -33,15 +33,19 @@ async def set_user_status(ui, profile):
             await set_rank_field(ui, profile, index)
 
     if not await confirm_profile(ui):
-        await set_user_status(ui, profile)
+        profile: utils.Profile = utils.Profile()
+        ui.embed = create_status_embed(ui.ctx.author.display_name, profile)
+        profile: utils.Profile = await set_user_status(ui, profile)
+
+    return profile
 
 
-async def get_user_stylepoints(ui):
+async def get_user_stylepoints(ui: utils.CommandUI) -> list:
     """Get the user's playstyle and calculate their, style points."""
     ui.embed = create_stylepoints_embed(ui.ctx)
-    error_fields = {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}
+    error_fields: dict = {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}
 
-    coros = [
+    coros: list = [
         lambda: ui.get_valid_message(lambda r: r.lower() in utils.Profile.playstyles.keys(), error_fields),
         lambda: ui.get_reply('reaction_add', valid_reactions=['\u23ed\ufe0f'], cancel=False)
     ]
@@ -50,7 +54,7 @@ async def get_user_stylepoints(ui):
 
 def create_stylepoints_embed(ctx):
     """Create embed for asking stylepoints."""
-    embed = discord.Embed(
+    embed: discord.Embed = discord.Embed(
         title=f"{ctx.author.display_name}'s Style Points",
         description=
         f"Type all of the playstyles below that apply to you, Type it again to remove it.\nClick the \u23ed\ufe0f when done.",
@@ -60,15 +64,15 @@ def create_stylepoints_embed(ctx):
     return embed
 
 
-async def get_user_cxp(ui):
+async def get_user_cxp(ui: utils.CommandUI) -> int:
     """Get the user's playstyle and calculate their, style points."""
     ui.embed = create_cxp_embed(ui.ctx)
-    error_fields = {"title": "Invalid number.", "description": "Please enter a valid number of tournaments."}
-    reply = await ui.get_valid_message(r'^\d+$', error_fields)
+    error_fields: dict = {"title": "Invalid number.", "description": "Please enter a valid number of tournaments."}
+    reply: discord.Message = await ui.get_valid_message(r'^\d+$', error_fields)
     return int(reply.content)
 
 
-def create_cxp_embed(ctx):
+def create_cxp_embed(ctx) -> discord.Embed:
     """Create embed for asking competitive experience."""
     return discord.Embed(
         title=f"{ctx.author.display_name}'s Competitive Experience",
@@ -77,7 +81,7 @@ def create_cxp_embed(ctx):
     )
 
 
-async def set_status_field(ui, profile, key, field_index):
+async def set_status_field(ui, profile, key, field_index) -> None:
     """Prompt the user for a standard user profile field."""
     instructions = {
         "IGN": 'Please type a valid **IGN**, `(WP*Zada, Lepto)`',
@@ -90,16 +94,16 @@ async def set_status_field(ui, profile, key, field_index):
             "description": instructions[key]
         }
     )
-    field_value = profile.set_status(key, parse_reply(key, reply.content))
+    field_value: str = profile.set_status(key, parse_reply(key, reply.content))
     ui.embed.set_field_at(field_index, name=key, value=display_field(key, field_value))
 
 
-async def set_rank_field(ui, profile, field_index):
+async def set_rank_field(ui: utils.CommandUI, profile: utils.Profile, field_index: int) -> None:
     """Prompt the user for each of the rank fields."""
     create_instructions = lambda k: f'Please type a valid **__{k}__ Rank**, `(C, A-, S+0, X2350.0)`'
     for key in profile.get_ranks().keys():
         ui.embed.description = create_instructions(key)
-        reply = await ui.get_valid_message(
+        reply: discord.Message = await ui.get_valid_message(
             valid=lambda r: parse_reply("Ranks", r),
             error_fields={
                 "title": "Invalid Rank",
@@ -115,7 +119,7 @@ async def set_rank_field(ui, profile, field_index):
         )
 
 
-def clean_status_key(profile, key):
+def clean_status_key(profile: utils.Profile, key: str):
     """Clean status at key, return new value."""
     clean_status = {
         "IGN": None,
@@ -136,7 +140,7 @@ def parse_reply(key, value):
     if key == "IGN":
         return value if 1 <= len(value) <= 10 else False
     elif key == "SW":
-        value = re.sub(r"[\D]", "", value)
+        value: str = re.sub(r"[\D]", "", value)
         return int(value) if len(value) == 12 and value[0] != "0" else False
     elif key == "Ranks":
         value = value.upper()
@@ -148,38 +152,38 @@ def parse_reply(key, value):
     return False
 
 
-async def wait_user_playstyles(ui, coros):
+async def wait_user_playstyles(ui, coros) -> list:
     """Constantly wait for the user to input playstyles."""
-    user_playstyles = []
+    user_playstyles: list = []
 
     complete = False
     while not complete:
-        tasks = [asyncio.create_task(coro()) for coro in coros]
+        tasks: list = [asyncio.create_task(coro()) for coro in coros]
         task, reply = await ui.wait_tasks(tasks)
 
         if task == tasks[0]:
-            content = reply.content.lower()
+            content: str = reply.content.lower()
 
             if content not in user_playstyles:
                 user_playstyles.append(content)
             else:
                 user_playstyles.remove(content)
         else:
-            complete = True
+            complete: bool = True
         ui.embed.set_field_at(0, name="Playstyles", value=create_playstyle_list(user_playstyles))
 
     return user_playstyles
 
 
-async def confirm_profile(ui):
+async def confirm_profile(ui) -> bool:
     """Confirms user profile and returns status."""
-    alert_embed = utils.Alert.create_embed(utils.Alert.Style.WARNING, title="Confirm?", description="Please confirm your profile.")
+    alert_embed: discord.Embed = utils.Alert.create_embed(utils.Alert.Style.WARNING, title="Confirm?", description="To confirm your profile, react with \u2611\ufe0f. To reenter your profile, react with \u23ea.")
     ui.embed.title, ui.embed.description, ui.embed.color = alert_embed.title, alert_embed.description, alert_embed.color
-    reply = await ui.get_reply("reaction_add", valid_reactions=['\u2611\ufe0f'])
+    reply = await ui.get_reply("reaction_add", valid_reactions=['\u2611\ufe0f', '\u23ea'])
     return reply[0].emoji == '\u2611\ufe0f'
 
 
-def create_playstyle_list(profile_playstyles=()):
+def create_playstyle_list(profile_playstyles=()) -> str:
     """Create the list of playstyles based on the current profiles."""
     set_checkmark = lambda p: '\u2705' if p in profile_playstyles else '\U0001f7e9'
     return "\n".join([f'{set_checkmark(playstyle)} {playstyle.capitalize()}' for playstyle in utils.Profile.playstyles])

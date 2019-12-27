@@ -1,9 +1,11 @@
 """Holds api for working with a custom command ui."""
 
-from discord import Embed
-from discord.ext.commands import context
 import asyncio
 import re
+from typing import Union, Callable, Optional, Tuple
+
+import discord
+from discord.ext.commands import Context
 
 import utils
 
@@ -11,14 +13,14 @@ import utils
 class CommandUI:
     """Class containing the command UI used in each command."""
 
-    def __init__(self, ctx: context, embed: Embed):
+    def __init__(self, ctx: Context, embed: discord.Embed):
         """Initilize command UI and declare self variables."""
-        self.ctx = ctx
-        self.embed = embed
-        self.reply_task = None
-        self.alert = None
+        self.ctx: Context = ctx
+        self.embed: discord.Embed = embed
+        self.reply_task: Optional[asyncio.Task] = None
+        self.alert: Optional[utils.Alert] = None
 
-    async def __new__(cls, ctx: context, embed: Embed):
+    async def __new__(cls, ctx: Context, embed: discord.Embed):
         """Use async to create embed and passive task on class creation."""
         self = super().__new__(cls)
         self.__init__(ctx, embed)
@@ -27,19 +29,19 @@ class CommandUI:
         return self
 
     @staticmethod
-    async def create_ui(ctx: context, embed: Embed):
+    async def create_ui(ctx: Context, embed: discord.Embed) -> discord.Message:
         """Create and return the discord embed UI."""
-        ui = await ctx.send(embed=embed)
+        ui: discord.Message = await ctx.send(embed=embed)
         await ui.add_reaction('❌')
         return ui
 
-    async def update(self):
+    async def update(self) -> None:
         """Update the ui with new information."""
         await self.ui.edit(embed=self.embed)
 
-    async def end(self, status: bool):
+    async def end(self, status: bool) -> None:
         """End UI interaction and display status."""
-        status_key = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED}
+        status_key: dict = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED}
         if status_key.get(status):
             await self.ui.edit(embed=status_key[status])
             await self.ui.clear_reactions()
@@ -50,26 +52,26 @@ class CommandUI:
         # Raise exception to cancel command
         raise utils.exc.CommandCancel
 
-    async def get_valid_message(self, valid, error_fields: dict = None, *, _alert_params=None):
+    async def get_valid_message(self, valid: Union[str, Callable], error_fields: dict = None, *, _alert_params=None) -> discord.Message:
         """Get message reply with validity checks."""
         # Check if it's the function's first run
         if _alert_params is None:  # Initilize error params
-            _alert_params = {**error_fields, "style": utils.Alert.Style.DANGER}
+            _alert_params: dict = {**error_fields, "style": utils.Alert.Style.DANGER}
         else:
             await self.update()
             await self.delete_alert()
             await self.create_alert(**_alert_params)
 
         # Get message and check if it's valid
-        reply = await self.get_reply()
+        reply: discord.Message = await self.get_reply()
         if self.check_valid(valid, reply.content):
             await self.delete_alert()
         else:
-            reply = await self.get_valid_message(valid=valid, _alert_params=_alert_params)
+            reply: discord.Message = await self.get_valid_message(valid=valid, _alert_params=_alert_params)
 
         return reply
 
-    async def get_reply(self, event: str = 'message', *, valid_reactions: list = None, cancel=True):
+    async def get_reply(self, event: str = 'message', *, valid_reactions: list = None, cancel: bool = True) -> discord.Message:
         """Get the reply from the user."""
         await self.update()  # First update embed
 
@@ -89,8 +91,8 @@ class CommandUI:
             }
         }
         # Create tasks
-        reply_task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]))
-        cancel_task = self.create_cancel_task()
+        reply_task: asyncio.Task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]))
+        cancel_task: asyncio.Task = self.create_cancel_task()
 
         # Await tasks
         if cancel:
@@ -114,18 +116,18 @@ class CommandUI:
 
         return reply
 
-    async def create_alert(self, style: utils.Alert.Style, title: str, description: str):
+    async def create_alert(self, style: utils.Alert.Style, title: str, description: str) -> None:
         """Create an alert with a given color to determine the style."""
         self.alert = await utils.Alert(self.ctx, style, title=title, description=description)
 
-    async def delete_alert(self):
+    async def delete_alert(self) -> None:
         """Delete an alert associated with the command ui if it exists."""
         if self.alert:
             await self.alert.delete()
             self.alert = None
 
     @staticmethod
-    def check_valid(valid, reply):
+    def check_valid(valid: Union[str, Callable], reply: discord.Message):
         """Check if a user's reply is valid."""
         if isinstance(valid, str):
             return re.search(valid, reply)
@@ -136,16 +138,16 @@ class CommandUI:
                 return False
 
     @staticmethod
-    async def wait_tasks(tasks: set):
+    async def wait_tasks(tasks: set) -> Tuple[asyncio.Future, Optional[discord.Message]]:
         """Try block to asyncio.wait a set of tasks with timeout handling, and return the first completed."""
         done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
-        task = done.pop()
+        task: asyncio.Future = done.pop()
 
         # Get reply
         try:
-            reply = task.result()
+            reply: Optional[discord.Message] = task.result()
         except asyncio.TimeoutError:
-            reply = None
+            reply: Optional[discord.Message] = None
 
         # Cancel the other still pending tasks
         for rest in pending:
@@ -153,7 +155,7 @@ class CommandUI:
 
         return task, reply
 
-    def create_cancel_task(self):
+    def create_cancel_task(self) -> asyncio.Task:
         """Create a task that checks if the user canceled the command."""
         return asyncio.create_task(
             self.ctx.bot.wait_for(

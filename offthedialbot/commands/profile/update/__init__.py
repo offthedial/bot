@@ -4,35 +4,46 @@ from .. import create, check_for_profile, display_field, create_status_embed
 
 async def main(ctx):
     """Run command for $profile update."""
-    profile = await check_for_profile(ctx)
+    profile: utils.Profile = await check_for_profile(ctx)
     embed, emojis = create_update_embed(ctx, profile)
 
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
 
     reply = await ui.get_reply("reaction_add", valid_reactions=emojis)
-    field = create.clean_status_key(profile, list(profile.get_status().keys())[emojis.index(reply[0].emoji)])
+    index: int = emojis.index(reply[0].emoji)
+    field = create.clean_status_key(profile, list(profile.get_status().keys())[index])
+    await wait_profile_field(ui, profile, index, field)
 
-    # Set up update field
-    embed.clear_fields()
-    embed.add_field(name=field[0], value=display_field(*field))
 
-    # Wait for user to type whichever field they want to update
-    await [
-        lambda: create.set_status_field(ui, profile, "IGN", 0),
-        lambda: create.set_status_field(ui, profile, "SW", 0),
-        lambda: create.set_rank_field(ui, profile, 0),
-    ][emojis.index(reply[0].emoji)]()
+async def wait_profile_field(ui: utils.CommandUI, profile: utils.Profile, index, field) -> None:
+    """wait for reply and write updated field."""
+    ui.embed.clear_fields()
+    ui.embed.add_field(name=field[0], value=display_field(*field))
+
+    await set_field(ui, profile, index)
 
     # Confirm profile and save it
     if await create.confirm_profile(ui):
         utils.dbh.update_profile(profile.dict(), ui.ctx.author.id)
         await ui.end(True)
+    else:
+        ui.embed, _ = create_update_embed(ui.ctx, profile)
+        await wait_profile_field(ui, profile, index, field)
 
 
-def create_update_embed(ctx, profile):
+async def set_field(ui: utils.CommandUI, profile: utils.Profile, index: int) -> None:
+    """Wait for user to type whichever field they want to update."""
+    await [
+        lambda: create.set_status_field(ui, profile, "IGN", 0),
+        lambda: create.set_status_field(ui, profile, "SW", 0),
+        lambda: create.set_rank_field(ui, profile, 0),
+    ][index]()
+
+
+def create_update_embed(ctx, profile: utils.Profile):
     """Create status embed, with some adjustments."""
     embed = create_status_embed(ctx.author.display_name, profile)
-    emojis = []
+    emojis: list = []
     for (index, field), emoji in zip(enumerate(embed.fields), utils.emojis.digits()):
         embed.set_field_at(index, name=(f"{emoji} " + field.name), value=field.value, inline=True if field.name != "Ranks" else False)
         emojis.append(emoji)

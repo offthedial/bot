@@ -2,9 +2,9 @@
 
 from discord.ext.commands import Bot
 
-from offthedialbot import listeners
-from offthedialbot import commands
 from offthedialbot import cogs
+from offthedialbot import commands
+from offthedialbot import listeners
 
 
 class Client(Bot):
@@ -32,6 +32,6 @@ class Client(Bot):
 
 client = Client(command_prefix='$')
 
-listeners.register_listeners(client)
-commands.register_commands(client)
 cogs.register_cogs(client)
+commands.register_commands(client)
+listeners.register_listeners(client)

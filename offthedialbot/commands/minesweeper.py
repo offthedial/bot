@@ -9,7 +9,7 @@ import utils
 
 async def main(ctx):
     """$minesweeper command."""
-    embed = discord.Embed(color=0x1c2a32)
+    embed: discord.Embed = discord.Embed(color=0x1c2a32)
     embed.set_author(
         name="Minesweeper!", icon_url="https://emojipedia-us.s3.amazonaws.com/thumbs/120/twitter/131/bomb_1f4a3.png"
     )
@@ -53,21 +53,21 @@ async def main(ctx):
 class Map:
     """Class that holds the map of the minesweeper."""
 
-    def __init__(self, size, difficulty):
+    def __init__(self, size: int, difficulty: int):
         """Initilize the map."""
-        self.size = size
-        self.difficulty = random.randint(1, 10) if difficulty <= 0 else difficulty
+        self.size: int = size
+        self.difficulty: int = random.randint(1, 10) if difficulty <= 0 else difficulty
 
         self.ALGORITHM = lambda: (np.cbrt(difficulty) * 0.8) * np.square(self.size) / 13
 
-    def create_mines(self):
+    def create_mines(self) -> list:
         """
-        Wraps the creating of the sweeper into a neat packaged class method.
+        Wraps the creating of the minesweeper into a neat packaged class method.
 
         Returns:
             A list of messages you paste seperately.
         """
-        output = []
+        output: list = []
 
         board = self.set_bombs(self.create_map())
         text_board = self.convert_to_text(board)
@@ -140,7 +140,7 @@ class Map:
         return text_board
 
     @staticmethod
-    def _prob_round(raw):
+    def _prob_round(raw: float) -> int:
         dice = random.uniform(0, 1)
         try:
             base = int(raw)

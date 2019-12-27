@@ -1,3 +1,5 @@
+from typing import Optional
+
 import discord
 
 
@@ -11,11 +13,11 @@ class Alert:
         SUCCESS = 0x63ae33
         INFO = 0x0082ef
 
-    def __init__(self, ctx, style, *, title, description):
+    def __init__(self, ctx, style: Style, *, title: str, description: str):
         """Create alert embed."""
         self.ctx = ctx
-        self.embed = self.create_embed(style, title, description)
-        self.alert = None
+        self.embed: discord.Embed = self.create_embed(style, title, description)
+        self.alert: Optional[discord.Message] = None
 
     async def __new__(cls, *args, **kwargs):
         """Use async to create message on class creation."""
@@ -26,7 +28,7 @@ class Alert:
         return self
 
     @classmethod
-    def create_embed(cls, style, title: str, description: str = None):
+    def create_embed(cls, style, title: str, description: str = None) -> discord.Embed:
         """Creates alert embed."""
         title_key = {
             cls.Style.DANGER: lambda t: f'\U0001f6ab Error: **{t}**',

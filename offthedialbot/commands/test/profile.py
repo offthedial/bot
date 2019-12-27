@@ -3,7 +3,7 @@ import utils
 
 async def main(ctx):
     """Test command to create a mock profile for the user instantly."""
-    profile = {
+    profile: dict = {
         "status": {
             "IGN": "Dave",
             "SW": 111100000000,

@@ -5,14 +5,14 @@ import utils
 
 async def main(ctx):
     """Run command for $profile."""
-    profile = await check_for_profile(ctx)
-    embed = create_status_embed(ctx.author.display_name, profile)
+    profile: utils.Profile = await check_for_profile(ctx)
+    embed: discord.Embed = create_status_embed(ctx.author.display_name, profile)
     await ctx.send(embed=embed)
 
 
 async def check_for_profile(ctx, reverse=False) -> utils.Profile:
     """Returns profile if it exists, otherwise cancels command."""
-    profile = utils.dbh.find_profile(id=ctx.author.id)
+    profile: dict = utils.dbh.find_profile(id=ctx.author.id)
     if (result := {
         False: lambda p: (p is None, {"title": "No profile found.", "description": "You can create one using `$profile create`."}),
         True: lambda p: (p, {"title": "Existing profile found.", "description": "You can view your profile with `$profile`."}),
@@ -22,18 +22,18 @@ async def check_for_profile(ctx, reverse=False) -> utils.Profile:
     return utils.Profile(profile)
 
 
-def create_status_embed(name, profile):
+def create_status_embed(name, profile) -> discord.Embed:
     """Create profile embed to display user profile."""
-    embed = discord.Embed(title=f"{name}'s Status", color=utils.colors.Roles.DIALER)
+    embed: discord.Embed = discord.Embed(title=f"{name}'s Status", color=utils.colors.Roles.DIALER)
 
     for key, value in profile.get_status().items():
-        value = display_field(key, value)
+        value: str = display_field(key, value)
         embed.add_field(name=key, value=value, inline=True if key != "Ranks" else False)
 
     return embed
 
 
-def display_field(key, field):
+def display_field(key, field) -> str:
     """Displays each field in displayable format."""
     return {
         "IGN": lambda: f'`{field}`' if field else '*`pending`*',

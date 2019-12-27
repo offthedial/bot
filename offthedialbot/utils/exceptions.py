@@ -2,4 +2,5 @@
 
 
 class CommandCancel(Exception):
+    """Cancel a command."""
     pass

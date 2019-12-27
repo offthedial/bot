@@ -1,6 +1,3 @@
-import utils
-
-
 async def on_member_join(self, member):
     if member.guild != self.get_guild(self.OTD):
         return

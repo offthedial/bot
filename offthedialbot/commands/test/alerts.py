@@ -5,10 +5,10 @@ import utils
 
 async def main(ctx):
     """Test command to test each of the alerts."""
-    embed = discord.Embed(title="Testing: Alerts")
-    ui = await utils.CommandUI(ctx, embed)
+    embed: discord.Embed = discord.Embed(title="Testing: Alerts")
+    ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
 
-    alert_styles = (
+    alert_styles: tuple = (
         utils.Alert.Style.DANGER, utils.Alert.Style.WARNING, utils.Alert.Style.INFO, utils.Alert.Style.SUCCESS
     )
 

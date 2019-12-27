@@ -1,7 +1,7 @@
 """Dynamically import and generate discord.ext listeners."""
-import os
-import inspect
 import importlib
+import inspect
+import os
 
 
 def register_listeners(bot):
@@ -24,7 +24,7 @@ def import_modules():
     return modules
 
 
-def get_listeners(modules):
+def get_listeners(modules: list) -> list:
     """Imports the listener functions from each module."""
     return [get_function(module) for module in modules]
 

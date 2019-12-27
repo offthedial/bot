@@ -1,7 +1,7 @@
 """Dynamically import and generate discord.ext cogs."""
-import os
-import inspect
 import importlib
+import inspect
+import os
 
 
 def register_cogs(bot):
@@ -24,7 +24,7 @@ def import_modules():
     return modules
 
 
-def get_cogs(modules):
+def get_cogs(modules) -> list:
     """Imports the cogs from each module."""
     return [get_class(module) for module in modules]
 
