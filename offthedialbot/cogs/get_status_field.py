@@ -13,7 +13,7 @@ class GetStatusField(commands.Cog, command_attrs=dict(hidden=True)):
             profile = await check_for_profile(ctx)
         except utils.exc.CommandCancel:
             return
-        await utils.Alert(ctx, utils.Alert.Style.INFO, title=f"`{profile['status']['IGN']}`'s Friend Code:", description=f"{display_field('SW', profile['status']['SW'])}")
+        await utils.Alert(ctx, utils.Alert.Style.INFO, title=f"`{profile.get_status()['IGN']}`'s Friend Code:", description=f"{display_field('SW', profile.get_status()['SW'])}")
 
     @commands.command()
     async def ign(self, ctx):
@@ -22,7 +22,7 @@ class GetStatusField(commands.Cog, command_attrs=dict(hidden=True)):
             profile = await check_for_profile(ctx)
         except utils.exc.CommandCancel:
             return
-        await utils.Alert(ctx, utils.Alert.Style.INFO, title=f"{ctx.author.display_name}'s IGN:", description=f"{display_field('IGN', profile['status']['IGN'])}")
+        await utils.Alert(ctx, utils.Alert.Style.INFO, title=f"{ctx.author.display_name}'s IGN:", description=f"{display_field('IGN', profile.get_status()['IGN'])}")
 
     @commands.command()
     async def ranks(self, ctx):
@@ -34,6 +34,6 @@ class GetStatusField(commands.Cog, command_attrs=dict(hidden=True)):
 
         await utils.Alert(
             ctx, utils.Alert.Style.INFO,
-            title=f"`{profile['status']['IGN']}`'s Ranks:",
-            description=f"{display_field('Ranks', profile['status']['Ranks'])}"
+            title=f"`{profile.get_status()['IGN']}`'s Ranks:",
+            description=f"{display_field('Ranks', profile.get_status()['Ranks'])}"
         )

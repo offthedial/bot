@@ -4,63 +4,36 @@ import re
 import discord
 
 import utils
-from . import create_status_embed, check_for_profile, display_field, convert_rank_power
+from . import create_status_embed, check_for_profile, display_field
 
 
 async def main(ctx):
     """Run command for $profile create."""
     await check_for_profile(ctx, reverse=True)
-    profile = {
-        "status": {
-            "IGN": None,
-            "SW": None,
-            "Ranks": {
-                "Splat Zones": None,
-                "Rainmaker": None,
-                "Tower Control": None,
-                "Clam Blitz": None,
-            },
-        },
-        "style_points": [],  # Groups A, B, and C.
-        "cxp": 0,
-        "meta": {
-            "currently_competing": False,
-            "previous_tourneys": [],
-            "dropout_ban": None,
-        }
-    }
+    profile = utils.Profile()
 
     embed = create_status_embed(ctx.author.display_name, profile)
     ui = await utils.CommandUI(ctx, embed)
 
     await set_user_status(ui, profile)
-    await confirm_profile(ui)
-    profile["style_points"] = await get_user_stylepoints(ui)
-    profile["cxp"] = await get_user_cxp(ui)
-    utils.dbh.new_profile(profile, ui.ctx.author.id)
+    profile.set_stylepoints(await get_user_stylepoints(ui))
+    profile.set_cxp(await get_user_cxp(ui))
+    utils.dbh.new_profile(profile.dict(), ui.ctx.author.id)
     await ui.end(True)
 
 
 async def set_user_status(ui, profile):
     """Get valid message for each rank."""
-    for index, key in enumerate(profile["status"].keys()):
+    for index, key in enumerate(profile.get_status().keys()):
+        clean_status_key(profile, key)
 
         if key != "Ranks":
             await set_status_field(ui, profile, key, index)
         else:
             await set_rank_field(ui, profile, index)
 
-
-playstyles = {
-    "frontline": (0, 0, 0),
-    "midline": (0, 0, 0),
-    "backline": (0, 0, 0),
-    "flex": (0, 0, 0),
-    "slayer": (0, 0, 0),
-    "defensive": (0, 0, 0),
-    "objective": (0, 0, 0),
-    "support": (0, 0, 0),
-}
+    if not await confirm_profile(ui):
+        await set_user_status(ui, profile)
 
 
 async def get_user_stylepoints(ui):
@@ -69,7 +42,7 @@ async def get_user_stylepoints(ui):
     error_fields = {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}
 
     coros = [
-        lambda: ui.get_valid_message(lambda r: r.lower() in playstyles.keys(), error_fields),
+        lambda: ui.get_valid_message(lambda r: r.lower() in utils.Profile.playstyles.keys(), error_fields),
         lambda: ui.get_reply('reaction_add', valid_reactions=['\u23ed\ufe0f'], cancel=False)
     ]
     return await wait_user_playstyles(ui, coros)  # Check if user has selected atleast 1 of the 3
@@ -117,14 +90,14 @@ async def set_status_field(ui, profile, key, field_index):
             "description": instructions[key]
         }
     )
-    profile["status"][key] = parse_reply(key, reply.content)
-    ui.embed.set_field_at(field_index, name=key, value=display_field(key, profile["status"][key]))
+    field_value = profile.set_status(key, parse_reply(key, reply.content))
+    ui.embed.set_field_at(field_index, name=key, value=display_field(key, field_value))
 
 
 async def set_rank_field(ui, profile, field_index):
     """Prompt the user for each of the rank fields."""
     create_instructions = lambda k: f'Please type a valid **__{k}__ Rank**, `(C, A-, S+0, X2350.0)`'
-    for key in profile["status"]["Ranks"].keys():
+    for key in profile.get_ranks().keys():
         ui.embed.description = create_instructions(key)
         reply = await ui.get_valid_message(
             valid=lambda r: parse_reply("Ranks", r),
@@ -133,13 +106,29 @@ async def set_rank_field(ui, profile, field_index):
                 "description": create_instructions(key)
             }
         )
-        profile["status"]["Ranks"][key] = parse_reply("Ranks", reply.content)
+        profile.set_rank(key, parse_reply("Ranks", reply.content))
         ui.embed.set_field_at(
             field_index,
             name="Ranks",
-            value=display_field("Ranks", profile["status"]["Ranks"]),
+            value=display_field("Ranks", profile.get_ranks()),
             inline=False
         )
+
+
+def clean_status_key(profile, key):
+    """Clean status at key, return new value."""
+    clean_status = {
+        "IGN": None,
+        "SW": None,
+        "Ranks": {
+            "Splat Zones": None,
+            "Rainmaker": None,
+            "Tower Control": None,
+            "Clam Blitz": None,
+        },
+    }
+    value = profile.set_status(key, clean_status[key])
+    return key, value
 
 
 def parse_reply(key, value):
@@ -152,9 +141,9 @@ def parse_reply(key, value):
     elif key == "Ranks":
         value = value.upper()
         if value in {"C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+", "S", "X"}:  # Standard rank, or default X
-            return convert_rank_power(value) if value != "X" else 2000.0
+            return utils.Profile.convert_rank_power(value) if value != "X" else 2000.0
         elif re.search(r"(^S\+\d$)|(^X[1-9]\d{3}(\.\d)?$)", value.upper()):  # S+ or X(power)
-            return convert_rank_power(value)
+            return utils.Profile.convert_rank_power(value)
 
     return False
 
@@ -193,14 +182,4 @@ async def confirm_profile(ui):
 def create_playstyle_list(profile_playstyles=()):
     """Create the list of playstyles based on the current profiles."""
     set_checkmark = lambda p: '\u2705' if p in profile_playstyles else '\U0001f7e9'
-    return "\n".join([f'{set_checkmark(playstyle)} {playstyle.capitalize()}' for playstyle in playstyles])
-
-
-def calculate_style_points(user_playstyles):  # A stub
-    """Calculate a user's style points given their playstyles."""
-    style_points = [0, 0, 0]
-    for playstyle in user_playstyles:
-        style_points += [*playstyles[playstyle]]
-        style_points = list(map(int.__add__, playstyles[playstyle], style_points))
-
-    return style_points
+    return "\n".join([f'{set_checkmark(playstyle)} {playstyle.capitalize()}' for playstyle in utils.Profile.playstyles])

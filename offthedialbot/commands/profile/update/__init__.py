@@ -10,7 +10,7 @@ async def main(ctx):
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
 
     reply = await ui.get_reply("reaction_add", valid_reactions=emojis)
-    field = get_field_item(profile, emojis.index(reply[0].emoji))
+    field = create.clean_status_key(profile, list(profile.get_status().keys())[emojis.index(reply[0].emoji)])
 
     # Set up update field
     embed.clear_fields()
@@ -25,7 +25,7 @@ async def main(ctx):
 
     # Confirm profile and save it
     if await create.confirm_profile(ui):
-        utils.dbh.update_profile(profile, ui.ctx.author.id)
+        utils.dbh.update_profile(profile.dict(), ui.ctx.author.id)
         await ui.end(True)
 
 
@@ -38,21 +38,3 @@ def create_update_embed(ctx, profile):
         emojis.append(emoji)
     embed.description = "React with the field you would like to change."
     return embed, emojis
-
-
-def get_field_item(profile, index):
-    """Return name and value of status at index."""
-    clean_status = {
-        "IGN": None,
-        "SW": None,
-        "Ranks": {
-            "Splat Zones": None,
-            "Rainmaker": None,
-            "Tower Control": None,
-            "Clam Blitz": None,
-        },
-    }
-    name = list(profile["status"].keys())[index]
-    profile["status"][name] = clean_status[name]
-    value = profile["status"][name]
-    return name, value

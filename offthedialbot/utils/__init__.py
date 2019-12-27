@@ -9,5 +9,6 @@ from . import exceptions as exc
 from .alert import Alert
 from .command_ui import CommandUI
 from .db import DatabaseHandler
+from .profile import Profile
 
 dbh = DatabaseHandler()
