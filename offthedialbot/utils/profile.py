@@ -36,12 +36,12 @@ class Profile:
         }
 
     # Setters
-    def set_status(self, key: str, value):
+    def set_status_key(self, key: str, value):
         """Set status key to value."""
         self.profile["status"][key] = value
         return self.profile["status"][key]
 
-    def set_rank(self, key: str, rank: Union[str, int, float]):
+    def set_rank(self, key: str, rank: Union[str, int, float]) -> Union[int, float]:
         """Set rank at specified key."""
         self.profile["status"]["Ranks"][key] = (self.convert_rank_power(rank) if isinstance(rank, str) else rank)
         return self.profile["status"]["Ranks"][key]
@@ -57,9 +57,9 @@ class Profile:
         return self.profile["cxp"]
 
     # Getters
-    def get_status(self) -> dict:
+    def get_status(self, key: str = None) -> dict:
         """Returns profile status."""
-        return self.profile["status"]
+        return self.profile["status"][key] if key else self.profile["status"]
 
     def get_ranks(self) -> dict:
         """Returns profile ranks."""
@@ -77,7 +77,7 @@ class Profile:
         """Calculate the user's points."""
         pass
 
-    def calculate_stylepoints(self, user_playstyles: list):
+    def calculate_stylepoints(self, user_playstyles: list) -> list:
         """Calculate a user's stylepoints given their playstyles."""
         stylepoints: list = [0, 0, 0]
         for playstyle in user_playstyles:

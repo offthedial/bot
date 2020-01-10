@@ -94,7 +94,7 @@ async def set_status_field(ui, profile, key, field_index) -> None:
             "description": instructions[key]
         }
     )
-    field_value: str = profile.set_status(key, parse_reply(key, reply.content))
+    field_value: str = profile.set_status_key(key, parse_reply(key, reply.content))
     ui.embed.set_field_at(field_index, name=key, value=display_field(key, field_value))
 
 
@@ -131,7 +131,7 @@ def clean_status_key(profile: utils.Profile, key: str):
             "Clam Blitz": None,
         },
     }
-    value = profile.set_status(key, clean_status[key])
+    value = profile.set_status_key(key, clean_status[key])
     return key, value
 
 
