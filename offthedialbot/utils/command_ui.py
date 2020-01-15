@@ -39,7 +39,7 @@ class CommandUI:
         """Update the ui with new information."""
         await self.ui.edit(embed=self.embed)
 
-    async def end(self, status: bool) -> None:
+    async def end(self, status: Union[bool, None]) -> None:
         """End UI interaction and display status."""
         status_key: dict = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED}
         if status_key.get(status):
