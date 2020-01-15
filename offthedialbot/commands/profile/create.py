@@ -57,7 +57,7 @@ def create_stylepoints_embed(ctx):
     embed: discord.Embed = discord.Embed(
         title=f"{ctx.author.display_name}'s Style Points",
         description=
-        f"Type all of the playstyles below that apply to you, Type it again to remove it.\nClick the \u23ed\ufe0f when done.",
+        f"Enter all of the playstyles below that apply to you, Type it again to remove it.\nClick the \u23ed\ufe0f when done.",
         color=utils.colors.Roles.DIALER
     )
     embed.add_field(name="Playstyles", value=create_playstyle_list())
@@ -76,7 +76,7 @@ def create_cxp_embed(ctx) -> discord.Embed:
     """Create embed for asking competitive experience."""
     return discord.Embed(
         title=f"{ctx.author.display_name}'s Competitive Experience",
-        description=f"How many tournaments with >= 16 teams have your competed in?",
+        description=f"How many tournaments, with more than 16 teams, have your competed in?",
         color=utils.colors.Roles.DIALER
     )
 
@@ -84,8 +84,8 @@ def create_cxp_embed(ctx) -> discord.Embed:
 async def set_status_field(ui, profile, key, field_index) -> None:
     """Prompt the user for a standard user profile field."""
     instructions = {
-        "IGN": 'Please type a valid **IGN**, `(WP*Zada, Lepto)`',
-        "SW": 'Please type a valid **SW**, `(SW-1111-1111-1111)`',
+        "IGN": 'Enter your **IGN**, `(WP*Zada, Lepto)`',
+        "SW": 'Enter your **SW**, `(SW-1111-1111-1111)`',
     }
     ui.embed.description = instructions[key]
     reply = await ui.get_valid_message(
@@ -100,7 +100,7 @@ async def set_status_field(ui, profile, key, field_index) -> None:
 
 async def set_rank_field(ui: utils.CommandUI, profile: utils.Profile, field_index: int) -> None:
     """Prompt the user for each of the rank fields."""
-    create_instructions = lambda k: f'Please type a valid **__{k}__ Rank**, `(C, A-, S+0, X2350.0)`'
+    create_instructions = lambda k: f'Enter your **__{k}__ Rank**, `(C, A-, S+0, X2350.0)`'
     for key in profile.get_ranks().keys():
         ui.embed.description = create_instructions(key)
         reply: discord.Message = await ui.get_valid_message(
