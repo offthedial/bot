@@ -16,6 +16,10 @@ class DatabaseHandler:
         """Find a document in the profiles collection by id."""
         return self.profiles.find_one({"_id": id})
 
+    def find_many_profiles(self, query: dict):
+        """Find all documents with the given kwargs."""
+        return self.profiles.find(query)
+
     def new_profile(self, profile: dict, id: int):
         """Insert a new profile into the profiles collection with id."""
         profile["_id"] = id
