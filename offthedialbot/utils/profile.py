@@ -29,9 +29,9 @@ class Profile:
             "stylepoints": [],  # Groups A, B, and C.
             "cxp": 0,
             "meta": {
-                "currently_competing": False,
+                "competing": False,
                 "previous_tourneys": [],
-                "dropout_ban": None,
+                "banned": None,
             }
         }
 
@@ -57,13 +57,17 @@ class Profile:
         return self.profile["cxp"]
 
     # Getters
+    def get_id(self) -> int:
+        """Returns discord id of profile."""
+        return self.profile["_id"]
+
     def get_status(self, key: str = None) -> dict:
         """Returns profile status."""
         return self.profile["status"][key] if key else self.profile["status"]
 
-    def get_ranks(self) -> dict:
+    def get_ranks(self, key: str = None) -> dict:
         """Returns profile ranks."""
-        return self.profile["status"]["Ranks"]
+        return self.profile["status"]["Ranks"][key] if key else self.profile["status"]["Ranks"]
 
     def get_stylepoints(self) -> list:
         """Returns stylepoints"""
@@ -73,9 +77,22 @@ class Profile:
         """Returns competitive experience."""
         return self.profile["cxp"]
 
-    def calculate_elo(self) -> int:
+    def is_competing(self) -> bool:
+        """Returns whether profile is competing."""
+        return self.profile["meta"]["competing"]
+
+    def get_previous_tourneys(self) -> list:
+        """Returns a list of previously attended tournaments."""
+        return self.profile["meta"]["previous_tourneys"]
+
+    def is_banned(self):
+        """Returns whether the user is banned or not."""
+        return self.profile["meta"]["banned"]
+
+    def calculate_elo(self) -> float:
         """Calculate the user's points."""
-        pass
+        rank_powers = [rank for rank in self.profile["status"]["Ranks"].values()]
+        return round(sum(rank_powers) / len(rank_powers), 1)
 
     def calculate_stylepoints(self, user_playstyles: list) -> list:
         """Calculate a user's stylepoints given their playstyles."""

@@ -14,12 +14,12 @@ async def main(ctx):
                 "Clam Blitz": 1260.8,
             },
         },
-        "style_points": ["flex", "slayer"],  # Groups A, B, and C.
+        "stylepoints": ["flex", "slayer"],  # Groups A, B, and C.
         "cxp": 22,
         "meta": {
-            "currently_competing": False,
+            "competing": True,
             "previous_tourneys": [],
-            "dropout_ban": None,
+            "banned": None,
         }
     }
     utils.dbh.new_profile(profile, ctx.author.id)
