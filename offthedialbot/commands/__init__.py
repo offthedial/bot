@@ -6,6 +6,7 @@ import sys
 from discord.ext import commands
 
 import utils
+from log import logger
 
 
 def register_commands(bot):
@@ -40,11 +41,11 @@ def find_commands(module=sys.modules[__name__]):
 
         # Get the current node in the tree
         if len(hierarchy) == 1:
-            # print(f'Module found: "{module_name}"')  # TODO: Use debug log
+            logger.debug(f'Module found: "{module_name}"')
             data[module_name] = sub_dict
         else:
             # Retrieve the direct parent
-            # print(f'Sub-module found: "{module_name}"')  # TODO: Use debug log
+            logger.debug(f'Sub-module found: "{module_name}"')
             parent = recursive_get(data, *hierarchy[:-1])
             parent['subcommands'][hierarchy[-1]] = sub_dict
 
@@ -66,7 +67,7 @@ def process_commands(data, parent):
 
         # If no "main" function was provided, skip
         if not func:
-            print(f"Cannot register command '{name}': Missing `main`")  # TODO: Use warning log
+            logger.warn(f"Cannot register command '{name}': Missing `main`")
             continue
 
         # If subcommands were found, create a command group
