@@ -84,7 +84,7 @@ def derive_command(func, name):
     if not func:
         logger.warn(f"Cannot register command '{name}': Missing `main`")
         func = lambda ctx: None
-    
+
     @wraps(func)
     async def _(ctx):
         try:
