@@ -84,6 +84,8 @@ def process_commands(data, parent):
 
 def derive_command(func):
     """Wrap command in another function to parse arguments and exceptions."""
+    if not func:
+        return None
 
     async def _(ctx):
         try:

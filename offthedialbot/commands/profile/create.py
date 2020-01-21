@@ -52,7 +52,7 @@ async def get_user_stylepoints(ui: utils.CommandUI) -> list:
     return await wait_user_playstyles(ui, coros)  # Check if user has selected atleast 1 of the 3
 
 
-def create_stylepoints_embed(ctx):
+def create_stylepoints_embed(ctx) -> discord.Embed:
     """Create embed for asking stylepoints."""
     embed: discord.Embed = discord.Embed(
         title=f"{ctx.author.display_name}'s Style Points",
@@ -119,7 +119,7 @@ async def set_rank_field(ui: utils.CommandUI, profile: utils.Profile, field_inde
         )
 
 
-def clean_status_key(profile: utils.Profile, key: str):
+def clean_status_key(profile: utils.Profile, key: str) -> tuple:
     """Clean status at key, return new value."""
     clean_status = {
         "IGN": None,
@@ -177,7 +177,11 @@ async def wait_user_playstyles(ui, coros) -> list:
 
 async def confirm_profile(ui) -> bool:
     """Confirms user profile and returns status."""
-    alert_embed: discord.Embed = utils.Alert.create_embed(utils.Alert.Style.WARNING, title="Confirm?", description="To confirm your profile, react with \u2611\ufe0f. To reenter your profile, react with \u23ea.")
+    alert_embed: discord.Embed = utils.Alert.create_embed(
+        utils.Alert.Style.WARNING,
+        title="Confirm?",
+        description="To confirm your profile, react with \u2611\ufe0f. To reenter your profile, react with \u23ea."
+    )
     ui.embed.title, ui.embed.description, ui.embed.color = alert_embed.title, alert_embed.description, alert_embed.color
     reply = await ui.get_reply("reaction_add", valid_reactions=['\u2611\ufe0f', '\u23ea'])
     return reply[0].emoji == '\u2611\ufe0f'
