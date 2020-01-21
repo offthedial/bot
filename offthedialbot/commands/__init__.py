@@ -2,6 +2,7 @@
 import inspect
 import pkgutil
 import sys
+from functools import wraps
 
 from discord.ext import commands
 
@@ -82,7 +83,9 @@ def derive_command(func, name):
     """Wrap command in another function to parse arguments and exceptions."""
     if not func:
         logger.warn(f"Cannot register command '{name}': Missing `main`")
-
+        func = lambda ctx: None
+    
+    @wraps(func)
     async def _(ctx):
         try:
             await func(ctx)
