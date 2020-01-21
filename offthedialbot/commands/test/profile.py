@@ -1,4 +1,4 @@
-import utils
+from offthedialbot import utils
 
 
 async def main(ctx):
@@ -24,4 +24,7 @@ async def main(ctx):
         }
     }
     utils.dbh.new_profile(profile, ctx.author.id)
-    await utils.Alert(ctx, utils.Alert.Style.SUCCESS, title="Created mock profile", description="Located under name: `Dave`")
+    await utils.Alert(
+        ctx, utils.Alert.Style.SUCCESS,
+        title="Created mock profile", description="Located under name: `Dave`"
+    )

@@ -3,7 +3,7 @@ import re
 
 import discord
 
-import utils
+from offthedialbot import utils
 from . import create_status_embed, check_for_profile, display_field
 
 

@@ -2,10 +2,10 @@
 
 from discord.ext.commands import Bot
 
-from log import logger
 from offthedialbot import cogs
 from offthedialbot import commands
 from offthedialbot import listeners
+from .log import logger
 
 
 class Client(Bot):

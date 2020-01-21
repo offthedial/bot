@@ -1,7 +1,9 @@
 import csv
 from io import StringIO
+
 import discord
-import utils
+
+from offthedialbot import utils
 
 
 async def main(ctx):
@@ -24,7 +26,10 @@ async def main(ctx):
 
 def create_embed():
     """Create embed."""
-    return discord.Embed(title="Do you want all profiles or just those competing?", description="Select \U0001f4e9 for all, and \U0001f3c5 for just those competing.")
+    return discord.Embed(
+        title="Do you want all profiles or just those competing?",
+        description="Select \U0001f4e9 for all, and \U0001f3c5 for just those competing."
+    )
 
 
 def create_file(ui: utils.CommandUI, profiles: list):
@@ -51,7 +56,8 @@ def create_file(ui: utils.CommandUI, profiles: list):
             str(profile.get_id())
         ])
 
-    writer.writerows([["Discord Mention", "IGN", "SW", "SZ", "RM", "TC", "CB", "Cumulative ELO", "Stylepoints", "CXP", "Competing", "Previous Tourneys", "Droppout Ban", "Discord ID"], []] + csv_profiles)
+    writer.writerows([["Discord Mention", "IGN", "SW", "SZ", "RM", "TC", "CB", "Cumulative ELO", "Stylepoints", "CXP",
+                       "Competing", "Previous Tourneys", "Droppout Ban", "Discord ID"], []] + csv_profiles)
 
     file.seek(0)
     return file
@@ -59,5 +65,9 @@ def create_file(ui: utils.CommandUI, profiles: list):
 
 async def upload_file(ui: utils.CommandUI, file: StringIO):
     """Upload csv file to discord."""
-    await ui.ctx.send(embed=utils.Alert.create_embed(utils.Alert.Style.SUCCESS, ":incoming_envelope: *Successfully exported profiles!*", "Download the spreadsheet below. \U0001f4e5"))
+    await ui.ctx.send(embed=utils.Alert.create_embed(
+        utils.Alert.Style.SUCCESS,
+        title=":incoming_envelope: *Successfully exported profiles!*",
+        description="Download the spreadsheet below. \U0001f4e5"
+    ))
     await ui.ctx.send(file=discord.File(file, filename="profiles.csv"))

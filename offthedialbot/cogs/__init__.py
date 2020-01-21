@@ -18,7 +18,7 @@ def import_modules():
     for module in os.listdir(os.path.dirname(__file__)):
         if module == '__init__.py' or module[-3:] != '.py':
             continue
-        modules.append(importlib.import_module(f".{module[:-3]}", package="cogs"))
+        modules.append(importlib.import_module(f"offthedialbot.cogs.{module[:-3]}"))
     del module
 
     return modules

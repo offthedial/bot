@@ -1,4 +1,4 @@
-import utils
+from offthedialbot import utils
 from .. import create, check_for_profile, display_field, create_status_embed
 
 
@@ -45,7 +45,8 @@ def create_update_embed(ctx, profile: utils.Profile):
     embed = create_status_embed(ctx.author.display_name, profile)
     emojis: list = []
     for (index, field), emoji in zip(enumerate(embed.fields), utils.emojis.digits()):
-        embed.set_field_at(index, name=(f"{emoji} " + field.name), value=field.value, inline=True if field.name != "Ranks" else False)
+        embed.set_field_at(index, name=(f"{emoji} " + field.name), value=field.value,
+                           inline=True if field.name != "Ranks" else False)
         emojis.append(emoji)
     embed.description = "React with the field you would like to change."
     return embed, emojis

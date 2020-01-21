@@ -7,7 +7,7 @@ from typing import Union, Callable, Optional, Tuple
 import discord
 from discord.ext.commands import Context
 
-import utils
+from offthedialbot import utils
 
 
 class CommandUI:
@@ -34,7 +34,10 @@ class CommandUI:
     async def check_pemissions(ctx, required_roles):
         """Check if the user has the correct permissions to execute the command."""
         if required_roles.get("moderator") and not ("moderator" in [role.name.lower() for role in ctx.author.roles]):
-            await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Permission Denied.", description="You don't have permission to use this command.")
+            await utils.Alert(
+                ctx, utils.Alert.Style.DANGER,
+                title="Permission Denied.", description="You don't have permission to use this command."
+            )
             raise utils.exc.CommandCancel
 
     @staticmethod
@@ -136,10 +139,10 @@ class CommandUI:
             self.alert = None
 
     @staticmethod
-    def check_valid(valid: Union[str, Callable], reply: discord.Message):
+    def check_valid(valid: Union[str, Callable], reply: discord.Message) -> bool:
         """Check if a user's reply is valid."""
         if isinstance(valid, str):
-            return re.search(valid, reply)
+            return bool(re.search(valid, reply))
         else:
             try:
                 return valid(reply)

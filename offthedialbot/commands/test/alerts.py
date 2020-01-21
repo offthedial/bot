@@ -1,6 +1,6 @@
 import discord
 
-import utils
+from offthedialbot import utils
 
 
 async def main(ctx):

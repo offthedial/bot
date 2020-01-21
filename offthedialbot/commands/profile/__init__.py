@@ -1,6 +1,6 @@
 import discord
 
-import utils
+from offthedialbot import utils
 
 
 async def main(ctx):
@@ -14,8 +14,10 @@ async def check_for_profile(ctx, reverse=False) -> utils.Profile:
     """Returns profile if it exists, otherwise cancels command."""
     profile: dict = utils.dbh.find_profile(id=ctx.author.id)
     if (result := {
-        False: lambda p: (p is None, {"title": "No profile found.", "description": "You can create one using `$profile create`."}),
-        True: lambda p: (p, {"title": "Existing profile found.", "description": "You can view your profile with `$profile`."}),
+        False: lambda p: (
+        p is None, {"title": "No profile found.", "description": "You can create one using `$profile create`."}),
+        True: lambda p: (
+        p, {"title": "Existing profile found.", "description": "You can view your profile with `$profile`."}),
     }[reverse](profile))[0]:
         await utils.Alert(ctx, utils.Alert.Style.DANGER, **result[1])
         raise utils.exc.CommandCancel
@@ -38,5 +40,7 @@ def display_field(key, field) -> str:
     return {
         "IGN": lambda: f'`{field}`' if field else '*`pending`*',
         "SW": lambda: f"`SW-{str(field)[:4]}-{str(field)[4:8]}-{str(field)[8:]}`" if field is not None else '*`pending`*',
-        "Ranks": lambda: "\n".join([f"**{k}:** {(f'`{utils.Profile.convert_rank_power(v)}`' if v else '*`pending`*')}" for k, v in field.items()])
+        "Ranks": lambda: "\n".join(
+            [f"**{k}:** {(f'`{utils.Profile.convert_rank_power(v)}`' if v else '*`pending`*')}" for k, v in
+             field.items()])
     }[key]()

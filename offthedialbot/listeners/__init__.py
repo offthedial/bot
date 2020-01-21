@@ -18,7 +18,7 @@ def import_modules():
     for module in os.listdir(os.path.dirname(__file__)):
         if module == '__init__.py' or module[-3:] != '.py':
             continue
-        modules.append(importlib.import_module(f".{module[:-3]}", package="listeners"))
+        modules.append(importlib.import_module(f"offthedialbot.listeners.{module[:-3]}"))
     del module
 
     return modules
@@ -38,8 +38,8 @@ def get_function(module):
 
 def derive_listener(func, bot):
     """Derive listener from function."""
+
     async def _(*args, **kwargs):
         return await func(bot, *args, **kwargs)
 
     return _
-

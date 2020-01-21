@@ -1,4 +1,4 @@
-import utils
+from offthedialbot import utils
 from .. import create, check_for_profile
 
 

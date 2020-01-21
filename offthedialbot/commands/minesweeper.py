@@ -4,7 +4,7 @@ import random
 import discord
 import numpy as np
 
-import utils
+from offthedialbot import utils
 
 
 async def main(ctx):
