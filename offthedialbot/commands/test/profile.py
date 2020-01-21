@@ -3,6 +3,7 @@ import utils
 
 async def main(ctx):
     """Test command to create a mock profile for the user instantly."""
+    await utils.CommandUI.check_pemissions(ctx, required_roles={"moderator": True})
     profile: dict = {
         "status": {
             "IGN": "Dave",

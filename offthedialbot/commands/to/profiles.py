@@ -6,7 +6,7 @@ import utils
 
 async def main(ctx):
     """$to profiles command."""
-    ui: utils.CommandUI = await utils.CommandUI(ctx, create_embed())
+    ui: utils.CommandUI = await utils.CommandUI(ctx, create_embed(), moderator=True)
     reply, _ = await ui.get_reply("reaction_add", valid_reactions=['\U0001f4e9', '\U0001f3c5'])
 
     profiles: list = {

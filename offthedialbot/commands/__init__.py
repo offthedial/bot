@@ -62,13 +62,8 @@ def process_commands(data, parent):
     """Extract main function and convert into an ext command."""
     for name, cmd_dict in data.items():
 
-        func = derive_command(cmd_dict['func'])
+        func = derive_command(cmd_dict['func'], name)
         subcommands = cmd_dict['subcommands']
-
-        # If no "main" function was provided, skip
-        if not func:
-            logger.warn(f"Cannot register command '{name}': Missing `main`")
-            continue
 
         # If subcommands were found, create a command group
         if subcommands:
@@ -83,10 +78,10 @@ def process_commands(data, parent):
         parent.add_command(cmd)
 
 
-def derive_command(func):
+def derive_command(func, name):
     """Wrap command in another function to parse arguments and exceptions."""
     if not func:
-        return None
+        logger.warn(f"Cannot register command '{name}': Missing `main`")
 
     async def _(ctx):
         try:
