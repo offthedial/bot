@@ -6,6 +6,29 @@ from offthedialbot import utils
 
 class HelpCommand(commands.DefaultHelpCommand):
     """Help command for the bot."""
+    async def command_not_found(self, string):
+        """Returns message when command is not found."""
+        return f"Command `{self.clean_prefix}{string}` does not exist."
+
+    async def subcommand_not_found(self, command, string):
+        """Returns message when subcommand is not found."""
+        message = super().subcommand_not_found(command, string).split()
+        message[1] = f'`${message[1][1:-1]}`'
+        if not message[-1].endswith("."):
+            message[-1] = f'`{message[-1]}`.'
+        return " ".join(message)
+
+    async def send_error_message(self, error):
+        """Send error message, override to support sending embeds."""
+        await self.get_destination().send(embed=utils.Alert.create_embed(utils.Alert.Style.DANGER, title="Command/Subcommand not found.", description=error))
+
+    def create_embed(self, fields: list = (), **kwargs):
+        """Create help embed."""
+        embed = discord.Embed(**kwargs, color=utils.Alert.Style.DANGER)
+        for field in fields:
+            embed.add_field(**field)
+        embed.set_footer(text=f"Type {self.clean_prefix}help command for more info on a command. You can also type {self.clean_prefix}help category for more info on a category.")
+        return embed
 
 
 help_command = HelpCommand()
