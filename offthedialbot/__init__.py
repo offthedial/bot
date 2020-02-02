@@ -5,7 +5,7 @@ from discord.ext.commands import Bot
 from offthedialbot import cogs
 from offthedialbot import commands
 from offthedialbot import listeners
-from .log import logger
+from . import log, help
 
 
 class Client(Bot):
@@ -15,7 +15,8 @@ class Client(Bot):
         super().__init__(*args, **kwargs)
 
         self.OTD = self.get_guild(374715620052172800)
-        self.logger = logger
+        self.logger = log.logger
+        self.help_command = help.help_command
 
         class Channels:
             """Class containing channel objects."""

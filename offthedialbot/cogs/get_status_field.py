@@ -4,8 +4,8 @@ from offthedialbot import utils
 from offthedialbot.commands.profile import check_for_profile, display_field
 
 
-class GetStatusField(commands.Cog, command_attrs=dict(hidden=True)):
-    """Cog containing comands to easily get profile fields."""
+class GetStatusField(commands.Cog, command_attrs={'hidden': True}):
+    """Quickly fetch the value of one of your status fields."""
 
     @commands.command(aliases=["fc"])
     async def sw(self, ctx: commands.Context):

@@ -83,7 +83,9 @@ def derive_command(func, name):
     """Wrap command in another function to parse arguments and exceptions."""
     if not func:
         logger.warn(f"Cannot register command '{name}': Missing `main`")
-        func = lambda ctx: None
+
+        async def func(ctx):
+            pass
 
     @wraps(func)
     async def _(ctx):

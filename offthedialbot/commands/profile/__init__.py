@@ -14,10 +14,8 @@ async def check_for_profile(ctx, reverse=False) -> utils.Profile:
     """Returns profile if it exists, otherwise cancels command."""
     profile: dict = utils.dbh.find_profile(id=ctx.author.id)
     if (result := {
-        False: lambda p: (
-        p is None, {"title": "No profile found.", "description": "You can create one using `$profile create`."}),
-        True: lambda p: (
-        p, {"title": "Existing profile found.", "description": "You can view your profile with `$profile`."}),
+        False: lambda p: (p is None, {"title": "No profile found.", "description": "You can create one using `$profile create`."}),
+        True: lambda p: (p, {"title": "Existing profile found.", "description": "You can view your profile with `$profile`."}),
     }[reverse](profile))[0]:
         await utils.Alert(ctx, utils.Alert.Style.DANGER, **result[1])
         raise utils.exc.CommandCancel

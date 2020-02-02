@@ -1,4 +1,4 @@
-"""Set's up logging for the bot."""
+"""Sets up logging for the bot."""
 import logging
 
 logging.basicConfig(
