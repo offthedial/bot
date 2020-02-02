@@ -6,6 +6,20 @@ from offthedialbot import utils
 
 class HelpCommand(commands.DefaultHelpCommand):
     """Help command for the bot."""
+    async def send_group_help(self, group):
+        """Send command group page."""
+        embed = self.create_embed(
+            title=f"`{self.clean_prefix}{group}`",
+            description=group.help,
+            fields=[{
+                "name": "Subcommands:",
+                "value": "\n".join([
+                    f'`{self.clean_prefix}{command}` {command.help}'
+                    for command in group.all_commands.values()
+                ])
+            }]
+        )
+        await self.get_destination().send(embed=embed)
 
     async def send_command_help(self, command):
         """Send command page."""
