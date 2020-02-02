@@ -6,6 +6,15 @@ from offthedialbot import utils
 
 class HelpCommand(commands.DefaultHelpCommand):
     """Help command for the bot."""
+
+    async def send_command_help(self, command):
+        """Send command page."""
+        embed = self.create_embed(
+            title=f"`{self.clean_prefix}{command}`",
+            description=command.help,
+        )
+        await self.get_destination().send(embed=embed)
+
     async def command_not_found(self, string):
         """Returns message when command is not found."""
         return f"Command `{self.clean_prefix}{string}` does not exist."
