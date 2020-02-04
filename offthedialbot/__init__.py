@@ -1,4 +1,4 @@
-"""Holds client subclass of discord.ext.Bot, and registers listeners, commands, and cogs."""
+"""Contains client subclass of discord.ext.Bot, and registers listeners, commands, and cogs."""
 
 from discord.ext.commands import Bot
 
@@ -9,7 +9,7 @@ from . import log, help
 
 
 class Client(Bot):
-    """commands.Bot subclass containing helpful constants."""
+    """Subclass of commands.Bot containing helpful constants."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

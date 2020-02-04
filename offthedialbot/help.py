@@ -1,11 +1,12 @@
-"""Sets up help command for the bot."""
+"""Contains HelpCommand class."""
 import discord
 from discord.ext import commands
 from offthedialbot import utils
 
 
 class HelpCommand(commands.DefaultHelpCommand):
-    """Help command for the bot."""
+    """Set up help command for the bot."""
+
     async def send_bot_help(self, mapping):
         """Send bot command page."""
         embed = self.create_embed(

@@ -1,4 +1,4 @@
-"""Holds the emojis used."""
+"""Contains commonly used emojis."""
 
 
 def digits():

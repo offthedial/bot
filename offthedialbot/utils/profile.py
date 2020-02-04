@@ -1,8 +1,9 @@
+"""Contains Profile class."""
 from typing import Union
 
 
 class Profile:
-    """User profile class."""
+    """Provides helpful functions for working with profiles."""
     playstyles = {
         "frontline": (0, 0, 0),
         "midline": (0, 0, 0),

@@ -1,4 +1,4 @@
-"""Holds the static embeds used."""
+"""Contains static embeds."""
 
 import discord
 

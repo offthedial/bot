@@ -1,4 +1,4 @@
-"""Holds api for working with a custom command ui."""
+"""Contains CommandUI class."""
 
 import asyncio
 import re
@@ -11,7 +11,7 @@ from offthedialbot import utils
 
 
 class CommandUI:
-    """Class containing the command UI used in each command."""
+    """Custom command UI."""
 
     def __init__(self, ctx: Context, embed: discord.Embed, **kwargs):
         """Initilize command UI and declare self variables."""

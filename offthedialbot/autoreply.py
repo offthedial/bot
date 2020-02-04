@@ -1,1 +1,1 @@
-"""Holds autoreply messages that are not commands directly."""
+"""Contains autoreply messages that are not commands directly."""

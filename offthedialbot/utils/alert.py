@@ -1,13 +1,14 @@
+"""Contains the Alert class."""
 from typing import Optional
 
 import discord
 
 
 class Alert:
-    """An alert API."""
+    """Custom polished alerts."""
 
     class Style:
-        """Class holding specifically alert styles and their colors."""
+        """Alert styles and their colors."""
         DANGER = 0xf50206
         WARNING = 0xffbe00
         SUCCESS = 0x63ae33
@@ -20,7 +21,7 @@ class Alert:
         self.alert: Optional[discord.Message] = None
 
     async def __new__(cls, *args, **kwargs):
-        """Use async to create message on class creation."""
+        """Create message on class creation using async."""
         self = super().__new__(cls)
         self.__init__(*args, **kwargs)
 
@@ -29,7 +30,7 @@ class Alert:
 
     @classmethod
     def create_embed(cls, style, title: str, description: str = None) -> discord.Embed:
-        """Creates alert embed."""
+        """Create alert embed."""
         title_key = {
             cls.Style.DANGER: lambda t: f'\U0001f6ab Error: **{t}**',
             cls.Style.WARNING: lambda t: f'\u26a0 Warning: **{t}**',
@@ -38,7 +39,7 @@ class Alert:
         }
         return discord.Embed(title=title_key[style](title), description=description, color=style)
 
-    async def delete(self):
+    async def delete(self) -> None:
         """Remove alert."""
         if self.alert:
             await self.alert.delete()

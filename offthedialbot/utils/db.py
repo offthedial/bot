@@ -1,4 +1,4 @@
-"""Holds the database handler to work with mongodb."""
+"""Contains the DatabaseHandler class."""
 import os
 if os.getenv("DEBUG"):
     import mongomock as pymongo
@@ -7,7 +7,7 @@ else:
 
 
 class DatabaseHandler:
-    """Database handler."""
+    """Custom database handler that works with mongodb."""
 
     def __init__(self):
         self.client = pymongo.MongoClient("mongodb://localhost:27017/")

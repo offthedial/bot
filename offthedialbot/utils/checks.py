@@ -1,4 +1,4 @@
-"""Holds checks used for filtering replies."""
+"""Contains checks used for filtering replies."""
 
 
 def msg(m, ctx) -> bool:

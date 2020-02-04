@@ -1,4 +1,8 @@
+"""Contains on_member_join listener."""
+
+
 async def on_member_join(self, member):
+    """When a new member joins Off the Dial."""
     if member.guild != self.get_guild(self.OTD):
         return
     # Get channel and role

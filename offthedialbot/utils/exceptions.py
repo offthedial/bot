@@ -1,4 +1,4 @@
-"""Holds custom exceptions."""
+"""Contains custom exceptions."""
 
 
 class CommandCancel(Exception):
