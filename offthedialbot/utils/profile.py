@@ -29,6 +29,7 @@ class Profile:
             },
             "stylepoints": [],  # Groups A, B, and C.
             "cxp": 0,
+            "signal_strength": 0,
             "meta": {
                 "competing": False,
                 "smashgg": None,
@@ -57,6 +58,11 @@ class Profile:
         self.profile["cxp"] = cxp
         return self.profile["cxp"]
 
+    def add_signal_strength(self, ss: int) -> int:
+        """Add to signal strength."""
+        self.profile["signal_strength"] = ss
+        return self.profile["signal_strength"]
+
     # Getters
     def get_id(self) -> int:
         """Returns discord id of profile."""
@@ -77,6 +83,10 @@ class Profile:
     def get_cxp(self) -> int:
         """Returns competitive experience."""
         return self.profile["cxp"]
+
+    def get_signal_strength(self) -> int:
+        """Returns signal strength."""
+        return self.profile["signal_strength"]
 
     def is_competing(self) -> bool:
         """Returns whether profile is competing."""

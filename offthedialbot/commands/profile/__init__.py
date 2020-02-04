@@ -25,8 +25,11 @@ async def check_for_profile(ctx, reverse=False) -> utils.Profile:
 
 def create_status_embed(name, profile) -> discord.Embed:
     """Create profile embed to display user profile."""
-    embed: discord.Embed = discord.Embed(title=f"{name}'s Status", color=utils.colors.Roles.DIALER)
-
+    embed: discord.Embed = discord.Embed(
+        title=f"{name}'s Status",
+        description=f"**\U0001f4f6 Signal Strength:** `{profile.get_signal_strength()}`",
+        color=utils.colors.Roles.DIALER
+    )
     for key, value in profile.get_status().items():
         value: str = display_field(key, value)
         embed.add_field(name=key, value=value, inline=True if key != "Ranks" else False)
