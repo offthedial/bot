@@ -1,5 +1,7 @@
 """Contains the DatabaseHandler class."""
 import os
+from dotenv import load_dotenv
+load_dotenv()
 if os.getenv("DEBUG"):
     import mongomock as pymongo
 else:
