@@ -1,10 +1,11 @@
+"""$profile"""
 import discord
 
 from offthedialbot import utils
 
 
 async def main(ctx):
-    """Run command for $profile."""
+    """View your profile."""
     profile: utils.Profile = await check_for_profile(ctx)
     embed: discord.Embed = create_status_embed(ctx.author.display_name, profile)
     await ctx.send(embed=embed)

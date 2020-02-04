@@ -1,8 +1,9 @@
+"""$test profile"""
 from offthedialbot import utils
 
 
 async def main(ctx):
-    """Test command to create a mock profile for the user instantly."""
+    """Create a mock profile for the user."""
     await utils.CommandUI.check_pemissions(ctx, required_roles={"moderator": True})
     profile: dict = {
         "status": {

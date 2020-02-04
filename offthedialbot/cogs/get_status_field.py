@@ -1,3 +1,4 @@
+"""cogs.GetStatusField"""
 from discord.ext import commands
 
 from offthedialbot import utils
@@ -9,7 +10,7 @@ class GetStatusField(commands.Cog, command_attrs={'hidden': True}):
 
     @commands.command(aliases=["fc"])
     async def sw(self, ctx: commands.Context):
-        """Quickly gets SW status field."""
+        """Quickly sends your friend-code."""
         try:
             profile: utils.Profile = await check_for_profile(ctx)
         except utils.exc.CommandCancel:
@@ -19,7 +20,7 @@ class GetStatusField(commands.Cog, command_attrs={'hidden': True}):
 
     @commands.command()
     async def ign(self, ctx: commands.Context):
-        """Quickly gets IGN status field."""
+        """Quickly sends your IGN."""
         try:
             profile: utils.Profile = await check_for_profile(ctx)
         except utils.exc.CommandCancel:
@@ -29,7 +30,7 @@ class GetStatusField(commands.Cog, command_attrs={'hidden': True}):
 
     @commands.command()
     async def ranks(self, ctx: commands.Context):
-        """Quickly gets SW status field."""
+        """Quickly sends your ranks."""
         try:
             profile: utils.Profile = await check_for_profile(ctx)
         except utils.exc.CommandCancel:

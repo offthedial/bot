@@ -1,9 +1,10 @@
+"""$profile update"""
 from offthedialbot import utils
 from .. import create, check_for_profile, display_field, create_status_embed
 
 
 async def main(ctx):
-    """Run command for $profile update."""
+    """Update your profile."""
     profile: utils.Profile = await check_for_profile(ctx)
     embed, emojis = create_update_embed(ctx, profile)
 

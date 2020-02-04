@@ -1,3 +1,4 @@
+"""$to profiles"""
 import csv
 from io import StringIO
 
@@ -7,7 +8,7 @@ from offthedialbot import utils
 
 
 async def main(ctx):
-    """$to profiles command."""
+    """Export user profiles to a csv."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, create_embed(), moderator=True)
     reply, _ = await ui.get_reply("reaction_add", valid_reactions=['\U0001f4e9', '\U0001f3c5'])
 

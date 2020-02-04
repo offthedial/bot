@@ -1,10 +1,11 @@
+"""$test alerts"""
 import discord
 
 from offthedialbot import utils
 
 
 async def main(ctx):
-    """Test command to test each of the alerts."""
+    """Cycle through each of the different alert types."""
     embed: discord.Embed = discord.Embed(title="Testing: Alerts")
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed, moderator=True)
 

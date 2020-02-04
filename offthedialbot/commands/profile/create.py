@@ -1,3 +1,4 @@
+"""$profile create"""
 import asyncio
 import re
 
@@ -8,7 +9,7 @@ from . import create_status_embed, check_for_profile, display_field
 
 
 async def main(ctx):
-    """Run command for $profile create."""
+    """Create your profile."""
     await check_for_profile(ctx, reverse=True)
     profile: utils.Profile = utils.Profile()
 

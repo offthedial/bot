@@ -1,9 +1,10 @@
+"""$profile update stylepoints"""
 from offthedialbot import utils
 from .. import create, check_for_profile
 
 
 async def main(ctx):
-    """Run command for $profile update."""
+    """Update your stylepoints."""
     profile: utils.Profile = await check_for_profile(ctx)
     ui: utils.CommandUI = await utils.CommandUI(ctx, create.create_stylepoints_embed(ctx))
 

@@ -1,5 +1,9 @@
 """Holds the database handler to work with mongodb."""
-import mongomock as pymongo
+import os
+if os.getenv("DEBUG"):
+    import mongomock as pymongo
+else:
+    import pymongo
 
 
 class DatabaseHandler:
