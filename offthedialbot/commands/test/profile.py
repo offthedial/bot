@@ -20,7 +20,7 @@ async def main(ctx):
         "cxp": 22,
         "meta": {
             "competing": True,
-            "previous_tourneys": [],
+            "smashgg": None,
             "banned": None,
         }
     }

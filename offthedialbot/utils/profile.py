@@ -31,7 +31,7 @@ class Profile:
             "cxp": 0,
             "meta": {
                 "competing": False,
-                "previous_tourneys": [],
+                "smashgg": None,
                 "banned": None,
             }
         }
@@ -53,7 +53,7 @@ class Profile:
         return self.profile["stylepoints"]
 
     def set_cxp(self, cxp: int) -> int:
-        """Sets competitive experience"""
+        """Sets competitive experience."""
         self.profile["cxp"] = cxp
         return self.profile["cxp"]
 
@@ -91,7 +91,7 @@ class Profile:
         return self.profile["meta"]["banned"]
 
     def calculate_elo(self) -> float:
-        """Calculate the user's points."""
+        """Calculate the user's ELO."""
         rank_powers = [rank for rank in self.profile["status"]["Ranks"].values()]
         return round(sum(rank_powers) / len(rank_powers), 1)
 
