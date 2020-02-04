@@ -6,14 +6,27 @@ from offthedialbot import utils
 
 class HelpCommand(commands.DefaultHelpCommand):
     """Help command for the bot."""
+    async def send_bot_help(self, mapping):
+        """Send bot command page."""
+        embed = self.create_embed(
+            title="`$help`",
+            description="All the commands for Off the Dial Bot!",
+            fields=[{
+                "name": f"{f'{cog.qualified_name.capitalize()} ' if cog else ''}Commands:",
+                "value": "\n".join([
+                    f'`{self.clean_prefix}{command}` {command.help}'
+                    for command in await self.filter_commands(cog_commands) if command.help
+                ])} for cog, cog_commands in mapping.items() if await self.filter_commands(cog_commands)][::-1]
+        )
+        await self.get_destination().send(embed=embed)
 
     async def send_cog_help(self, cog):
         """Send cog command page."""
         embed = self.create_embed(
-            title=f"**{cog.qualified_name.capitalize()}**",
+            title=f"{cog.qualified_name.capitalize()}",
             description=cog.description,
             fields=[{
-                "name": "Commands:",
+                "name": f"{cog.qualified_name.capitalize()} Commands:",
                 "value": "\n".join([
                     f'`{self.clean_prefix}{command}` {command.help}'
                     for command in cog.get_commands()
@@ -28,7 +41,7 @@ class HelpCommand(commands.DefaultHelpCommand):
             title=f"`{self.clean_prefix}{group}`",
             description=group.help,
             fields=[{
-                "name": "Subcommands:",
+                "name": f"Subcommands:",
                 "value": "\n".join([
                     f'`{self.clean_prefix}{command}` {command.help}'
                     for command in group.all_commands.values()
@@ -65,7 +78,7 @@ class HelpCommand(commands.DefaultHelpCommand):
         """Create help embed."""
         embed = discord.Embed(**kwargs, color=utils.Alert.Style.DANGER)
         for field in fields:
-            embed.add_field(**field)
+            embed.add_field(**field, inline=False)
         embed.set_footer(text=f"Type {self.clean_prefix}help command for more info on a command. You can also type {self.clean_prefix}help category for more info on a category.")
         return embed
 

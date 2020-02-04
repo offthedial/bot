@@ -6,7 +6,7 @@ import numpy as np
 from offthedialbot import utils
 
 
-class Misc(commands.Cog, name='misc', command_attrs={'hidden': True}):
+class Misc(commands.Cog, name='misc'):
     """All of the miscellaneous commands."""
 
     @commands.command(aliases=["mines"])
