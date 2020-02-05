@@ -1,7 +1,7 @@
 # `offthedialbot`
 > A polished bot for the Off the Dial discord server.
 
-![Tags][tag-image]
+![Tags][tag-image] ![Continuous Integration](https://github.com/LeptoSpira/offthedialbot/workflows/Continuous%20Integration/badge.svg)
 
 This bot was created to help organize Off The Dial's tournaments easier and faster. It includes many commands that automate previously manual tasks. Another reason was the lack of a tournament managing discord bot in general. This bot also gets realtime data from smash.gg's API.
 
