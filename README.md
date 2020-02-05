@@ -28,7 +28,7 @@ Support me - Patreon: [`https://www.patreon.com/leptospira`](https://www.patreon
 
 As always, distributed under the MIT license. See `LICENSE` for more information.
 
-**[https://github.com/LeptoSpira/rw-offthedialbot](https://github.com/LeptoSpira/)**
+**[https://github.com/LeptoSpira/offthedialbot](https://github.com/LeptoSpira/)**
 
 <!-- Markdown link & img dfn's -->
 [tag-image]: https://img.shields.io/github/license/LeptoSpira/rw-offthedialbot.svg
