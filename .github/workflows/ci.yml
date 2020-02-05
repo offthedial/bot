@@ -1,0 +1,14 @@
+name: Continuous Integration
+on: [push]
+jobs:
+
+  build:
+    name: SSH Remote Commands
+    runs-on: ubuntu-latest
+    steps:
+    - uses: appleboy/ssh-action@master
+      with:
+        host:  ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        script: cd ~/offthedialbot && source .venv/bin/activate && git fetch && git checkout $GITHUB_SHA && pip install -r requirements.txt && systemctl --user restart offthedialbot
