@@ -6,7 +6,7 @@ on:
 jobs:
   build:
 
-    name: SSH Remote Commands
+    name: Deploy
     runs-on: ubuntu-latest
     steps:
     - uses: appleboy/ssh-action@master
