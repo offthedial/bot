@@ -11,4 +11,4 @@ jobs:
         host:  ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
-        script: cd offthedialbot && source .venv/bin/activate && git fetch && git checkout $GITHUB_SHA && pip install -r requirements.txt && systemctl offthedialbot
+        script: cd ~/offthedialbot && source .venv/bin/activate && git fetch && git checkout $GITHUB_SHA && pip install -r requirements.txt && systemctl --user restart offthedialbot
