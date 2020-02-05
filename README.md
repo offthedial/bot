@@ -16,8 +16,8 @@ This bot was created to help organize Off The Dial's tournaments easier and fast
 ![Example Output][example-output] <!-- Picture of someone using the help command -->
 
 ## Development Enviroment
-1. Clone the repo `git clone https://github.com/LeptoSpira/offthedialbot.git`
-2. Create a `.env` with your discord bot token:
+1. Clone the repo with `git clone https://github.com/LeptoSpira/offthedialbot.git`
+2. Create a `.env` in the repository root with your discord bot token:
    ```
    token=90c3f4ce...d3123c42
    ```
