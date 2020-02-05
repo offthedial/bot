@@ -16,10 +16,10 @@ This bot was created to help organize Off The Dial's tournaments easier and fast
 ![Example Output][example-output] <!-- Picture of someone using the help command -->
 
 ## Development Enviroment
-1. Clone the repo `git clone https://github.com/LeptoSpira/rw-offthedialbot.git`
-2. Create a `.env` with your discord bot token:
+1. Clone the repo with `git clone https://github.com/LeptoSpira/offthedialbot.git`
+2. Create a `.env` in the repository root with your discord bot token:
    ```
-   token=90c3f4ce...d3123c42
+   TOKEN=90c3f4ce...d3123c42
    ```
 
 ## Footnote
@@ -28,8 +28,8 @@ Support me - Patreon: [`https://www.patreon.com/leptospira`](https://www.patreon
 
 As always, distributed under the MIT license. See `LICENSE` for more information.
 
-**[https://github.com/LeptoSpira/rw-offthedialbot](https://github.com/LeptoSpira/)**
+**[https://github.com/LeptoSpira/offthedialbot](https://github.com/LeptoSpira/)**
 
 <!-- Markdown link & img dfn's -->
-[tag-image]: https://img.shields.io/github/license/LeptoSpira/rw-offthedialbot.svg
-[example-output]: https://github.com/LeptoSpira/rw-offthedialbot/example-output.png
+[tag-image]: https://img.shields.io/github/license/LeptoSpira/offthedialbot.svg
+[example-output]: https://github.com/LeptoSpira/offthedialbot/example-output.png
