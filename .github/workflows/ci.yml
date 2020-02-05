@@ -1,8 +1,11 @@
 name: Continuous Integration
-on: [push]
+on: 
+  push:
+    branches:
+      - master
 jobs:
-
   build:
+
     name: SSH Remote Commands
     runs-on: ubuntu-latest
     steps:
