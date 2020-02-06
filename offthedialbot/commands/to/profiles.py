@@ -68,7 +68,7 @@ async def upload_file(ui: utils.CommandUI, file: StringIO):
     """Upload csv file to discord."""
     await ui.ctx.send(embed=utils.Alert.create_embed(
         utils.Alert.Style.SUCCESS,
-        title=":incoming_envelope: *Successfully exported profiles!*",
+        title=":incoming_envelope: *Exporting profiles complete!*",
         description="Download the spreadsheet below. \U0001f4e5"
     ))
     await ui.ctx.send(file=discord.File(file, filename="profiles.csv"))
