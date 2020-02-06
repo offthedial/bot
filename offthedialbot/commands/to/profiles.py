@@ -52,13 +52,13 @@ def create_file(ui: utils.CommandUI, profiles: list):
             profile.get_stylepoints(),
             profile.get_cxp(),
             profile.is_competing(),
-            profile.get_previous_tourneys(),
+            profile.get_signal_strength(),
             profile.is_banned(),
             str(profile.get_id())
         ])
 
     writer.writerows([["Discord Mention", "IGN", "SW", "SZ", "RM", "TC", "CB", "Cumulative ELO", "Stylepoints", "CXP",
-                       "Competing", "Previous Tourneys", "Droppout Ban", "Discord ID"], []] + csv_profiles)
+                       "Competing", "Signal Strength", "Droppout Ban", "Discord ID"], []] + csv_profiles)
 
     file.seek(0)
     return file

@@ -60,7 +60,7 @@ class Profile:
 
     def add_signal_strength(self, ss: int) -> int:
         """Add to signal strength."""
-        self.profile["signal_strength"] = ss
+        self.profile["signal_strength"] += ss
         return self.profile["signal_strength"]
 
     # Getters
@@ -91,10 +91,6 @@ class Profile:
     def is_competing(self) -> bool:
         """Returns whether profile is competing."""
         return self.profile["meta"]["competing"]
-
-    def get_previous_tourneys(self) -> list:
-        """Returns a list of previously attended tournaments."""
-        return self.profile["meta"]["previous_tourneys"]
 
     def is_banned(self):
         """Returns whether the user is banned or not."""
