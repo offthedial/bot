@@ -17,7 +17,9 @@ class DatabaseHandler:
 
         # Collections
         self.profiles = self.db["profiles"]
+        self.links = self.db["links"]
 
+    # Profiles
     def find_profile(self, id: int):
         """Find a document in the profiles collection by id."""
         return self.profiles.find_one({"_id": id})
@@ -35,3 +37,15 @@ class DatabaseHandler:
         """Update an existing profile in the profiles collection by id."""
         profile["_id"] = id
         return self.profiles.replace_one({"_id": id}, profile)
+
+    # Links
+    def set_tourney_link(self, link):
+        """Set the tournament link."""
+        link = {"_id": "tourney", "link": link}
+        return self.links.replace_one({"_id": "tourney"}, link, upsert=True)
+
+    def get_tourney_link(self):
+        """Get the tournament link."""
+        link = self.links.find_one({"_id": "tourney"})
+        if link:
+            return link["link"]
