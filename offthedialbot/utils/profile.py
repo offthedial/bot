@@ -63,6 +63,11 @@ class Profile:
         self.profile["signal_strength"] += ss
         return self.profile["signal_strength"]
 
+    def set_competing(self, competing: bool) -> bool:
+        """Set competing."""
+        self.profile["meta"]["competing"] = competing
+        return self.profile["meta"]["competing"]
+
     # Getters
     def get_id(self) -> int:
         """Returns discord id of profile."""
@@ -77,7 +82,7 @@ class Profile:
         return self.profile["status"]["Ranks"][key] if key else self.profile["status"]["Ranks"]
 
     def get_stylepoints(self) -> list:
-        """Returns stylepoints"""
+        """Returns stylepoints."""
         return self.profile["stylepoints"]
 
     def get_cxp(self) -> int:
@@ -91,6 +96,10 @@ class Profile:
     def is_competing(self) -> bool:
         """Returns whether profile is competing."""
         return self.profile["meta"]["competing"]
+
+    def smashgg_id(self):
+        """Returns smash.gg id."""
+        return self.profile["meta"]["smashgg"]
 
     def is_banned(self):
         """Returns whether the user is banned or not."""
