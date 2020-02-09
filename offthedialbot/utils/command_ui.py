@@ -173,6 +173,6 @@ class CommandUI:
             self.ctx.bot.wait_for(
                 'reaction_add',
                 check=lambda r, u: utils.checks.react((r, u), self.ctx, self.ui, valids='❌'),
-                timeout=120
+                timeout=210
             )
         )

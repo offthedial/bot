@@ -20,7 +20,7 @@ async def main(ctx):
         "cxp": 22,
         "signal_strength": 150,
         "meta": {
-            "competing": True,
+            "competing": False,
             "smashgg": None,
             "banned": None,
         }
