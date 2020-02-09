@@ -14,23 +14,10 @@ class Client(Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.OTD = self.get_guild(374715620052172800)
         self.logger = log.logger
         self.help_command = help.help_command
 
-        class Channels:
-            """Class containing channel objects."""
-            GENERAL = self.get_channel(374715620052172802)
-
-        class Roles:
-            """Class containing role objects."""
-            try:
-                DIALER = self.OTD.get_role(427710343616397322)
-            except AttributeError:
-                DIALER = None
-
-        self.Channels = Channels
-        self.Roles = Roles
+        self.OTD = self.get_guild(374715620052172800)
 
 
 client = Client(command_prefix='$')

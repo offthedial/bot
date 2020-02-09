@@ -4,6 +4,8 @@ from . import checks
 from . import colors
 from . import embeds
 from . import emojis
+from . import channels
+from . import roles
 from . import exceptions as exc
 from .alert import Alert
 from .command_ui import CommandUI
