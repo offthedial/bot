@@ -64,7 +64,7 @@ class CommandUI:
         # Raise exception to cancel command
         raise utils.exc.CommandCancel
 
-    async def get_valid_message(self, valid: Union[str, Callable], error_fields: dict = None, *, _alert_params=None) -> discord.Message:
+    async def get_valid_message(self, valid: Union[str, Callable], error_fields: dict = None, *, _alert_params=None, **get_reply_params) -> discord.Message:
         """Get message reply with validity checks."""
         # Check if it's the function's first run
         if _alert_params is None:  # Initilize error params
@@ -75,7 +75,7 @@ class CommandUI:
             await self.create_alert(**_alert_params)
 
         # Get message and check if it's valid
-        reply: discord.Message = await self.get_reply()
+        reply: discord.Message = await self.get_reply(**get_reply_params)
         if self.check_valid(valid, reply.content):
             await self.delete_alert()
         else:
@@ -83,7 +83,7 @@ class CommandUI:
 
         return reply
 
-    async def get_reply(self, event: str = 'message', *, valid_reactions: list = None, cancel: bool = True) -> discord.Message:
+    async def get_reply(self, event: str = 'message', *, valid_reactions: list = None, **kwargs) -> discord.Message:
         """Get the reply from the user."""
         await self.update()  # First update embed
 
@@ -104,13 +104,13 @@ class CommandUI:
         }
         # Create tasks
         reply_task: asyncio.Task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]))
-        cancel_task: asyncio.Task = self.create_cancel_task()
+        cancel_task: asyncio.Task = self.create_cancel_task(kwargs.get("timeout"))
 
         # Await tasks
-        if cancel:
-            task, reply = await self.wait_tasks({reply_task, cancel_task})
-        else:
+        if kwargs.get("cancel") is False:
             task, reply = reply_task, await reply_task
+        else:
+            task, reply = await self.wait_tasks({reply_task, cancel_task})
 
         # Get result
         if task == cancel_task:
@@ -167,12 +167,12 @@ class CommandUI:
 
         return task, reply
 
-    def create_cancel_task(self) -> asyncio.Task:
+    def create_cancel_task(self, timeout=None) -> asyncio.Task:
         """Create a task that checks if the user canceled the command."""
         return asyncio.create_task(
             self.ctx.bot.wait_for(
                 'reaction_add',
                 check=lambda r, u: utils.checks.react((r, u), self.ctx, self.ui, valids='❌'),
-                timeout=210
+                timeout=(timeout if timeout else 120)
             )
         )
