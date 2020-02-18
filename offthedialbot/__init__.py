@@ -17,8 +17,6 @@ class Client(Bot):
         self.logger = log.logger
         self.help_command = help.help_command
 
-        self.OTD = self.get_guild(374715620052172800)
-
 
 client = Client(command_prefix='$')
 
