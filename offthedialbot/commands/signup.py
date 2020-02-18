@@ -18,6 +18,7 @@ async def main(ctx):
     await profile_updated(ui)
     await smashgg(ui, link)
 
+    await confirm_signup(ui)
     await finalize_signup(ui, profile)
     
     await ui.end(True)
@@ -53,21 +54,22 @@ async def smashgg(ui, link):
     # Uses OAuth2 to link user's smash.gg account
     # Give signup code to sign up on smash.gg
     ui.embed.description = f"Sign up on smash.gg at **<{link}>**.\nOnce you are finished, enter your confirmation code you recieved in the email (`#F1PN28`)."
-    code = await ui.get_valid_message(r"^#?.{6}$", {"title": "Invalid Confirmation Code", "description": "The code you entered was not valid, please try again."})
+    code = await ui.get_valid_message(r"^#?([A-Za-z0-9]){6}$", {"title": "Invalid Confirmation Code", "description": "The code you entered was not valid, please try again."})
     # Save code to show in exported profiles
 
 
 async def confirm_signup(ui):
     """Confirm user signup."""
     confirm = utils.Alert.create_embed(utils.Alert.Style.WARNING, "Confirm Signup", "Are you ready to sign up? You will not be able to undo without first contacting the organisers.")
-    ui.embed.title, ui.embed.description, ui.embed.description = confirm.embed.title, confirm.embed.description, confirm.embed.description
+    ui.embed.title, ui.embed.description, ui.embed.color = confirm.title, confirm.description, confirm.color
     await ui.get_reply('reaction_add', valid_reactions=["\u2705"])
 
 
 async def finalize_signup(ui, profile):
     """Finalize user signup, hand out roles, update profile, etc."""
     # Hand out competing role
-    await ui.ctx.author.add_roles(utils.roles.competing(ui.ctx.bot))
+    if competing_role := utils.roles.competing(ui.ctx.bot):
+        await ui.ctx.author.add_roles(competing_role)
 
     # Set profile to competing
     profile = utils.Profile(utils.dbh.find_profile(ui.ctx.author.id))
