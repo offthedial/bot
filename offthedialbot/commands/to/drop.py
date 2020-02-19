@@ -15,7 +15,7 @@ async def main(ctx):
             profile = utils.Profile(profile)
             if profile.is_competing():
                 link = utils.dbh.get_tourney_link()
-                ui.embed.description = f"Remove player from smash.gg at **<{link}>**, then hit the \u2705."
+                ui.embed.description = f"Remove `{member.display_name}` from smash.gg at **<{link}>**, then hit the \u2705."
                 await ui.get_reply("reaction_add", valid_reactions=["\u2705"])
                 profile.set_competing(False)
                 utils.dbh.update_profile(profile.dict(), member.id)
