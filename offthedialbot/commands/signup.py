@@ -1,4 +1,6 @@
 """$signup"""
+from contextlib import contextmanager
+
 import discord
 
 from offthedialbot import utils
@@ -14,11 +16,21 @@ async def main(ctx):
             title=f"Signup Form",
             color=utils.colors.Roles.COMPETING
     ))
+    checklist = Checklist(ui, {
+        "prerequisites": True,
+        "profile is updated": False,
+        "smash.gg integration": False,
+        "final confirmation": False
+    })
 
-    await profile_updated(ui)
-    await smashgg(ui, link)
+    # Check requirements
+    with checklist.checking("profile is updated"):
+        await profile_updated(ui)
+    with checklist.checking("smash.gg integration"):
+        await smashgg(ui, link)
+    with checklist.checking("final confirmation"):
+        await confirm_signup(ui)
 
-    await confirm_signup(ui)
     await finalize_signup(ui, profile)
     
     await ui.end(True)
@@ -75,3 +87,38 @@ async def finalize_signup(ui, profile):
     profile = utils.Profile(utils.dbh.find_profile(ui.ctx.author.id))
     profile.set_competing(True)
     utils.dbh.update_profile(profile.dict(), ui.ctx.author.id)
+
+class Checklist:
+    """Set checklist field on the signup form."""
+
+    emojis = {
+        True: '\u2705',
+        None: '\U0001f7e6',
+        False: '\u2b1b'
+    }
+
+    def __init__(self, ui, checklist):
+        self.ui = ui
+        self.checklist = checklist
+        
+        self.ui.embed.add_field(name="Requirements:", value=self.create(self.checklist))
+
+    @contextmanager
+    def checking(self, field):
+        """Check a requirement as a context manager.""" 
+        try:
+            self.update({field: None})
+            yield
+        finally:
+            self.update({field: True})
+
+    def update(self, updates):
+        """Update the checklist inside of the UI."""
+        self.checklist.update(**updates)
+        self.ui.embed.set_field_at(0, name=self.ui.embed.fields[0].name, value=self.create(self.checklist))
+
+    @classmethod
+    def create(cls, checklist):
+        """Create the checklist string."""
+        return "\n".join(f"{cls.emojis[value]} Checking {name}..." for name, value in checklist.items())
+    
