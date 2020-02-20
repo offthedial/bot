@@ -9,6 +9,5 @@ async def main(ctx):
     ui: utils.CommandUI = await utils.CommandUI(ctx, create.create_cxp_embed(ctx))
 
     profile.set_cxp(await create.get_user_cxp(ui))
-
-    utils.dbh.update_profile(profile.dict(), ui.ctx.author.id)
+    profile.write()
     await ui.end(True)

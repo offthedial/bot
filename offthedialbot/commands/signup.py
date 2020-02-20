@@ -39,14 +39,16 @@ async def main(ctx):
 async def check_prerequisites(ctx):
     """Check to make sure the user fits all the prerequisites."""
     link = utils.dbh.get_tourney_link()
-    if profile := utils.dbh.find_profile(id=ctx.author.id):
-        profile = utils.Profile(profile)
+    try:
+        profile = utils.Profile(ctx.author.id)
+    except utils.Profile.NotFound:
+        profile = None
 
     check = {
         (lambda: not link): "Registration is not open.",
         (lambda: not profile): "You don't have a profile, create one with `$profile create`.",
-        (lambda: not profile or profile.is_banned()): "You are currently banned from competing in Off the Dial tournaments.",
-        (lambda: not profile or profile.is_competing()): "You are already signed up!"
+        (lambda: not profile or profile.get_banned()): "You are currently banned from competing in Off the Dial tournaments.",
+        (lambda: not profile or profile.get_competing()): "You are already signed up!"
     }
     if any(values := [value for key, value in check.items() if key()]):
         await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Registration Failed.", description=values[0])
@@ -84,9 +86,8 @@ async def finalize_signup(ui, profile):
         await ui.ctx.author.add_roles(competing_role)
 
     # Set profile to competing
-    profile = utils.Profile(utils.dbh.find_profile(ui.ctx.author.id))
     profile.set_competing(True)
-    utils.dbh.update_profile(profile.dict(), ui.ctx.author.id)
+    profile.write()
 
 class Checklist:
     """Set checklist field on the signup form."""

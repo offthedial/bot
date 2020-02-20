@@ -11,7 +11,7 @@ from . import create_status_embed, check_for_profile, display_field
 async def main(ctx):
     """Create your profile."""
     await check_for_profile(ctx, reverse=True)
-    profile: utils.Profile = utils.Profile()
+    profile: utils.Profile = utils.Profile(ctx.author.id, new=True)
 
     embed: discord.Embed = create_status_embed(ctx.author.display_name, profile)
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
@@ -19,7 +19,7 @@ async def main(ctx):
     profile = await set_user_status(ui, profile)
     profile.set_stylepoints(await get_user_stylepoints(ui))
     profile.set_cxp(await get_user_cxp(ui))
-    utils.dbh.new_profile(profile.dict(), ui.ctx.author.id)
+    profile.write()
     await ui.end(True)
 
 
@@ -34,7 +34,7 @@ async def set_user_status(ui: utils.CommandUI, profile: utils.Profile) -> utils.
             await set_rank_field(ui, profile, index)
 
     if not await confirm_profile(ui):
-        profile: utils.Profile = utils.Profile()
+        profile: utils.Profile = utils.Profile(ui.ctx.author.id, new=True)
         ui.embed = create_status_embed(ui.ctx.author.display_name, profile)
         profile: utils.Profile = await set_user_status(ui, profile)
 
@@ -95,7 +95,8 @@ async def set_status_field(ui, profile, key, field_index) -> None:
             "description": instructions[key]
         }
     )
-    field_value: str = profile.set_status_key(key, parse_reply(key, reply.content))
+    field_value: str = parse_reply(key, reply.content)
+    profile.set_status(key, field_value)
     ui.embed.set_field_at(field_index, name=key, value=display_field(key, field_value))
 
 
@@ -132,8 +133,8 @@ def clean_status_key(profile: utils.Profile, key: str) -> tuple:
             "Clam Blitz": None,
         },
     }
-    value = profile.set_status_key(key, clean_status[key])
-    return key, value
+    profile.set_status(key, clean_status[key])
+    return key, profile.get_status()[key]
 
 
 def parse_reply(key, value):
@@ -157,11 +158,11 @@ async def wait_user_playstyles(ui, coros) -> list:
     """Constantly wait for the user to input playstyles."""
     user_playstyles: list = []
 
-    complete = False
+    complete: bool = False
     while not complete:
         tasks: list = [asyncio.create_task(coro()) for coro in coros]
         task, reply = await ui.wait_tasks(tasks)
-
+        await ui.delete_alert()
         if task == tasks[0]:
             content: str = reply.content.lower()
 
@@ -170,7 +171,10 @@ async def wait_user_playstyles(ui, coros) -> list:
             else:
                 user_playstyles.remove(content)
         else:
-            complete: bool = True
+            if not user_playstyles:
+                await ui.create_alert(utils.Alert.Style.DANGER, title="No Playstyles Selected", description="You did not select any playstyles.")
+            else:
+                complete = True
         ui.embed.set_field_at(0, name="Playstyles", value=create_playstyle_list(user_playstyles))
 
     return user_playstyles

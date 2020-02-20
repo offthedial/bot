@@ -19,25 +19,6 @@ class DatabaseHandler:
         self.profiles = self.db["profiles"]
         self.links = self.db["links"]
 
-    # Profiles
-    def find_profile(self, id: int):
-        """Find a document in the profiles collection by id."""
-        return self.profiles.find_one({"_id": id})
-
-    def find_many_profiles(self, query: dict):
-        """Find all documents with the given kwargs."""
-        return self.profiles.find(query)
-
-    def new_profile(self, profile: dict, id: int):
-        """Insert a new profile into the profiles collection with id."""
-        profile["_id"] = id
-        return self.profiles.insert_one(profile)
-
-    def update_profile(self, profile: dict, id: int):
-        """Update an existing profile in the profiles collection by id."""
-        profile["_id"] = id
-        return self.profiles.replace_one({"_id": id}, profile)
-
     # Links
     def set_tourney_link(self, link):
         """Set the tournament link."""
@@ -49,3 +30,6 @@ class DatabaseHandler:
         link = self.links.find_one({"_id": "tourney"})
         if link:
             return link["link"]
+
+
+dbh = DatabaseHandler()

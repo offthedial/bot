@@ -14,8 +14,7 @@ async def on_member_join(self, member):
         utils.roles.alerts(self)
     ]
     # Add roles
-    for role in roles:
-        await member.add_roles(role)
+    member.add_roles(*roles)
     # Create welcome message
     welcome = await channel.send(f"Let's welcome {member.mention} to __Off the Dial__! :wave:")
     await welcome.add_reaction("\U0001f44b")
