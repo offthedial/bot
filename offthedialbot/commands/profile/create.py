@@ -170,7 +170,10 @@ async def wait_user_playstyles(ui, coros) -> list:
             else:
                 user_playstyles.remove(content)
         else:
-            complete: bool = True
+            if not user_playstyles:
+                await ui.create_alert(utils.Alert.Style.DANGER, title="No Playstyles Selected", description="You did not select any playstyles.")
+            else:
+                complete = True
         ui.embed.set_field_at(0, name="Playstyles", value=create_playstyle_list(user_playstyles))
 
     return user_playstyles
