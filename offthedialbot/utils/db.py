@@ -49,3 +49,6 @@ class DatabaseHandler:
         link = self.links.find_one({"_id": "tourney"})
         if link:
             return link["link"]
+
+
+dbh = DatabaseHandler()
