@@ -13,21 +13,24 @@ async def main(ctx):
 
 async def check_for_profile(ctx, reverse=False) -> utils.Profile:
     """Returns profile if it exists, otherwise cancels command."""
-    profile: dict = utils.dbh.find_profile(id=ctx.author.id)
+    try:
+        profile = utils.Profile(ctx.author.id)
+    except utils.Profile.NotFound:
+        profile = None
     if (result := {
         False: lambda p: (p is None, {"title": "No profile found.", "description": "You can create one using `$profile create`."}),
         True: lambda p: (p, {"title": "Existing profile found.", "description": "You can view your profile with `$profile`."}),
     }[reverse](profile))[0]:
         await utils.Alert(ctx, utils.Alert.Style.DANGER, **result[1])
         raise utils.exc.CommandCancel
-    return utils.Profile(profile)
+    return profile
 
 
 def create_status_embed(name, profile) -> discord.Embed:
     """Create profile embed to display user profile."""
     embed: discord.Embed = discord.Embed(
         title=f"{name}'s Status",
-        description=f"**\U0001f4f6 Signal Strength:** `{profile.get_signal_strength()}`",
+        description=f"**\U0001f4f6 Signal Strength:** `{profile.get_ss()}`",
         color=utils.colors.Roles.DIALER
     )
     for key, value in profile.get_status().items():

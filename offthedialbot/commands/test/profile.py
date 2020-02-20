@@ -6,6 +6,7 @@ async def main(ctx):
     """Create a mock profile for the user."""
     await utils.CommandUI.check_pemissions(ctx, required_roles={"moderator": True})
     profile: dict = {
+        "_id": ctx.author.id,
         "status": {
             "IGN": "Dave",
             "SW": 111100000000,
@@ -25,7 +26,7 @@ async def main(ctx):
             "banned": None,
         }
     }
-    utils.dbh.new_profile(profile, ctx.author.id)
+    utils.dbh.profiles.replace_one({"_id": ctx.author.id}, profile, upsert=True)
     await utils.Alert(
         ctx, utils.Alert.Style.SUCCESS,
         title="Created mock profile", description="Located under name: `Dave`"

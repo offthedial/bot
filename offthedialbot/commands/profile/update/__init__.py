@@ -10,8 +10,8 @@ async def main(ctx):
 
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
 
-    reply = await ui.get_reply("reaction_add", valid_reactions=emojis)
-    index: int = emojis.index(reply[0].emoji)
+    reply, user = await ui.get_reply("reaction_add", valid_reactions=emojis)
+    index: int = emojis.index(reply.emoji)
     field = create.clean_status_key(profile, list(profile.get_status().keys())[index])
     await wait_profile_field(ui, profile, index, field)
 
@@ -25,7 +25,7 @@ async def wait_profile_field(ui: utils.CommandUI, profile: utils.Profile, index,
 
     # Confirm profile and save it
     if await create.confirm_profile(ui):
-        utils.dbh.update_profile(profile.dict(), ui.ctx.author.id)
+        profile.write()
         await ui.end(True)
     else:
         ui.embed, _ = create_update_embed(ui.ctx, profile)

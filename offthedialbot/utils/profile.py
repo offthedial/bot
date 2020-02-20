@@ -1,117 +1,50 @@
 """Contains Profile class."""
 from typing import Union
+from offthedialbot.utils import dbh
 
 
 class Profile:
-    """Provides helpful functions for working with profiles."""
-    playstyles = {
-        "frontline": (0, 0, 0),
-        "midline": (0, 0, 0),
-        "backline": (0, 0, 0),
-        "flex": (0, 0, 0),
-        "slayer": (0, 0, 0),
-        "defensive": (0, 0, 0),
-        "objective": (0, 0, 0),
-        "support": (0, 0, 0),
-    }
+    """Wraps the DatabaseHandler and provides extra functionality for dealing with profiles."""
 
-    def __init__(self, profile: dict = None):
-        self.profile = profile if profile else {
-            "status": {
-                "IGN": None,
-                "SW": None,
-                "Ranks": {
-                    "Splat Zones": None,
-                    "Rainmaker": None,
-                    "Tower Control": None,
-                    "Clam Blitz": None,
+    def __init__(self, _id, new=False):
+        self.id = _id
+        self.new = new
+
+        if profile := dbh.profiles.find_one(self.id):
+            self.profile = profile
+        elif new:
+            self.profile: dict = {
+                "_id": _id,
+                "status": {
+                    "IGN": None,
+                    "SW": None,
+                    "Ranks": {
+                        "Splat Zones": None,
+                        "Rainmaker": None,
+                        "Tower Control": None,
+                        "Clam Blitz": None,
+                    },
                 },
-            },
-            "stylepoints": [],  # Groups A, B, and C.
-            "cxp": 0,
-            "signal_strength": 0,
-            "meta": {
-                "competing": False,
-                "smashgg": None,
-                "banned": None,
+                "stylepoints": [],
+                "cxp": 0,
+                "signal_strength": 0,
+                "meta": {
+                    "competing": False,
+                    "smashgg": None,
+                    "banned": None,
+                }
             }
-        }
+        else:
+            raise self.NotFound
 
-    # Setters
-    def set_status_key(self, key: str, value):
-        """Set status key to value."""
-        self.profile["status"][key] = value
-        return self.profile["status"][key]
-
-    def set_rank(self, key: str, rank: Union[str, int, float]) -> Union[int, float]:
-        """Set rank at specified key."""
-        self.profile["status"]["Ranks"][key] = (self.convert_rank_power(rank) if isinstance(rank, str) else rank)
-        return self.profile["status"]["Ranks"][key]
-
-    def set_stylepoints(self, stylepoints: list) -> list:
-        """Sets stylepoints."""
-        self.profile["stylepoints"] = stylepoints
-        return self.profile["stylepoints"]
-
-    def set_cxp(self, cxp: int) -> int:
-        """Sets competitive experience."""
-        self.profile["cxp"] = cxp
-        return self.profile["cxp"]
-
-    def add_signal_strength(self, ss: int) -> int:
-        """Add to signal strength."""
-        self.profile["signal_strength"] += ss
-        return self.profile["signal_strength"]
-
-    def set_competing(self, competing: bool) -> bool:
-        """Set competing."""
-        self.profile["meta"]["competing"] = competing
-        return self.profile["meta"]["competing"]
-
-    # Getters
-    def get_id(self) -> int:
-        """Returns discord id of profile."""
-        return self.profile["_id"]
-
-    def get_status(self, key: str = None) -> dict:
-        """Returns profile status."""
-        return self.profile["status"][key] if key else self.profile["status"]
-
-    def get_ranks(self, key: str = None) -> dict:
-        """Returns profile ranks."""
-        return self.profile["status"]["Ranks"][key] if key else self.profile["status"]["Ranks"]
-
-    def get_stylepoints(self) -> list:
-        """Returns stylepoints."""
-        return self.profile["stylepoints"]
-
-    def get_cxp(self) -> int:
-        """Returns competitive experience."""
-        return self.profile["cxp"]
-
-    def get_signal_strength(self) -> int:
-        """Returns signal strength."""
-        return self.profile["signal_strength"]
-
-    def is_competing(self) -> bool:
-        """Returns whether profile is competing."""
-        return self.profile["meta"]["competing"]
-
-    def smashgg_id(self):
-        """Returns smash.gg id."""
-        return self.profile["meta"]["smashgg"]
-
-    def is_banned(self):
-        """Returns whether the user is banned or not."""
-        return self.profile["meta"]["banned"]
-
+    # Profile Methods
     def calculate_elo(self) -> float:
         """Calculate the user's ELO."""
         rank_powers = [rank for rank in self.profile["status"]["Ranks"].values()]
         return round(sum(rank_powers) / len(rank_powers), 1)
 
     def calculate_stylepoints(self, user_playstyles: list) -> list:
-        """Calculate a user's stylepoints given their playstyles."""
+        """Calculate a user's stylepoints given playstyles."""
         stylepoints: list = [0, 0, 0]
         for playstyle in user_playstyles:
             stylepoints += [self.playstyles[playstyle]]
@@ -119,9 +52,15 @@ class Profile:
 
         return stylepoints
 
-    def dict(self) -> dict:
-        """Returns the dictionary representation of a profile."""
-        return self.profile
+    # Utility Methods
+    def read(self):
+        """Update profile from database."""
+        assert not new
+        self.profile = dbh.profiles.find_one(self.id)
+
+    def write(self):
+        """Write profile to database."""
+        return dbh.profiles.replace_one({"_id": self.id}, self.profile, upsert=True)
 
     @staticmethod
     def convert_rank_power(value: Union[str, int, float]) -> Union[str, int, float]:
@@ -156,3 +95,104 @@ class Profile:
             return rank
         elif isinstance(value, str):
             return float(value[1:])
+
+    playstyles = {
+        "frontline": (0, 0, 0),
+        "midline": (0, 0, 0),
+        "backline": (0, 0, 0),
+        "flex": (0, 0, 0),
+        "slayer": (0, 0, 0),
+        "defensive": (0, 0, 0),
+        "objective": (0, 0, 0),
+        "support": (0, 0, 0),
+    }
+
+    class NotFound(Exception):
+        """Database doesn't return a profile."""
+        pass
+
+    # Setters
+    def set_status(self, key, value):
+        self.profile["status"][key] = value
+
+    def set_ign(self, ign: str):
+        self.profile["status"]["IGN"] = ign
+
+    def set_sw(self, sw: int):
+        self.profile["status"]["SW"] = sw
+
+    def set_rank(self, key, rank: Union[int, float]):
+        self.profile["status"]["Ranks"][key] = rank
+
+    def set_sz(self, sz: Union[int, float]):
+        self.profile["status"]["Ranks"]["Splat Zones"] = sz
+
+    def set_rm(self, rm: Union[int, float]):
+        self.profile["status"]["Ranks"]["Rainmaker"] = rm
+
+    def set_tc(self, tc: Union[int, float]):
+        self.profile["status"]["Ranks"]["Tower Control"] = tc
+
+    def set_cb(self, cb: Union[int, float]):
+        self.profile["status"]["Ranks"]["Clam Blitz"] = cb
+
+    def set_stylepoints(self, sp: list):
+        self.profile["stylepoints"] = sp
+
+    def set_cxp(self, cxp: int):
+        self.profile["cxp"] = cxp
+
+    def inc_ss(self, ss: int):
+        self.profile["signal_strength"] += ss
+
+    def set_competing(self, competing: bool):
+        self.profile["meta"]["competing"] = competing
+
+    def set_smashgg(self, smashgg):
+        self.profile["meta"]["smashgg"] = smashgg
+
+    def set_banned(self, banned):
+        self.profile["meta"]["banned"] = banned
+
+    # Getters
+    def get_status(self) -> dict:
+        return self.profile["status"]
+
+    def get_ign(self) -> str:
+        return self.profile["status"]["IGN"]
+
+    def get_sw(self) -> int:
+        return self.profile["status"]["SW"]
+
+    def get_ranks(self) -> dict:
+        return self.profile["status"]["Ranks"]
+
+    def get_sz(self) -> Union[int, float]:
+        return self.profile["status"]["Ranks"]["Splat Zones"]
+
+    def get_rm(self) -> Union[int, float]:
+        return self.profile["status"]["Ranks"]["Rainmaker"]
+
+    def get_tc(self) -> Union[int, float]:
+        return self.profile["status"]["Ranks"]["Tower Control"]
+
+    def get_cb(self) -> Union[int, float]:
+        return self.profile["status"]["Ranks"]["Clam Blitz"]
+
+    def get_stylepoints(self) -> list:
+        return self.profile["stylepoints"]
+
+    def get_cxp(self) -> int:
+        return self.profile["cxp"]
+
+    def get_ss(self) -> int:
+        return self.profile["signal_strength"]
+
+    def get_competing(self) -> bool:
+        return self.profile["meta"]["competing"]
+
+    def get_smashgg(self):
+        return self.profile["meta"]["smashgg"]
+
+    def get_banned(self):
+        return self.profile["meta"]["banned"]

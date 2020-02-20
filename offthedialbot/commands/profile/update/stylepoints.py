@@ -9,6 +9,5 @@ async def main(ctx):
     ui: utils.CommandUI = await utils.CommandUI(ctx, create.create_stylepoints_embed(ctx))
 
     profile.set_stylepoints(await create.get_user_stylepoints(ui))
-
-    utils.dbh.update_profile(profile.dict(), ui.ctx.author.id)
+    profile.write()
     await ui.end(True)
