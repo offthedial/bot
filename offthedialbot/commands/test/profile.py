@@ -9,7 +9,7 @@ async def main(ctx):
         "_id": ctx.author.id,
         "status": {
             "IGN": "Dave",
-            "SW": 111100000000,
+            "SW": '048922225689',
             "Ranks": {
                 "Splat Zones": 1000,
                 "Rainmaker": 2500.0,
