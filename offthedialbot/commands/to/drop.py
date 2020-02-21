@@ -20,10 +20,10 @@ async def main(ctx):
                 profile.set_competing(False)
                 utils.dbh.update_profile(profile.dict(), member.id)
                 await member.remove_roles(utils.roles.competing(ctx.bot))
-                await ui.end(True)
+                await utils.Alert(ctx, utils.Alert.Style.WARNING, title="Drop Complete", description=f"`{member.display_name}` is no longer competing.")
             else:
-                await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Drop Failed", description=f"`{member.display_name}` is not competing.")
+                await utils.Alert(ctx, utils.Alert.Style.WARNING, title="Drop Failed", description=f"`{member.display_name}` is not competing.")
         else:
-            await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Drop Failed", description=f"`{member.display_name}` does not own a profile.")
+            await utils.Alert(ctx, utils.Alert.Style.WARNING, title="Drop Failed", description=f"`{member.display_name}` does not own a profile.")
     
     await ui.end(None)
