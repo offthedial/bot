@@ -89,8 +89,12 @@ def derive_command(func, name):
 
     @wraps(func)
     async def _(ctx):
+        if ctx.author.id in ctx.bot.ongoing_commands[ctx.channel.id]:
+            return
         try:
+            ctx.bot.ongoing_commands[ctx.channel.id].add(ctx.author.id)
             await func(ctx)
+            ctx.bot.ongoing_commands[ctx.channel.id].remove(ctx.author.id)
         except utils.exc.CommandCancel:
             return
 
