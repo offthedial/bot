@@ -48,7 +48,7 @@ async def get_user_stylepoints(ui: utils.CommandUI) -> list:
 
     coros: list = [
         lambda: ui.get_valid_message(lambda r: r.lower() in utils.Profile.playstyles.keys(), error_fields),
-        lambda: ui.get_reply('reaction_add', valid_reactions=['\u23ed\ufe0f'], cancel=False)
+        lambda: ui.get_reply("reaction_add", valid_reactions=['\u23ed\ufe0f'], cancel=False)
     ]
     return await wait_user_playstyles(ui, coros)  # Check if user has selected atleast 1 of the 3
 
@@ -189,7 +189,7 @@ async def confirm_profile(ui) -> bool:
     )
     ui.embed.title, ui.embed.description, ui.embed.color = alert_embed.title, alert_embed.description, alert_embed.color
     reply = await ui.get_reply("reaction_add", valid_reactions=['\u2611\ufe0f', '\u23ea'])
-    return reply[0].emoji == '\u2611\ufe0f'
+    return reply.emoji == '\u2611\ufe0f'
 
 
 def create_playstyle_list(profile_playstyles=()) -> str:

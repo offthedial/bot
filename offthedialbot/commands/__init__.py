@@ -1,6 +1,7 @@
 """Dynamically import and generate discord.ext commands."""
 import inspect
 import pkgutil
+from contextlib import contextmanager
 import sys
 from functools import wraps
 
@@ -89,9 +90,25 @@ def derive_command(func, name):
 
     @wraps(func)
     async def _(ctx):
+        if locked(ctx):
+            return
         try:
-            await func(ctx)
+            with lock_command_access(ctx):
+                await func(ctx)
         except utils.exc.CommandCancel:
             return
 
     return _
+
+
+def locked(ctx):
+    return ctx.author.id in ctx.bot.ongoing_commands[ctx.channel.id]
+
+
+@contextmanager
+def lock_command_access(ctx):
+    try:
+        ctx.bot.ongoing_commands[ctx.channel.id].add(ctx.author.id)
+        yield
+    finally:
+        ctx.bot.ongoing_commands[ctx.channel.id].remove(ctx.author.id)

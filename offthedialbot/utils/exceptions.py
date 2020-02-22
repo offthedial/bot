@@ -3,4 +3,6 @@
 
 class CommandCancel(Exception):
     """Cancel a command."""
-    pass
+    def __init__(self, status=None, ui=None):
+        self.status = status
+        self.ui = ui
