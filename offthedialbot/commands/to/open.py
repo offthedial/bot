@@ -8,7 +8,8 @@ from offthedialbot import utils
 @utils.deco.registration(required=False)
 async def main(ctx):
     """Open registration for a new tournament!"""
-    ui = await utils.CommandUI(ctx, discord.Embed(title="Opening registration for a new tournament...", color=utils.colors.Roles.COMPETING))
+    ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Opening registration for a new tournament...", color=utils.colors.Roles.COMPETING))
+    
     # Steps
     await link(ui)
 
