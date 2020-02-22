@@ -14,7 +14,7 @@ async def main(ctx):
     embed.add_field(name="Link:", value=f"`{str(utils.dbh.get_tourney_link())}`")
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
 
-    reply, _ = await ui.get_reply("reaction_add", valid_reactions=list(emojis.values()))
+    reply = await ui.get_reply("reaction_add", valid_reactions=list(emojis.values()))
 
     if reply.emoji == emojis['edit']:
         embed.description = "Enter the new link to the tournament. (https://smash.gg/slug)"

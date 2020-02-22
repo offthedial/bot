@@ -59,14 +59,13 @@ async def check_prerequisites(ctx):
 async def profile_updated(ui, profile):
     """Make sure the user's profiles are up-to-date."""
     if not profile:
-        ui.embed.description = "You do not have a profile. Do you want to create one right now?"
-        await ui.get_reply('reaction_add', valid_reactions=["\u2705"])
+        ui.embed.description = "A profile is required to participate. Do you want to proceed?"
+        await ui.get_reply("reaction_add", valid_reactions=["\u2705"])
         await ui.run_command(create.main)
     else:
-        ui.embed.description = "Is your profile is up-to-date? You can update it right now."
-        reply, _ = await ui.get_reply('reaction_add', valid_reactions=["\u2705", "\u270f\ufe0f"])
+        ui.embed.description = "Make sure your profile is up-to-date. To update it, select the \u270f\ufe0f."
+        reply = await ui.get_reply("reaction_add", valid_reactions=["\u270f\ufe0f", "\u2705"])
         if reply.emoji == "\u270f\ufe0f":
-            ui.embed.description = "Update your profile."
             await ui.run_command(update.main)
 
 
@@ -83,7 +82,7 @@ async def confirm_signup(ui):
     """Confirm user signup."""
     confirm = utils.Alert.create_embed(utils.Alert.Style.WARNING, "Confirm Signup", "Are you ready to sign up? You will not be able to undo without first contacting the organisers.")
     ui.embed.title, ui.embed.description, ui.embed.color = confirm.title, confirm.description, confirm.color
-    await ui.get_reply('reaction_add', valid_reactions=["\u2705"])
+    await ui.get_reply("reaction_add", valid_reactions=["\u2705"])
 
 
 async def finalize_signup(ui, profile):

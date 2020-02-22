@@ -118,6 +118,8 @@ class CommandUI:
             await self.end(status=False)
         else:
             await key[event]["delete"](reply)
+            if event.startswith('reaction'):
+                reply = reply[0]
 
             # Remove valid reactions if valids are specified
             if len(valid_reactions := valid_reactions if valid_reactions else []) < 3:
