@@ -52,3 +52,28 @@ def to_only(command):
             await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Permission Denied", description="This command is only avaliable to Tournament Organisers.")
     
     return _
+
+
+def registration(required=True):
+    """Makes sure the command is only callable by tournament organisers."""
+    if required:
+        def deco(command):
+            @wraps(command)
+            async def _(ctx):
+                if utils.dbh.get_tourney_link():
+                    await command(ctx)
+                else:
+                    await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Command Failed", description="Registration is not open.")
+            return _
+    else:
+        def deco(command):
+            @wraps(command)
+            async def _(ctx):
+                if not utils.dbh.get_tourney_link():
+                    await command(ctx)
+                else:
+                    await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Command Failed", description="Registration is already open.")
+            return _
+        
+    return deco
+
