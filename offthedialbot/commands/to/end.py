@@ -8,7 +8,7 @@ from offthedialbot import utils
 @utils.deco.tourney(False)
 async def main(ctx):
     """End the tournament."""
-    ui: utils.CommandUI = await utils.CommandUI(ctx, embed=discord.Embed(title="Ending tournament..."))
+    ui: utils.CommandUI = await utils.CommandUI(ctx, embed=discord.Embed(title="Ending tournament...", color=utils.colors.Roles.COMPETING))
 
     # Steps
     profiles = utils.dbh.profiles.find({"meta.competing": True}, {"_id": True})

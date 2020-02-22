@@ -74,7 +74,7 @@ def tourney(open=(True, False)):
         True: Tournament registration is open
         False: Tournament registration is closed
     """
-    if open is (True, False):
+    if open == (True, False):
         def deco(command):
             @wraps(command)
             async def _(ctx):

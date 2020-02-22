@@ -9,7 +9,7 @@ from offthedialbot import log
 @utils.deco.tourney()
 async def main(ctx):
     """Remove an attendee from the tournament."""
-    ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Remove attendees.", description="Mention each attendee you want to remove."))
+    ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Remove attendees.", description="Mention each attendee you want to remove.", color=utils.colors.Roles.COMPETING))
     reply = await ui.get_reply()
 
     for attendee in reply.mentions:

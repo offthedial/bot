@@ -8,5 +8,5 @@ from offthedialbot import utils
 @utils.deco.tourney(False)
 async def main(ctx):
     """Start the tournament!"""
-    ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Commencing tournament..."))
+    ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Commencing tournament...", color=utils.colors.Roles.COMPETING))
     await ui.end(True)

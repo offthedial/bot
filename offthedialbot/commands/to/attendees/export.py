@@ -33,7 +33,8 @@ def create_embed():
     """Create embed."""
     return discord.Embed(
         title="Do you want all profiles or just those competing?",
-        description="Select \U0001f4e9 for all, and \U0001f3c5 for just those competing."
+        description="Select \U0001f4e9 for all, and \U0001f3c5 for just those competing.",
+        color=utils.colors.Roles.COMPETING
     )
 
 
