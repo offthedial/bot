@@ -6,6 +6,8 @@ import discord
 from offthedialbot import utils
 from offthedialbot.commands.profile import create, update
 
+
+@utils.deco.otd_only
 async def main(ctx):
     """Sign up for the upcoming tournament!"""
     link, profile = await check_prerequisites(ctx)

@@ -7,6 +7,7 @@ import discord
 from offthedialbot import utils
 
 
+@utils.deco.to_only
 async def main(ctx):
     """Export user profiles to a csv."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, create_embed())

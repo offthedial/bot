@@ -4,6 +4,7 @@ import discord
 from offthedialbot import utils
 
 
+@utils.deco.to_only
 async def main(ctx):
     """Set the smash.gg link for the next tournament."""
     emojis = {
