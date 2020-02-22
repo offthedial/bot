@@ -5,12 +5,12 @@ import re
 import discord
 
 from offthedialbot import utils
-from . import create_status_embed, check_for_profile, display_field
+from . import create_status_embed, display_field
 
 
+@utils.deco.profile_required(reverse=True)
 async def main(ctx):
     """Create your profile."""
-    await check_for_profile(ctx, reverse=True)
     profile: utils.Profile = utils.Profile(ctx.author.id, new=True)
 
     embed: discord.Embed = create_status_embed(ctx.author.display_name, profile)

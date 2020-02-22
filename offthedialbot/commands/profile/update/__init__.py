@@ -1,11 +1,12 @@
 """$profile update"""
 from offthedialbot import utils
-from .. import create, check_for_profile, display_field, create_status_embed
+from .. import create, display_field, create_status_embed
 
 
+@utils.deco.profile_required()
 async def main(ctx):
     """Update your profile."""
-    profile: utils.Profile = await check_for_profile(ctx)
+    profile: utils.Profile = utils.Profile(ctx.author.id)
     embed, emojis = create_update_embed(ctx, profile)
 
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
