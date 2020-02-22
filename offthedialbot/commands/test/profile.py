@@ -4,7 +4,6 @@ from offthedialbot import utils
 
 async def main(ctx):
     """Create a mock profile for the user."""
-    await utils.CommandUI.check_pemissions(ctx, required_roles={"moderator": True})
     profile: dict = {
         "_id": ctx.author.id,
         "status": {

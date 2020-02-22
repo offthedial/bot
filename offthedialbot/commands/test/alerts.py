@@ -7,7 +7,7 @@ from offthedialbot import utils
 async def main(ctx):
     """Cycle through each of the different alert types."""
     embed: discord.Embed = discord.Embed(title="Testing: Alerts")
-    ui: utils.CommandUI = await utils.CommandUI(ctx, embed, moderator=True)
+    ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
 
     alert_styles: tuple = (
         utils.Alert.Style.DANGER, utils.Alert.Style.WARNING, utils.Alert.Style.INFO, utils.Alert.Style.SUCCESS
