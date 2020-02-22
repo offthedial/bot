@@ -14,32 +14,20 @@ from offthedialbot import utils
 class CommandUI:
     """Custom command UI."""
 
-    def __init__(self, ctx: Context, embed: discord.Embed, **kwargs):
+    def __init__(self, ctx: Context, embed: discord.Embed):
         """Initilize command UI and declare self variables."""
         self.ctx: Context = ctx
         self.embed: discord.Embed = embed
         self.reply_task: Optional[asyncio.Task] = None
         self.alert: Optional[utils.Alert] = None
 
-    async def __new__(cls, ctx: Context, embed: discord.Embed, **kwargs):
+    async def __new__(cls, ctx: Context, embed: discord.Embed):
         """Use async to create embed and passive task on class creation."""
         self = super().__new__(cls)
-        self.__init__(ctx, embed, **kwargs)
-
-        await self.check_pemissions(ctx, kwargs)
+        self.__init__(ctx, embed)
 
         self.ui = await self.create_ui(ctx, embed)
         return self
-
-    @staticmethod
-    async def check_pemissions(ctx, required_roles):
-        """Check if the user has the correct permissions to execute the command."""
-        if required_roles.get("moderator") and not ("moderator" in [role.name.lower() for role in ctx.author.roles]):
-            await utils.Alert(
-                ctx, utils.Alert.Style.DANGER,
-                title="Permission Denied.", description="You don't have permission to use this command."
-            )
-            raise utils.exc.CommandCancel
 
     @staticmethod
     async def create_ui(ctx: Context, embed: discord.Embed) -> discord.Message:

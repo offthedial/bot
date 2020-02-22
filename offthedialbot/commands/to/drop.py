@@ -5,6 +5,7 @@ from offthedialbot import utils
 from offthedialbot import log
 
 
+@utils.deco.to_only
 async def main(ctx):
     """Drop a player from competing."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Player drop.", description="Send a mention of the player."))

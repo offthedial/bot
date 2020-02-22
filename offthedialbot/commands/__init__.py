@@ -29,9 +29,7 @@ def find_commands(module=sys.modules[__name__]):
         return recursive_get(value['subcommands'], *args)
 
     # Adjust the name of the current module for submodule compatibility
-    path = module.__file__
-    if path.endswith('/__init__.py'):
-        path, _, _ = module.__file__.rpartition('/')
+    path = module.__file__[:-12]
 
     # Iterate over all modules
     for loader, module_name, _ in pkgutil.walk_packages([path]):
