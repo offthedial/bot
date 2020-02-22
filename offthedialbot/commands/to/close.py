@@ -1,5 +1,6 @@
 """$to close"""
 import discord
+
 from offthedialbot import utils
 from .attendees import export
 
