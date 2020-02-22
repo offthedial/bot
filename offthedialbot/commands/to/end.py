@@ -5,7 +5,7 @@ from offthedialbot import utils
 
 
 @utils.deco.to_only
-@utils.deco.registration(False)
+@utils.deco.tourney(False)
 async def main(ctx):
     """End the tournament."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed=discord.Embed(title="Ending tournament..."))
@@ -14,6 +14,7 @@ async def main(ctx):
     profiles = utils.dbh.profiles.find({"meta.competing": True}, {"_id": True})
     await remove_roles(ui, profiles)
     await update_profiles(ui, profiles)
+    utils.dbh.end_tourney()
 
     await ui.end(True)
 
