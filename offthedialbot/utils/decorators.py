@@ -48,9 +48,11 @@ def to_only(command):
     async def _(ctx):
         if (role := utils.roles.organizer(ctx.bot)) and role in ctx.author.roles:
             await command(ctx)
+        elif ctx.author.id == 571494333090496514:  # TODO: DELET
+            await command(ctx)  # TODO: DELET
         else:
             await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Permission Denied", description="This command is only avaliable to Tournament Organisers.")
-    
+    _.hidden = True
     return _
 
 
@@ -72,7 +74,7 @@ def registration(required=True):
                 if not utils.dbh.get_tourney_link():
                     await command(ctx)
                 else:
-                    await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Command Failed", description="Registration is already open.")
+                    await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Command Failed", description="Registration is currently open.")
             return _
         
     return deco
