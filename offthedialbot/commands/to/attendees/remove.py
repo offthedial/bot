@@ -6,6 +6,7 @@ from offthedialbot import log
 
 
 @utils.deco.to_only
+@utils.deco.tourney()
 async def main(ctx):
     """Remove an attendee from the tournament."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Remove attendees.", description="Mention each attendee you want to remove."))
@@ -18,7 +19,7 @@ async def main(ctx):
             continue
         
         # Remove attendee from smash.gg
-        link = utils.dbh.get_tourney_link()
+        link = utils.dbh.get_tourney()["link"]
         ui.embed.description = f"Remove `{attendee.display_name}` from smash.gg at **<{link}/attendees>**, then hit the \u2705."
         await ui.get_reply("reaction_add", valid_reactions=["\u2705"])
         # Set profile to false
