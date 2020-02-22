@@ -1,4 +1,4 @@
-"""$to profiles"""
+"""$to attendees export"""
 import csv
 from io import StringIO
 
@@ -12,18 +12,21 @@ async def main(ctx):
     """Export user profiles to a csv."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, create_embed())
     reply = await ui.get_reply("reaction_add", valid_reactions=['\U0001f4e9', '\U0001f3c5'])
-
-    profiles: list = utils.dbh.profiles.find(filter={
+    query = {
         '\U0001f4e9': {},
         '\U0001f3c5': {"meta.competing": True}
-    }[reply.emoji], projection={"_id": True})
+    }[reply.emoji]
 
+    await export_profiles(ui, query)
+    await ui.end(status=None)
+
+
+async def export_profiles(ui, query):
+    """Export user profiles."""
+    profiles: list = utils.dbh.profiles.find(query, {"_id": True})
     await ui.ctx.trigger_typing()
-
     file = create_file(ui, profiles)
     await upload_file(ui, file)
-
-    await ui.end(status=None)
 
 
 def create_embed():

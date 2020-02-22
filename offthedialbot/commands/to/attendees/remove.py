@@ -1,4 +1,4 @@
-"""$to drop"""
+"""$to attendees remove"""
 import discord
 
 from offthedialbot import utils
@@ -7,7 +7,7 @@ from offthedialbot import log
 
 @utils.deco.to_only
 async def main(ctx):
-    """Drop a player from competing."""
+    """Remove an attendee from the tournament."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Player drop.", description="Send a mention of the player."))
 
     reply = await ui.get_reply()
