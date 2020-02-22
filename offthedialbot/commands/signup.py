@@ -4,7 +4,7 @@ from contextlib import contextmanager
 import discord
 
 from offthedialbot import utils
-
+from offthedialbot.commands.profile import create, update
 
 async def main(ctx):
     """Sign up for the upcoming tournament!"""
@@ -25,7 +25,7 @@ async def main(ctx):
 
     # Check requirements
     with checklist.checking("profile is updated"):
-        await profile_updated(ui)
+        await profile_updated(ui, profile)
     with checklist.checking("smash.gg integration"):
         await smashgg(ui, link)
     with checklist.checking("final confirmation"):
@@ -46,9 +46,8 @@ async def check_prerequisites(ctx):
 
     check = {
         (lambda: not link): "Registration is not open.",
-        (lambda: not profile): "You don't have a profile, create one with `$profile create`.",
-        (lambda: not profile or profile.get_banned()): "You are currently banned from competing in Off the Dial tournaments.",
-        (lambda: not profile or profile.get_competing()): "You are already signed up!"
+        (lambda: profile and profile.get_banned()): "You are currently banned from competing in Off the Dial tournaments.",
+        (lambda: profile and profile.get_competing()): "You are already signed up!"
     }
     if any(values := [value for key, value in check.items() if key()]):
         await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Registration Failed.", description=values[0])
@@ -57,10 +56,18 @@ async def check_prerequisites(ctx):
     return link, profile
 
 
-async def profile_updated(ui):
+async def profile_updated(ui, profile):
     """Make sure the user's profiles are up-to-date."""
-    ui.embed.description = "Ensure your profile is up-to-date. You can update it with `$profile update`."
-    await ui.get_reply('reaction_add', valid_reactions=["\u2705"])
+    if not profile:
+        ui.embed.description = "You do not have a profile. Do you want to create one right now?"
+        await ui.get_reply('reaction_add', valid_reactions=["\u2705"])
+        await ui.run_command(create.main)
+    else:
+        ui.embed.description = "Is your profile is up-to-date? You can update it right now."
+        reply, _ = await ui.get_reply('reaction_add', valid_reactions=["\u2705", "\u270f\ufe0f"])
+        if reply.emoji == "\u270f\ufe0f":
+            ui.embed.description = "Update your profile."
+            await ui.run_command(update.main)
 
 
 async def smashgg(ui, link):

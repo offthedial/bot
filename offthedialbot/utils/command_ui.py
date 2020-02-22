@@ -2,6 +2,7 @@
 
 import asyncio
 import re
+from contextlib import asynccontextmanager
 from typing import Union, Callable, Optional, Tuple
 
 import discord
@@ -62,7 +63,7 @@ class CommandUI:
         await self.delete_alert()
 
         # Raise exception to cancel command
-        raise utils.exc.CommandCancel
+        raise utils.exc.CommandCancel(status, self)
 
     async def get_valid_message(self, valid: Union[str, Callable], error_fields: dict = None, *, _alert_params=None, **get_reply_params) -> discord.Message:
         """Get message reply with validity checks."""
@@ -137,6 +138,26 @@ class CommandUI:
         if self.alert:
             await self.alert.delete()
             self.alert = None
+
+    async def run_command(self, main):
+        """Run an external command, from a command ui."""
+        @asynccontextmanager
+        async def hide_x():
+            try:
+                await self.ui.remove_reaction('❌', self.ctx.me)
+                yield
+            finally:
+                await self.ui.add_reaction('❌')
+
+        try:
+            async with hide_x():
+                await main(self.ctx)
+        except utils.exc.CommandCancel as e:
+            if e.ui:
+                await e.ui.ui.delete()
+            if e.status == False:
+                await self.end(e.status)
+            return e
 
     @staticmethod
     def check_valid(valid: Union[str, Callable], reply: discord.Message) -> bool:
