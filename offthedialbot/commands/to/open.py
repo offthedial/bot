@@ -4,12 +4,9 @@ from offthedialbot import utils
 
 
 @utils.deco.to_only
+@utils.deco.registration(required=False)
 async def main(ctx):
     """Open registration for a new tournament!"""
-    if utils.dbh.get_tourney_link():
-        await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Open Failed", description="Tournament is already open!")
-        raise utils.exc.CommandCancel
-
     ui = await utils.CommandUI(ctx, discord.Embed(title="Opening registration for a new tournament...", color=utils.colors.Roles.COMPETING))
     # Steps
     await link(ui)
