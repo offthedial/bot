@@ -18,7 +18,6 @@ async def main(ctx):
     }[reply.emoji]
 
     await export_profiles(ui, query)
-    await ui.end(status=None)
 
 
 async def export_profiles(ui, query):
@@ -69,9 +68,12 @@ def create_file(ui: utils.CommandUI, profiles: list):
 
 async def upload_file(ui: utils.CommandUI, file: StringIO):
     """Upload csv file to discord."""
-    await ui.ctx.send(embed=utils.Alert.create_embed(
+    alert = utils.Alert.create_embed(
         utils.Alert.Style.SUCCESS,
         title=":incoming_envelope: *Exporting profiles complete!*",
         description="Download the spreadsheet below. \U0001f4e5"
-    ))
+    )
+    ui.embed.title, ui.embed.description, ui.embed.color = alert.title, alert.description, alert.color
     await ui.ctx.send(file=discord.File(file, filename="profiles.csv"))
+    await ui.ui.clear_reactions()
+    await ui.update()
