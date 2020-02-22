@@ -12,11 +12,15 @@ async def main(ctx):
 
     reply = await ui.get_reply()
     for member in reply.mentions:
-        if profile := utils.dbh.find_profile(member.id):
-            profile = utils.Profile(profile)
-            if profile.is_competing():
+        try:
+            profile = utils.Profile(member.id)
+        except utils.Profile.NotFound:
+            profile = None
+            await utils.Alert(ctx, utils.Alert.Style.WARNING, title="Drop Failed", description=f"`{member.display_name}` does not own a profile.")
+        else:
+            if profile.get_competing():
                 link = utils.dbh.get_tourney_link()
-                ui.embed.description = f"Remove `{member.display_name}` from smash.gg at **<{link}>**, then hit the \u2705."
+                ui.embed.description = f"Remove `{member.display_name}` from smash.gg at **<{link}/attendees>**, then hit the \u2705."
                 await ui.get_reply("reaction_add", valid_reactions=["\u2705"])
                 profile.set_competing(False)
                 utils.dbh.update_profile(profile.dict(), member.id)
@@ -24,7 +28,5 @@ async def main(ctx):
                 await utils.Alert(ctx, utils.Alert.Style.WARNING, title="Drop Complete", description=f"`{member.display_name}` is no longer competing.")
             else:
                 await utils.Alert(ctx, utils.Alert.Style.WARNING, title="Drop Failed", description=f"`{member.display_name}` is not competing.")
-        else:
-            await utils.Alert(ctx, utils.Alert.Style.WARNING, title="Drop Failed", description=f"`{member.display_name}` does not own a profile.")
     
     await ui.end(None)
