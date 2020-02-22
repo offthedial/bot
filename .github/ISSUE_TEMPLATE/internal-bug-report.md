@@ -1,6 +1,6 @@
 ---
 name: Internal Bug Report
-about: A bug report template for those working with the code directly.
+about: A bug report template for developers working with the code directly.
 title: "\U0001F41B - [Bug Report Title]"
 labels: bug
 assignees: ''
