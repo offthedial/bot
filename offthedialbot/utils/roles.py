@@ -24,11 +24,3 @@ def competing(client):
         return client.OTD.get_role(415767083691802624)
     except AttributeError:
         log.logger.warn("Could not get 'Competing' role object, possibly not in Off the Dial.")
-
-
-def organizer(client):
-    """Organizer role."""
-    try:
-        return client.OTD.get_role(441015722060283934)
-    except AttributeError:
-        log.logger.warn("Could not get 'Organiser' role object, possibly not in Off the Dial.")

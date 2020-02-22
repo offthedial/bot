@@ -46,15 +46,24 @@ def to_only(command):
     """Makes sure the command is only callable by tournament organisers."""
     @wraps(command)
     async def _(ctx):
-        if (role := utils.roles.organizer(ctx.bot)) and role in ctx.author.roles:
+        if ctx.guild and "Organiser" in [role.name for role in ctx.author.roles]:
             await command(ctx)
-        elif ctx.author.id == 571494333090496514:  # TODO: DELET
-            await command(ctx)  # TODO: DELET
         else:
             await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Permission Denied", description="This command is only avaliable to Tournament Organisers.")
     _.hidden = True
     return _
 
+
+def dev_only(command):
+    """Makes sure the command is only callable by developers."""
+    @wraps(command)
+    async def _(ctx):
+        if ctx.guild and "Developer" in [role.name for role in ctx.author.roles]:
+            await command(ctx)
+        else:
+            await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Permission Denied", description="This command is only avaliable to Developers.")
+    _.hidden = True
+    return _
 
 def registration(required=True):
     """Makes sure the command is only callable by tournament organisers."""
@@ -78,4 +87,3 @@ def registration(required=True):
             return _
         
     return deco
-

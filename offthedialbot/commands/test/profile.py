@@ -2,7 +2,7 @@
 from offthedialbot import utils
 
 
-@utils.deco.to_only
+@utils.deco.dev_only
 async def main(ctx):
     """Create a mock profile for the user."""
     profile: dict = {
