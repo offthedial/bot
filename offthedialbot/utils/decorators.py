@@ -3,18 +3,32 @@ from offthedialbot import utils
 from functools import wraps
 
 
-def profile_required(reverse=False):
+def profile_required(reverse=False, competing=False):
     """Make sure the command is only callable if the user has a profile."""
-    if not reverse:
+    if reverse:
         def deco(command):
             @wraps(command)
             async def _(*args):
                 try:
                     utils.Profile(args[-1].author.id)
                 except utils.Profile.NotFound:
-                    await utils.Alert(args[-1], utils.Alert.Style.DANGER, title="Command Failed", description="No profile found. You can create one using `$profile create`.")
+                    await command(*args)
                 else:
-                    await command(args[-1])
+                    await utils.Alert(args[-1], utils.Alert.Style.DANGER, title="Command Failed", description="Existing profile found. You can edit it using `$profile update`.")
+            return _
+    elif competing:
+        def deco(command):
+            @wraps(command)
+            async def _(*args):
+                try:
+                    profile = utils.Profile(args[-1].author.id)
+                except utils.Profile.NotFound:
+                    profile = None
+                if profile and profile.get_competing():
+                    await command(*args)
+                else:
+                    await utils.Alert(args[-1], utils.Alert.Style.DANGER, title="Command Failed", description="You are not currently competing.")
+
             return _
     else:
         def deco(command):
