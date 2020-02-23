@@ -11,4 +11,7 @@ async def on_message(client, message):
 
 def locked(client, message):
     """Check if the user has been command-locked."""
-    return message.author.id in client.ongoing_commands[message.channel.id]
+    if getattr(client, 'ongoing_commands', False):
+        return message.author.id in client.ongoing_commands[message.channel.id]
+    else:
+        return True
