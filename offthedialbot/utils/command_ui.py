@@ -83,11 +83,11 @@ class CommandUI:
         # Key that determines which check to use for the event
         key = {
             'message': {
-                "check": lambda m: utils.checks.msg(m, self.ctx),
+                "check": utils.checks.msg(self.ctx),
                 "delete": lambda r: r.delete()
             },
             'reaction_add': {
-                "check": lambda r, u: utils.checks.react((r, u), self.ctx, self.ui, valids=valid_reactions),
+                "check": utils.checks.react(self.ctx, self.ui, valids=valid_reactions),
                 "delete": lambda r: self.ui.remove_reaction(r[0].emoji, r[1])
             }
         }
@@ -183,7 +183,7 @@ class CommandUI:
         return asyncio.create_task(
             self.ctx.bot.wait_for(
                 'reaction_add',
-                check=lambda r, u: utils.checks.react((r, u), self.ctx, self.ui, valids='❌'),
+                check=utils.checks.react(self.ctx, self.ui, valids='❌'),
                 timeout=(timeout if timeout else 120)
             )
         )

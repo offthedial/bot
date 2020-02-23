@@ -1,11 +1,16 @@
 """Contains checks used for filtering replies."""
 
 
-def msg(m, ctx) -> bool:
+def msg(ctx):
     """Check if the message is in the same channel, and is by the same author."""
-    return m.channel == ctx.channel and m.author == ctx.author
+    return lambda m: m.channel == ctx.channel and m.author == ctx.author
 
 
-def react(r, ctx, ui, valids=None) -> bool:
+def react(ctx, message, valids=None):
     """Check if the reaction is on the correct message, and is by the same author."""
-    return (r[0].message.id, r[1]) == (ui.id, ctx.author) and (valids is None or r[0].emoji in valids)
+    return lambda r, u: (r.message.id, u) == (message.id, ctx.author) and (valids is None or r.emoji in valids)
+
+
+def join_or_leave(member):
+    """Check if the member who joined or leaved is the same as the member specified."""
+    return  lambda m: m.id == member.id
