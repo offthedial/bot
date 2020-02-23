@@ -20,7 +20,7 @@ async def on_member_join(self, member):
     if profile and profile.get_competing():
         roles.append(utils.roles.competing(self))
     # Add roles
-    member.add_roles(*roles)
+    await member.add_roles(*roles)
     # Create welcome message
     welcome = await channel.send(f"Let's welcome {member.mention} to __Off the Dial__! :wave:")
     await welcome.add_reaction("\U0001f44b")
