@@ -62,17 +62,18 @@ def process_commands(data, parent):
     for name, cmd_dict in data.items():
 
         func = derive_command(cmd_dict['func'], name)
+        func.hidden = getattr(func, 'hidden', False)
         subcommands = cmd_dict['subcommands']
 
         # If subcommands were found, create a command group
         if subcommands:
-            cmd = commands.Group(func, name=name, invoke_without_command=True, ignore_extra=False)
+            cmd = commands.Group(func, name=name, invoke_without_command=True, ignore_extra=False, hidden=func.hidden)
             # Re-run this function for all of the subcommands
             process_commands(subcommands, cmd)
 
         # Otherwise, create a normal command
         else:
-            cmd = commands.Command(func, name=name, ignore_extra=False)
+            cmd = commands.Command(func, name=name, ignore_extra=False, hidden=func.hidden)
 
         parent.add_command(cmd)
 

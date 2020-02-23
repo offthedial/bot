@@ -7,33 +7,21 @@ async def on_member_join(client, member):
     # Check if it's the correct the server
     if member.guild != client.OTD:
         return
-    
-    # Add roles
-    await add_roles(client, member)
-    # Create welcome message
-    welcome = await send_welcome(client, member)
-    # Incase they leave immediately
-    await member_leave(client, member, welcome)
-
-
-async def add_roles(client, member):
+    # Check if they have a profile
     try:
         profile = utils.Profile(member.id)
     except utils.Profile.NotFound:
         profile = None
-
+    # Get channel and roles
+    channel = utils.channels.general(self)
     roles = [
-        utils.roles.dialer(client),
-        utils.roles.alerts(client)
-    ]
+        utils.roles.dialer(self),
+        utils.roles.alerts(self)]
     if profile and profile.get_competing():
-        roles.append(utils.roles.competing(client))
-
-    await member.add_roles(*roles)
-
-
-async def send_welcome(client, member):
-    channel = utils.channels.general(client)
+        roles.append(utils.roles.competing(self))
+    # Add roles
+    member.add_roles(*roles)
+    # Create welcome message
     welcome = await channel.send(f"Let's welcome {member.mention} to __Off the Dial__! :wave:")
     await welcome.add_reaction("\U0001f44b")
     return welcome

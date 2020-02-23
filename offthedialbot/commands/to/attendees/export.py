@@ -1,4 +1,4 @@
-"""$to profiles"""
+"""$to attendees export"""
 import csv
 from io import StringIO
 
@@ -7,30 +7,34 @@ import discord
 from offthedialbot import utils
 
 
-@utils.deco.to_only
+@utils.deco.require_role("Organiser")
+@utils.deco.tourney()
 async def main(ctx):
     """Export user profiles to a csv."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, create_embed())
     reply = await ui.get_reply("reaction_add", valid_reactions=['\U0001f4e9', '\U0001f3c5'])
-
-    profiles: list = utils.dbh.profiles.find(filter={
+    query = {
         '\U0001f4e9': {},
         '\U0001f3c5': {"meta.competing": True}
-    }[reply.emoji], projection={"_id": True})
+    }[reply.emoji]
 
+    await export_profiles(ui, query)
+
+
+async def export_profiles(ui, query):
+    """Export user profiles."""
+    profiles: list = utils.dbh.profiles.find(query, {"_id": True})
     await ui.ctx.trigger_typing()
-
     file = create_file(ui, profiles)
     await upload_file(ui, file)
-
-    await ui.end(status=None)
 
 
 def create_embed():
     """Create embed."""
     return discord.Embed(
         title="Do you want all profiles or just those competing?",
-        description="Select \U0001f4e9 for all, and \U0001f3c5 for just those competing."
+        description="Select \U0001f4e9 for all, and \U0001f3c5 for just those competing.",
+        color=utils.colors.Roles.COMPETING
     )
 
 
@@ -66,9 +70,12 @@ def create_file(ui: utils.CommandUI, profiles: list):
 
 async def upload_file(ui: utils.CommandUI, file: StringIO):
     """Upload csv file to discord."""
-    await ui.ctx.send(embed=utils.Alert.create_embed(
+    alert = utils.Alert.create_embed(
         utils.Alert.Style.SUCCESS,
         title=":incoming_envelope: *Exporting profiles complete!*",
         description="Download the spreadsheet below. \U0001f4e5"
-    ))
+    )
+    ui.embed.title, ui.embed.description, ui.embed.color = alert.title, alert.description, alert.color
     await ui.ctx.send(file=discord.File(file, filename="profiles.csv"))
+    await ui.ui.clear_reactions()
+    await ui.update()

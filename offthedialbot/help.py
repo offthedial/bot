@@ -1,6 +1,7 @@
 """Contains HelpCommand class."""
 import discord
 from discord.ext import commands
+
 from offthedialbot import utils
 
 
