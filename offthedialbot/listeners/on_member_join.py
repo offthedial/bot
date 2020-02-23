@@ -27,7 +27,7 @@ async def on_member_join(client, member):
 
     # Incase they leave immediately
     try:
-        await client.wait_for('member_leave', check=utils.checks.join_or_leave(member), timeout=300)
+        await client.wait_for('member_remove', check=utils.checks.join_or_leave(member), timeout=300)
     except TimeoutError:
         pass
     else:
