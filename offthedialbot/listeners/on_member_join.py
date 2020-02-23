@@ -24,3 +24,11 @@ async def on_member_join(client, member):
     # Create welcome message
     welcome = await channel.send(f"Let's welcome {member.mention} to __Off the Dial__! :wave:")
     await welcome.add_reaction("\U0001f44b")
+
+    # Incase they leave immediately
+    try:
+        await client.wait_for('member_leave', check=utils.checks.join_or_leave(member), timeout=300)
+    except TimeoutError:
+        pass
+    else:
+        await welcome.delete()
