@@ -6,10 +6,10 @@ from offthedialbot.commands.profile import create, update
 
 
 class Checkin(commands.Cog, command_attrs={'hidden': True}):
-    """Quickly fetch the value of one of your status fields."""
+    """Cog holding check-in command for easy disabling."""
 
     @commands.command(enabled=False)
-    # @utils.deco.otd_only
+    @utils.deco.otd_only
     @utils.deco.tourney(open=False)
     @utils.deco.profile_required(competing=True)
     async def checkin(self, ctx: commands.Context):
