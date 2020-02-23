@@ -88,11 +88,8 @@ def derive_command(func, name):
 
     @wraps(func)
     async def _(ctx):
-        try:
-            with lock_command_access(ctx):
-                await func(ctx)
-        except utils.exc.CommandCancel:
-            return
+        with lock_command_access(ctx):
+            await func(ctx)
 
     return _
 
