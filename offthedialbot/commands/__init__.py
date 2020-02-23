@@ -88,8 +88,6 @@ def derive_command(func, name):
 
     @wraps(func)
     async def _(ctx):
-        if locked(ctx):
-            return
         try:
             with lock_command_access(ctx):
                 await func(ctx)
@@ -97,10 +95,6 @@ def derive_command(func, name):
             return
 
     return _
-
-
-def locked(ctx):
-    return ctx.author.id in ctx.bot.ongoing_commands[ctx.channel.id]
 
 
 @contextmanager
