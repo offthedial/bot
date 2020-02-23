@@ -3,7 +3,7 @@
 
 def msg(ctx):
     """Check if the message is in the same channel, and is by the same author."""
-    return lambda m: m.channel == ctx.channel and m.author == ctx.author
+    return lambda m: m.channel == ctx.channel and m.author == ctx.author and not m.content.startswith("\\")
 
 
 def react(ctx, message, valids=None):
