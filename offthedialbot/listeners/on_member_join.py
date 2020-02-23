@@ -2,10 +2,10 @@
 from offthedialbot import utils
 
 
-async def on_member_join(self, member):
+async def on_member_join(client, member):
     """When a new member joins Off the Dial."""
     # Check if it's the correct the server
-    if member.guild != self.OTD:
+    if member.guild != client.OTD:
         return
     # Check if they have a profile
     try:
@@ -13,12 +13,12 @@ async def on_member_join(self, member):
     except utils.Profile.NotFound:
         profile = None
     # Get channel and roles
-    channel = utils.channels.general(self)
+    channel = utils.channels.general(client)
     roles = [
-        utils.roles.dialer(self),
-        utils.roles.alerts(self)]
+        utils.roles.dialer(client),
+        utils.roles.alerts(client)]
     if profile and profile.get_competing():
-        roles.append(utils.roles.competing(self))
+        roles.append(utils.roles.competing(client))
     # Add roles
     await member.add_roles(*roles)
     # Create welcome message
