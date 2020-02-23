@@ -74,7 +74,7 @@ def process_commands(data, parent):
 
         # Otherwise, create a normal command
         else:
-            cmd = commands.Command(func, name=name, hidden=func.hidden)
+            cmd = commands.Command(func, name=name, ignore_extra=False, hidden=func.hidden)
 
         parent.add_command(cmd)
 
