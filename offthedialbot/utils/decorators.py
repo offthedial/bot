@@ -79,6 +79,7 @@ def dev_only(command):
     _.hidden = True
     return _
 
+
 def tourney(open=(True, False)):
     """ Require tournament to call command.
 
@@ -93,47 +94,47 @@ def tourney(open=(True, False)):
     if open == (True, False):
         def deco(command):
             @wraps(command)
-            async def _(ctx):
+            async def _(*args):
                 if utils.dbh.get_tourney():
-                    await command(ctx)
+                    await command(*args)
                 else:
-                    await error_msg(ctx)
+                    await error_msg(args[-1])
             return _
 
     elif open is None:
         def deco(command):
             @wraps(command)
-            async def _(ctx):
+            async def _(*args):
                 if not utils.dbh.get_tourney():
-                    await command(ctx)
+                    await command(*args)
                 else:
-                    await error_msg(ctx, "Tournament already exists.")
+                    await error_msg(args[-1], "Tournament already exists.")
             return _
 
     elif open is True:
         def deco(command):
             @wraps(command)
-            async def _(ctx):
+            async def _(*args):
                 if (tourney := utils.dbh.get_tourney()):
                     if tourney["reg"]:
-                        await command(ctx)
+                        await command(*args)
                     else:
-                        await error_msg(ctx, "Tournament registration is not open.")
+                        await error_msg(args[-1], "Tournament registration is not open.")
                 else:
-                    await error_msg(ctx)
+                    await error_msg(args[-1])
             return _
 
     elif open is False:
         def deco(command):
             @wraps(command)
-            async def _(ctx):
+            async def _(*args):
                 if (tourney := utils.dbh.get_tourney()):
                     if not tourney["reg"]:
-                        await command(ctx)
+                        await command(*args)
                     else:
-                        await error_msg(ctx, "Tournament registration is currently open.")
+                        await error_msg(args[-1], "Tournament registration is currently open.")
                 else:
-                    await error_msg(ctx)
+                    await error_msg(args[-1])
             return _
 
     return deco
