@@ -4,7 +4,7 @@ import discord
 from offthedialbot import utils
 
 
-@utils.deco.to_only
+@utils.deco.require_role("Organiser")
 @utils.deco.tourney(None)
 async def main(ctx):
     """Open registration for a new tournament!"""

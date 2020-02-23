@@ -5,7 +5,7 @@ from offthedialbot import utils
 from offthedialbot import log
 
 
-@utils.deco.to_only
+@utils.deco.require_role("Organiser")
 @utils.deco.tourney()
 async def main(ctx):
     """Remove an attendee from the tournament."""
