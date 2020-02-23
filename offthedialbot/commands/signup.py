@@ -27,7 +27,7 @@ async def main(ctx):
 
     # Check requirements
     with checklist.checking("profile is updated"):
-        await profile_updated(ui, profile)
+        profile = await profile_updated(ui, profile)
     with checklist.checking("smash.gg integration"):
         await smashgg(ui, link)
     with checklist.checking("final confirmation"):
@@ -61,7 +61,7 @@ async def check_prerequisites(ctx):
 async def profile_updated(ui, profile):
     """Make sure the user's profiles are up-to-date."""
     if not profile:
-        ui.embed.description = "A profile is required to participate. Do you want to proceed?"
+        ui.embed.description = "A profile is required to participate. To proceed, select the \u2705."
         await ui.get_reply("reaction_add", valid_reactions=["\u2705"])
         await ui.run_command(create.main)
     else:
@@ -69,6 +69,7 @@ async def profile_updated(ui, profile):
         reply = await ui.get_reply("reaction_add", valid_reactions=["\u270f\ufe0f", "\u2705"])
         if reply.emoji == "\u270f\ufe0f":
             await ui.run_command(update.main)
+    return utils.Profile(ui.ctx.author.id)
 
 
 async def smashgg(ui, link):
