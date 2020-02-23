@@ -1,7 +1,10 @@
 """Dynamically import and generate discord.ext listeners."""
 import importlib
 import inspect
+from functools import wraps
 import os
+
+from offthedialbot.log import logger
 
 
 def register_listeners(bot):
@@ -16,7 +19,7 @@ def import_modules():
     """Imports all of the modules."""
     modules = []
     for module in os.listdir(os.path.dirname(__file__)):
-        if module == '__init__.py' or module[-3:] != '.py':
+        if module == '__init__.py' or not module.endswith('.py'):
             continue
         modules.append(importlib.import_module(f"offthedialbot.listeners.{module[:-3]}"))
     del module
@@ -26,19 +29,23 @@ def import_modules():
 
 def get_listeners(modules: list) -> list:
     """Imports the listener functions from each module."""
-    return [get_function(module) for module in modules]
+    return [get_function(module) for module in modules if get_function(module)]
 
 
 def get_function(module):
     """Get the first function present in a given module."""
     for name, obj in inspect.getmembers(module):
-        if inspect.isfunction(obj):
+        module_name = ".".join(module.__name__.split(".")[-1:])
+        if inspect.isfunction(obj) and obj.__name__ == module_name:
             return obj
+    else:
+        logger.warn(f"Cannot register listener in '{module_name}.py': Missing `{module_name}`")
 
 
 def derive_listener(func, bot):
     """Derive listener from function."""
 
+    @wraps(func)
     async def _(*args, **kwargs):
         return await func(bot, *args, **kwargs)
 
