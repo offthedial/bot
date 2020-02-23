@@ -1,4 +1,5 @@
 """Contains on_message listener."""
+from contextlib import contextmanager
 
 
 async def on_message(client, message):
@@ -9,7 +10,8 @@ async def on_message(client, message):
     }):
         return
 
-    await client.process_commands(message)
+    with lock_command_access(client, message):
+        await client.process_commands(message)
 
 
 def locked(client, message):
@@ -24,3 +26,12 @@ def override_commands(client, message):
     """Check if the user wants to send a message without it being seen by the bot."""
     if message.content.startswith("\\"):
         return True
+
+
+@contextmanager
+def lock_command_access(client, message):
+    try:
+        client.ongoing_commands[message.channel.id].add(message.author.id)
+        yield
+    finally:
+        client.ongoing_commands[message.channel.id].remove(message.author.id)
