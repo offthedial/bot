@@ -2,7 +2,6 @@
 import discord
 
 from offthedialbot import utils
-from offthedialbot import log
 
 
 @utils.deco.to_only

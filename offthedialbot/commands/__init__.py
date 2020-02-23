@@ -73,7 +73,7 @@ def process_commands(data, parent):
 
         # Otherwise, create a normal command
         else:
-            cmd = commands.Command(func, name=name)
+            cmd = commands.Command(func, name=name, ignore_extra=False)
 
         parent.add_command(cmd)
 
