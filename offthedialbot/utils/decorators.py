@@ -37,10 +37,11 @@ def profile_required(reverse=False, competing=False):
                 try:
                     utils.Profile(args[-1].author.id)
                 except utils.Profile.NotFound:
-                    await command(args[-1])
+                    await utils.Alert(args[-1], utils.Alert.Style.DANGER, title="Command Failed", description="No profile found. You can create one using `$profile create`.")
                 else:
-                    await utils.Alert(args[-1], utils.Alert.Style.DANGER, title="Command Failed", description="Existing profile found. You can edit it using `$profile update`.")
+                    await command(*args)
             return _
+
     return deco
 
 
