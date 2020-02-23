@@ -3,7 +3,10 @@
 
 async def on_message(client, message):
     """When a new message is sent."""
-    if locked(client, message):
+    if any({
+        locked(client, message),
+        override_commands(client, message)
+    }):
         return
 
     await client.process_commands(message)
@@ -13,3 +16,9 @@ def locked(client, message):
     """Check if the user has been command-locked."""
     if getattr(client, 'ongoing_commands', False):
         return message.author.id in client.ongoing_commands[message.channel.id]
+
+
+def override_commands(client, message):
+    """Check if the user wants to send a message without it being seen by the bot."""
+    if message.content.startswith("\\"):
+        return True
