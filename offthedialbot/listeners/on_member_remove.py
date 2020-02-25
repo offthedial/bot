@@ -2,10 +2,10 @@
 from offthedialbot import utils
 
 
-async def on_member_remove(self, member):
+async def on_member_remove(client, member):
     """When a new member leaves Off the Dial."""
     # Check if it's the correct the server
-    if member.guild != self.OTD:
+    if member.guild != client.OTD:
         return
     
     await warn_if_competing(member)
