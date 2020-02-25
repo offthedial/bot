@@ -1,4 +1,6 @@
 """$to attendees"""
+from discord.ext import commands
+
 from offthedialbot import utils
 
 
@@ -6,3 +8,4 @@ from offthedialbot import utils
 @utils.deco.tourney()
 async def main(ctx):
     """Command tools for managing attendees."""
+    raise commands.TooManyArguments

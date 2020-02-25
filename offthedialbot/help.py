@@ -78,7 +78,7 @@ class HelpCommand(commands.DefaultHelpCommand):
 
     def create_embed(self, fields: list = (), **kwargs):
         """Create help embed."""
-        embed = discord.Embed(**kwargs, color=utils.Alert.Style.DANGER)
+        embed = discord.Embed(color=utils.Alert.Style.DANGER, **kwargs)
         for field in fields:
             embed.add_field(**field, inline=False)
         embed.set_footer(text=f"Type {self.clean_prefix}help command for more info on a command. You can also type {self.clean_prefix}help category for more info on a category.")

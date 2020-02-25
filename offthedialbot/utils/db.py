@@ -35,4 +35,5 @@ class DatabaseHandler:
     def set_tourney_reg(self, reg):
         return self.to.update_one({"_id": 0}, {"$set": {"reg": reg}})
 
+
 dbh = DatabaseHandler()

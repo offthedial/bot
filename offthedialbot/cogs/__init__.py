@@ -3,6 +3,8 @@ import importlib
 import inspect
 import os
 
+from offthedialbot.log import logger
+
 
 def register_cogs(bot):
     """Register the cogs in the package."""
@@ -26,11 +28,18 @@ def import_modules():
 
 def get_cogs(modules) -> list:
     """Imports the cogs from each module."""
-    return [get_class(module) for module in modules]
+    return [get_class(module) for module in modules if get_class(module)]
 
 
 def get_class(module):
     """Get the first class present in a given module."""
     for name, obj in inspect.getmembers(module):
-        if inspect.isclass(obj):
+        module_name = ".".join(module.__name__.split(".")[-1:])
+        if inspect.isclass(obj) and obj.__name__ == snake_to_pascal(module_name):
             return obj
+    else:
+        logger.warn(f"Cannot register cog in '{module_name}.py': Missing `{snake_to_pascal(module_name)}`")
+
+
+def snake_to_pascal(name):
+    return ''.join([w.title() for w in name.split('_')])

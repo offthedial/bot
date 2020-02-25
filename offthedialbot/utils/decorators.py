@@ -5,6 +5,7 @@ from functools import wraps
 
 def profile_required(reverse=False, competing=False):
     """Make sure the command is only callable if the user has a profile."""
+
     if reverse:
         def deco(command):
             @wraps(command)
@@ -16,6 +17,7 @@ def profile_required(reverse=False, competing=False):
                 else:
                     await utils.Alert(args[-1], utils.Alert.Style.DANGER, title="Command Failed", description="Existing profile found. You can edit it using `$profile update`.")
             return _
+
     elif competing:
         def deco(command):
             @wraps(command)
@@ -28,8 +30,8 @@ def profile_required(reverse=False, competing=False):
                     await command(*args)
                 else:
                     await utils.Alert(args[-1], utils.Alert.Style.DANGER, title="Command Failed", description="You are not currently competing.")
-
             return _
+
     else:
         def deco(command):
             @wraps(command)

@@ -1,5 +1,4 @@
 """Contains CommandUI class."""
-
 import asyncio
 import re
 from contextlib import asynccontextmanager
@@ -35,23 +34,6 @@ class CommandUI:
         ui: discord.Message = await ctx.send(embed=embed)
         await ui.add_reaction('❌')
         return ui
-
-    async def update(self) -> None:
-        """Update the ui with new information."""
-        await self.ui.edit(embed=self.embed)
-
-    async def end(self, status: Union[bool, None]) -> None:
-        """End UI interaction and display status."""
-        status_key: dict = {True: utils.embeds.SUCCESS, False: utils.embeds.CANCELED}
-        if status_key.get(status):
-            await self.ui.edit(embed=status_key[status])
-            await self.ui.clear_reactions()
-        else:
-            await self.ui.delete()
-        await self.delete_alert()
-
-        # Raise exception to cancel command
-        raise utils.exc.CommandCancel(status, self)
 
     async def get_valid_message(self, valid: Union[str, Callable], error_fields: dict = None, *, _alert_params=None, **get_reply_params) -> discord.Message:
         """Get message reply with validity checks."""
@@ -119,6 +101,26 @@ class CommandUI:
 
         return reply
 
+    async def update(self) -> None:
+        """Update the ui with new information."""
+        await self.ui.edit(embed=self.embed)
+
+    async def end(self, status: Union[bool, None]) -> None:
+        """End UI interaction and display status."""
+        status_key: dict = {
+            True: discord.Embed(title="Success!", color=utils.Alert.Style.SUCCESS),
+            False: discord.Embed(title="Canceled.", color=utils.Alert.Style.DANGER),
+        }
+        if status_key.get(status):
+            await self.ui.edit(embed=status_key[status])
+            await self.ui.clear_reactions()
+        else:
+            await self.ui.delete()
+        await self.delete_alert()
+
+        # Raise exception to cancel command
+        raise utils.exc.CommandCancel(status, self)
+
     async def create_alert(self, style: utils.Alert.Style, title: str, description: str) -> None:
         """Create an alert with a given color to determine the style."""
         self.alert = await utils.Alert(self.ctx, style, title=title, description=description)
@@ -149,6 +151,16 @@ class CommandUI:
                 await self.end(e.status)
             return e
 
+    def create_cancel_task(self, timeout=None) -> asyncio.Task:
+        """Create a task that checks if the user canceled the command."""
+        return asyncio.create_task(
+            self.ctx.bot.wait_for(
+                'reaction_add',
+                check=utils.checks.react(self.ctx, self.ui, valids='❌'),
+                timeout=(timeout if timeout else 120)
+            )
+        )
+
     @staticmethod
     def check_valid(valid: Union[str, Callable], reply: discord.Message) -> bool:
         """Check if a user's reply is valid."""
@@ -177,13 +189,3 @@ class CommandUI:
             rest.cancel()
 
         return task, reply
-
-    def create_cancel_task(self, timeout=None) -> asyncio.Task:
-        """Create a task that checks if the user canceled the command."""
-        return asyncio.create_task(
-            self.ctx.bot.wait_for(
-                'reaction_add',
-                check=utils.checks.react(self.ctx, self.ui, valids='❌'),
-                timeout=(timeout if timeout else 120)
-            )
-        )

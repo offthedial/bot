@@ -44,7 +44,6 @@ class GetStatusField(commands.Cog, command_attrs={'hidden': True}):
             profile: utils.Profile = utils.Profile(ctx.author.id)
         except utils.exc.CommandCancel:
             return
-
         await utils.Alert(
             ctx, utils.Alert.Style.INFO,
             title=f"`{profile.get_status()['IGN']}`'s Ranks:",

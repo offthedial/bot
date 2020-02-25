@@ -2,7 +2,6 @@
 
 from . import checks
 from . import colors
-from . import embeds
 from . import emojis
 from . import channels
 from . import roles
