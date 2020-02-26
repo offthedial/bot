@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 
 from offthedialbot import utils
-from offthedialbot.commands.profile import create, update
+from offthedialbot.commands.signup import profile_updated
 
 
 class Checkin(commands.Cog, command_attrs={'hidden': True}):
@@ -16,15 +16,14 @@ class Checkin(commands.Cog, command_attrs={'hidden': True}):
     async def checkin(self, ctx: commands.Context):
         """Check in."""
         # Get Checked In role, or create it.
+        ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Check-in Form", color=utils.colors.COMPETING))
+        await profile_updated(ui, True)
         if not (role := utils.roles.get(ctx, "Checked In")):
-            role = await ctx.guild.create_role(name="Checked In")
+            role = await ui.ctx.guild.create_role(name="Checked In")
         
         # Check the attendee in
-        await ctx.author.add_roles(role)
-        await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
-            title="Check-in Complete",
-            description="You are all set! Good luck in the tournament!"
-        )
+        await ui.ctx.author.add_roles(role)
+        await ui.end(True)
     
     @checkin.error
     async def checkin_error(self, ctx, error):

@@ -97,6 +97,7 @@ async def finalize_signup(ui, profile):
     profile.set_competing(True)
     profile.write()
 
+
 class Checklist:
     """Set checklist field on the signup form."""
 
