@@ -25,13 +25,15 @@ async def remove_roles(ui, profiles):
     ui.embed.description = "Removing `competing` role from everyone."
     await ui.update()
     for p in profiles:
-        await ui.ctx.bot.OTD.get_member(p["_id"]).remove_roles(utils.roles.competing(ui.ctx.bot))  # Remove competing role
+        member = ui.ctx.guild.get_member(p["_id"])
+        await member.remove_roles(utils.roles.get(ui.ctx, name=name) for name in ["Competing", "Checked In"])
+
 
 async def update_profiles(ui, profiles):
     ui.embed.description = "Updating profiles to set `competing` to false."
     await ui.update()
     for p in profiles:
-        utils.dbh.profiles.update_one({"_id": p["_id"]}, {"$set": {"meta.competing": False}})  # Set competing key to false
+        utils.dbh.profiles.update_one({"_id": p["_id"]}, {"$set": {"meta.competing": False}})
 
 
 async def check_tourney_started(ctx):

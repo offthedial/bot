@@ -27,7 +27,7 @@ async def add_roles(client, member):
         utils.roles.alerts(client)
     ]
     if profile and profile.get_competing():
-        roles.append(utils.roles.competing(client))
+        roles.append(utils.roles.get(member, "Competing"))
 
     await member.add_roles(*roles)
 

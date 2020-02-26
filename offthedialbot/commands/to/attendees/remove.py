@@ -26,8 +26,8 @@ async def main(ctx):
         profile.set_competing(False)
         profile.write()
         # Remove roles
-        await attendee.remove_roles(utils.roles.competing(ctx.bot))
-        
+        await attendee.remove_roles(utils.roles.get(ctx, name=name) for name in ["Competing", "Checked In"])
+
         await utils.Alert(ctx, utils.Alert.Style.SUCCESS, title="Remove attendee complete", description=f"`{attendee.display_name}` is no longer competing.")
     await ui.end(None)
 

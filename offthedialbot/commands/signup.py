@@ -91,8 +91,7 @@ async def confirm_signup(ui):
 async def finalize_signup(ui, profile):
     """Finalize user signup, hand out roles, update profile, etc."""
     # Hand out competing role
-    if competing_role := utils.roles.competing(ui.ctx.bot):
-        await ui.ctx.author.add_roles(competing_role)
+    await ui.ctx.author.add_roles(utils.roles.get(ui.ctx, "Competing"))
 
     # Set profile to competing
     profile.set_competing(True)

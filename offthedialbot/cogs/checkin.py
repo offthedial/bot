@@ -16,7 +16,7 @@ class Checkin(commands.Cog, command_attrs={'hidden': True}):
     async def checkin(self, ctx: commands.Context):
         """Check in."""
         # Get Checked In role, or create it.
-        if not (role := discord.utils.get(ctx.guild.roles, name='Checked In')):
+        if not (role := utils.roles.get(ctx, "Checked In")):
             role = await ctx.guild.create_role(name="Checked In")
         
         # Check the attendee in
