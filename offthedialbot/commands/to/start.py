@@ -21,3 +21,7 @@ async def end_checkin(ui):
     await ui.update()
     checkin_cmd = ui.ctx.bot.get_command("checkin")
     checkin_cmd.enabled = False
+
+async def remove_inactives(ui):
+    """Remove attendees who have not checked in."""
+    # TODO
