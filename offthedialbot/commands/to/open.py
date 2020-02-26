@@ -8,7 +8,7 @@ from offthedialbot import utils
 @utils.deco.tourney(None)
 async def main(ctx):
     """Open registration for a new tournament!"""
-    ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Opening registration for a new tournament...", color=utils.colors.Roles.COMPETING))
+    ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Opening registration for a new tournament...", color=utils.colors.COMPETING))
     
     # Steps
     link = await get_tourney_link(ui)

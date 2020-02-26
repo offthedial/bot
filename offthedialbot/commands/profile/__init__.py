@@ -17,7 +17,7 @@ def create_status_embed(name, profile) -> discord.Embed:
     embed: discord.Embed = discord.Embed(
         title=f"{name}'s Status",
         description=f"**\U0001f4f6 Signal Strength:** `{profile.get_ss()}`",
-        color=utils.colors.Roles.DIALER if not profile.get_competing() else utils.colors.Roles.COMPETING
+        color=utils.colors.DIALER if not profile.get_competing() else utils.colors.COMPETING
     )
     for key, value in profile.get_status().items():
         value: str = display_field(key, value)

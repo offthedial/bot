@@ -16,7 +16,7 @@ async def main(ctx):
         ctx,
         discord.Embed(
             title=f"Signup Form",
-            color=utils.colors.Roles.COMPETING
+            color=utils.colors.COMPETING
     ))
     checklist = Checklist(ui, {
         "prerequisites": True,

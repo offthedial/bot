@@ -8,7 +8,7 @@ from offthedialbot import utils
 @utils.deco.tourney(True)
 async def main(ctx):
     """Close registration for the tournament."""
-    ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Closing registration for the tournament...", color=utils.colors.Roles.COMPETING))
+    ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Closing registration for the tournament...", color=utils.colors.COMPETING))
 
     # Steps
     await close_signup(ui)

@@ -10,7 +10,7 @@ async def main(ctx):
     """End the tournament."""
     await check_tourney_started(ctx)
 
-    ui: utils.CommandUI = await utils.CommandUI(ctx, embed=discord.Embed(title="Ending tournament...", color=utils.colors.Roles.COMPETING))
+    ui: utils.CommandUI = await utils.CommandUI(ctx, embed=discord.Embed(title="Ending tournament...", color=utils.colors.COMPETING))
 
     # Steps
     profiles = utils.dbh.profiles.find({"meta.competing": True}, {"_id": True})
