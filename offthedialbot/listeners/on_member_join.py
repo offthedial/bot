@@ -41,7 +41,7 @@ async def send_welcome(client, member):
 
 async def member_leave(client, member, welcome):
     try:
-        await client.wait_for('member_remove', check=utils.checks.join_or_leave(member), timeout=300)
+        await client.wait_for('member_remove', check=utils.checks.member(member), timeout=300)
     except TimeoutError:
         pass
     else:

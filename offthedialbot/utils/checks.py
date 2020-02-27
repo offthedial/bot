@@ -11,6 +11,6 @@ def react(ctx, message, valids=None):
     return lambda r, u: (r.message.id, u) == (message.id, ctx.author) and (valids is None or r.emoji in valids)
 
 
-def join_or_leave(member):
+def member(mem):
     """Check if the member who joined or leaved is the same as the member specified."""
-    return  lambda m: m.id == member.id
+    return  lambda m: m.id == mem.id
