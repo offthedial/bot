@@ -2,7 +2,7 @@
 import os
 
 from offthedialbot import env
-if env["debug"]:
+if env.get("debug"):
     import mongomock as pymongo
 else:
     import pymongo
