@@ -22,11 +22,8 @@ async def main(ctx):
         link = utils.dbh.get_tourney()["link"]
         ui.embed.description = f"Remove `{attendee.display_name}` from smash.gg at **<{link}/attendees>**, then hit the \u2705."
         await ui.get_reply("reaction_add", valid_reactions=["\u2705"])
-        # Set profile to false
-        profile.set_competing(False)
-        profile.write()
-        # Remove roles
-        await attendee.remove_roles(utils.roles.get(ctx, name=name) for name in ["Competing", "Checked In"])
+        # Remove attendee from discord
+        await remove_attendee(ctx, attendee, profile)
 
         await utils.Alert(ctx, utils.Alert.Style.SUCCESS, title="Remove attendee complete", description=f"`{attendee.display_name}` is no longer competing.")
     await ui.end(None)
@@ -46,3 +43,13 @@ async def check_valid_attendee(ctx, attendee):
             return False
 
         return profile
+
+
+async def remove_attendee(ctx, attendee, profile):
+    """Remove competing from attendee's profile and discord roles."""
+    # Profile
+    profile.set_competing(False)
+    profile.write()
+    # Discord roles
+    if attendee:
+        await attendee.remove_roles(*[utils.roles.get(ctx, name=name) for name in ["Competing", "Checked In"]])
