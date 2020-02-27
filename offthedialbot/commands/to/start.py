@@ -30,4 +30,4 @@ async def remove_inactives(ctx):
     for attendee, profile in attendees.attendee_and_profile(ctx):
 
         if (attendee is None) or (not "Checked In" in [role.name for role in attendee.roles]):
-            await attendees.remove.remove_attendee(ctx, attendee, profile)
+            await attendees.remove.remove_attendee(ctx, attendee, profile, reason="attendee failed to check-in.")

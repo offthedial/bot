@@ -22,7 +22,7 @@ async def main(ctx):
 
 async def remove_all_attendees(ctx):
     for attendee, profile in attendees.attendee_and_profile(ctx):
-        await attendees.remove.remove_attendee(ctx, attendee, profile)
+        await attendees.remove.remove_attendee(ctx, attendee, profile, reason="tournament has ended.")
 
 
 async def check_tourney_started(ctx):
