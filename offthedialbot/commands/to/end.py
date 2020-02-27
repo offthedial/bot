@@ -2,6 +2,7 @@
 import discord
 
 from offthedialbot import utils
+from . import attendees
 
 
 @utils.deco.require_role("Organiser")
@@ -13,27 +14,15 @@ async def main(ctx):
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed=discord.Embed(title="Ending tournament...", color=utils.colors.COMPETING))
 
     # Steps
-    profiles = utils.dbh.profiles.find({"meta.competing": True}, {"_id": True})
-    await remove_roles(ui, profiles)
-    await update_profiles(ui, profiles)
+    await remove_all_attendees(ctx)
     utils.dbh.end_tourney()
 
     await ui.end(True)
 
 
-async def remove_roles(ui, profiles):
-    ui.embed.description = "Removing `competing` role from everyone."
-    await ui.update()
-    for p in profiles:
-        member = ui.ctx.guild.get_member(p["_id"])
-        await member.remove_roles(utils.roles.get(ui.ctx, name=name) for name in ["Competing", "Checked In"])
-
-
-async def update_profiles(ui, profiles):
-    ui.embed.description = "Updating profiles to set `competing` to false."
-    await ui.update()
-    for p in profiles:
-        utils.dbh.profiles.update_one({"_id": p["_id"]}, {"$set": {"meta.competing": False}})
+async def remove_all_attendees(ctx):
+    for attendee, profile in attendees.attendee_and_profile(ctx):
+        await attendees.remove.remove_attendee(ctx, attendee, profile)
 
 
 async def check_tourney_started(ctx):
