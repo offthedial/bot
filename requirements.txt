@@ -1,5 +1,5 @@
 discord
-python-dotenv
+pyyaml
 numpy
 mongomock
 pymongo

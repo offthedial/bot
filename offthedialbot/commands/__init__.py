@@ -40,11 +40,9 @@ def find_commands(module=sys.modules[__name__]):
 
         # Get the current node in the tree
         if len(hierarchy) == 1:
-            logger.debug(f'Module found: "{module_name}"')
             data[module_name] = sub_dict
         else:
             # Retrieve the direct parent
-            logger.debug(f'Sub-module found: "{module_name}"')
             parent = recursive_get(data, *hierarchy[:-1])
             parent['subcommands'][hierarchy[-1]] = sub_dict
 
