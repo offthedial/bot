@@ -1,5 +1,6 @@
 """Set up logging for the bot."""
 import logging
+
 from offthedialbot import env
 
 

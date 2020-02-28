@@ -1,7 +1,7 @@
 """Contains commonly used roles."""
 import discord
 
-from offthedialbot.log import logger
+from offthedialbot import logger
 
 
 def dialer(client):

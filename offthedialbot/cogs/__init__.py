@@ -3,7 +3,7 @@ import importlib
 import inspect
 import os
 
-from offthedialbot.log import logger
+from offthedialbot import logger
 
 
 def register_cogs(bot):

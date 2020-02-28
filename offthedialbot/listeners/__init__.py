@@ -4,7 +4,7 @@ import inspect
 from functools import wraps
 import os
 
-from offthedialbot.log import logger
+from offthedialbot import logger
 
 
 def register_listeners(bot):
