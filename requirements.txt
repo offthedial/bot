@@ -3,3 +3,4 @@ pyyaml
 numpy
 mongomock
 pymongo
+python-dateutil
