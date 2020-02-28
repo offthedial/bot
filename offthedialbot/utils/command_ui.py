@@ -1,4 +1,4 @@
-"""Contains CommandUI class."""
+"""Contains the CommandUI class."""
 import asyncio
 import re
 from contextlib import asynccontextmanager
