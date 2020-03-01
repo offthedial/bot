@@ -3,7 +3,7 @@ from discord.ext import commands
 from offthedialbot import utils
 
 
-async def on_command_error(self, ctx, error):
+async def on_command_error(client, ctx, error):
     """When an error occurs."""
     if not any({
         await invalid_command(ctx, error),

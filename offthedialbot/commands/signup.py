@@ -16,7 +16,7 @@ async def main(ctx):
         ctx,
         discord.Embed(
             title=f"Signup Form",
-            color=utils.colors.Roles.COMPETING
+            color=utils.colors.COMPETING
     ))
     checklist = Checklist(ui, {
         "prerequisites": True,
@@ -40,7 +40,7 @@ async def main(ctx):
 
 async def check_prerequisites(ctx):
     """Check to make sure the user fits all the prerequisites."""
-    link = utils.dbh.get_tourney_link()
+    link = utils.dbh.get_tourney()["link"]
     try:
         profile = utils.Profile(ctx.author.id)
     except utils.Profile.NotFound:
@@ -61,11 +61,11 @@ async def check_prerequisites(ctx):
 async def profile_updated(ui, profile):
     """Make sure the user's profiles are up-to-date."""
     if not profile:
-        ui.embed.description = "A profile is required to participate. To proceed, select the \u2705."
+        ui.embed.description = "A profile is required to participate. To proceed with creating one, select \u2705."
         await ui.get_reply("reaction_add", valid_reactions=["\u2705"])
         await ui.run_command(create.main)
     else:
-        ui.embed.description = "Make sure your profile is up-to-date. To update it, select the \u270f\ufe0f."
+        ui.embed.description = "Make sure your profile is up-to-date. Select \u270f\ufe0f to update it, or select \u2705 if it is up-to-date."
         reply = await ui.get_reply("reaction_add", valid_reactions=["\u270f\ufe0f", "\u2705"])
         if reply.emoji == "\u270f\ufe0f":
             await ui.run_command(update.main)
@@ -76,7 +76,7 @@ async def smashgg(ui, link):
     """Make sure the user has signed up on smash.gg."""
     # Uses OAuth2 to link user's smash.gg account
     # Give signup code to sign up on smash.gg
-    ui.embed.description = f"Sign up on smash.gg at **<{link}>**.\nOnce you are finished, enter your confirmation code you recieved in the email (`#F1PN28`)."
+    ui.embed.description = f"Sign up on smash.gg at **<{link}/register>**.\nOnce you are finished, enter your confirmation code you recieved in the email (`#F1PN28`)."
     code = await ui.get_valid_message(r"^#?([A-Za-z0-9]){6}$", {"title": "Invalid Confirmation Code", "description": "The code you entered was not valid, please try again."}, timeout=540)
     # Save code to show in exported profiles
 
@@ -91,12 +91,12 @@ async def confirm_signup(ui):
 async def finalize_signup(ui, profile):
     """Finalize user signup, hand out roles, update profile, etc."""
     # Hand out competing role
-    if competing_role := utils.roles.competing(ui.ctx.bot):
-        await ui.ctx.author.add_roles(competing_role)
+    await ui.ctx.author.add_roles(utils.roles.get(ui.ctx, "Competing"))
 
     # Set profile to competing
     profile.set_competing(True)
     profile.write()
+
 
 class Checklist:
     """Set checklist field on the signup form."""

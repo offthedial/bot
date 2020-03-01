@@ -1,8 +1,7 @@
 """Contains commonly used colors."""
 
 
-class Roles:
-    """Class holding role colors used in embeds."""
-    DIALER = 0xc27c28
-    COMPETING = 0xc0a659
-    STORYMODE = 0xb198be
+DIALER = 0xdc7e00
+STORYMODE = 0x9452df
+COMPETING = 0xf4ca6c
+RESCUE_CREW = 0xba60f7

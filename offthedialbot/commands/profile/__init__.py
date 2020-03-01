@@ -4,26 +4,12 @@ import discord
 from offthedialbot import utils
 
 
+@utils.deco.profile_required()
 async def main(ctx):
     """View your profile."""
-    profile: utils.Profile = await check_for_profile(ctx)
+    profile: utils.Profile = utils.Profile(ctx.author.id)
     embed: discord.Embed = create_status_embed(ctx.author.display_name, profile)
     await ctx.send(embed=embed)
-
-
-async def check_for_profile(ctx, reverse=False) -> utils.Profile:
-    """Returns profile if it exists, otherwise cancels command."""
-    try:
-        profile = utils.Profile(ctx.author.id)
-    except utils.Profile.NotFound:
-        profile = None
-    if (result := {
-        False: lambda p: (p is None, {"title": "No profile found.", "description": "You can create one using `$profile create`."}),
-        True: lambda p: (p, {"title": "Existing profile found.", "description": "You can view your profile with `$profile`."}),
-    }[reverse](profile))[0]:
-        await utils.Alert(ctx, utils.Alert.Style.DANGER, **result[1])
-        raise utils.exc.CommandCancel
-    return profile
 
 
 def create_status_embed(name, profile) -> discord.Embed:
@@ -31,7 +17,7 @@ def create_status_embed(name, profile) -> discord.Embed:
     embed: discord.Embed = discord.Embed(
         title=f"{name}'s Status",
         description=f"**\U0001f4f6 Signal Strength:** `{profile.get_ss()}`",
-        color=utils.colors.Roles.DIALER if not profile.get_competing() else utils.colors.Roles.COMPETING
+        color=utils.colors.DIALER if not profile.get_competing() else utils.colors.COMPETING
     )
     for key, value in profile.get_status().items():
         value: str = display_field(key, value)

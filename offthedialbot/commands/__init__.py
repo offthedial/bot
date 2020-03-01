@@ -6,8 +6,7 @@ from functools import wraps
 
 from discord.ext import commands
 
-from offthedialbot import utils
-from offthedialbot.log import logger
+from offthedialbot import utils, logger
 
 
 def register_commands(bot):
@@ -40,11 +39,9 @@ def find_commands(module=sys.modules[__name__]):
 
         # Get the current node in the tree
         if len(hierarchy) == 1:
-            logger.debug(f'Module found: "{module_name}"')
             data[module_name] = sub_dict
         else:
             # Retrieve the direct parent
-            logger.debug(f'Sub-module found: "{module_name}"')
             parent = recursive_get(data, *hierarchy[:-1])
             parent['subcommands'][hierarchy[-1]] = sub_dict
 
@@ -62,17 +59,18 @@ def process_commands(data, parent):
     for name, cmd_dict in data.items():
 
         func = derive_command(cmd_dict['func'], name)
+        func.hidden = getattr(func, 'hidden', False)
         subcommands = cmd_dict['subcommands']
 
         # If subcommands were found, create a command group
         if subcommands:
-            cmd = commands.Group(func, name=name, invoke_without_command=True, ignore_extra=False)
+            cmd = commands.Group(func, name=name, invoke_without_command=True, ignore_extra=False, hidden=func.hidden)
             # Re-run this function for all of the subcommands
             process_commands(subcommands, cmd)
 
         # Otherwise, create a normal command
         else:
-            cmd = commands.Command(func, name=name, ignore_extra=False)
+            cmd = commands.Command(func, name=name, ignore_extra=False, hidden=func.hidden)
 
         parent.add_command(cmd)
 

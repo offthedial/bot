@@ -5,12 +5,12 @@ import re
 import discord
 
 from offthedialbot import utils
-from . import create_status_embed, check_for_profile, display_field
+from . import create_status_embed, display_field
 
 
+@utils.deco.profile_required(reverse=True)
 async def main(ctx):
     """Create your profile."""
-    await check_for_profile(ctx, reverse=True)
     profile: utils.Profile = utils.Profile(ctx.author.id, new=True)
 
     embed: discord.Embed = create_status_embed(ctx.author.display_name, profile)
@@ -59,7 +59,7 @@ def create_stylepoints_embed(ctx) -> discord.Embed:
         title=f"{ctx.author.display_name}'s Style Points",
         description=
         f"Enter all of the playstyles below that apply to you, Type it again to remove it.\nClick the \u23ed\ufe0f when done.",
-        color=utils.colors.Roles.DIALER
+        color=utils.colors.DIALER
     )
     embed.add_field(name="Playstyles", value=create_playstyle_list())
     return embed
@@ -78,7 +78,7 @@ def create_cxp_embed(ctx) -> discord.Embed:
     return discord.Embed(
         title=f"{ctx.author.display_name}'s Competitive Experience",
         description=f"How many tournaments, with more than 16 teams, have your competed in?",
-        color=utils.colors.Roles.DIALER
+        color=utils.colors.DIALER
     )
 
 

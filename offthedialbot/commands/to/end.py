@@ -2,18 +2,33 @@
 import discord
 
 from offthedialbot import utils
+from . import attendees
 
 
-@utils.deco.to_only
+@utils.deco.require_role("Organiser")
+@utils.deco.tourney(False)
 async def main(ctx):
     """End the tournament."""
-    await ctx.trigger_typing()
-    utils.dbh.set_tourney_link(None)  # Remove the tourney link
-    # Update all the profiles
-    profiles = utils.dbh.profiles.find({"meta.competing": True}, {"_id": True})
-    for p in profiles:
-        # Remove competing role
-        await ctx.bot.OTD.get_member(p["_id"]).remove_roles(utils.roles.competing(ctx.bot))
-        # Set competing key to false
-        utils.dbh.profiles.update_one({"_id": p["_id"]}, {"$set": {"meta.competing": False}})
-    await utils.Alert(ctx, utils.Alert.Style.SUCCESS, title="Tournament Complete!", description="All roles have been removed, profiles have been updated, and signal strength has been applied.")
+    await check_tourney_started(ctx)
+
+    ui: utils.CommandUI = await utils.CommandUI(ctx, embed=discord.Embed(title="Ending tournament...", color=utils.colors.COMPETING))
+
+    # Steps
+    await remove_all_attendees(ctx)
+    utils.dbh.end_tourney()
+
+    await ui.end(True)
+
+
+async def remove_all_attendees(ctx):
+    for attendee, profile in attendees.attendee_and_profile(ctx):
+        await attendees.remove.remove_attendee(ctx, attendee, profile, reason="tournament has ended.")
+
+
+async def check_tourney_started(ctx):
+    if ctx.bot.get_command("checkin").enabled:
+        await utils.Alert(ctx, utils.Alert.Style.DANGER,
+            title="Command Failed",
+            description="Tournament has not started yet."
+        )
+        raise utils.exc.CommandCancel

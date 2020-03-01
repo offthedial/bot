@@ -1,8 +1,8 @@
 """Contains the DatabaseHandler class."""
 import os
-from dotenv import load_dotenv
-load_dotenv()
-if os.getenv("DEBUG"):
+
+from offthedialbot import env
+if env.get("debug"):
     import mongomock as pymongo
 else:
     import pymongo
@@ -17,19 +17,23 @@ class DatabaseHandler:
 
         # Collections
         self.profiles = self.db["profiles"]
-        self.links = self.db["links"]
+        self.to = self.db["to"]
 
-    # Links
-    def set_tourney_link(self, link):
-        """Set the tournament link."""
-        link = {"_id": "tourney", "link": link}
-        return self.links.replace_one({"_id": "tourney"}, link, upsert=True)
+    def new_tourney(self, link: str, reg: bool = True):
+        return self.to.insert_one({
+            "_id": 0,
+            "link": link,
+            "reg": reg
+        })
+    
+    def get_tourney(self):
+        return self.to.find_one({"_id": 0})
 
-    def get_tourney_link(self):
-        """Get the tournament link."""
-        link = self.links.find_one({"_id": "tourney"})
-        if link:
-            return link["link"]
+    def end_tourney(self):
+        return self.to.find_one_and_delete({"_id": 0})
+    
+    def set_tourney_reg(self, reg):
+        return self.to.update_one({"_id": 0}, {"$set": {"reg": reg}})
 
 
 dbh = DatabaseHandler()
