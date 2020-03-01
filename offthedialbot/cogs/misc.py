@@ -129,12 +129,12 @@ class Misc(commands.Cog, name='misc'):
             {
                 "type": "Size",
                 "desc": "Enter a size `6` to `32`",
-                "valid": lambda r: 6 <= int(r) <= 36,
+                "valid": lambda m: 6 <= int(m.content) <= 36,
                 "out": None
             }, {
                 "type": "Difficulty",
                 "desc": "Enter a difficulty `1` to `10`, or `0` for a random difficulty.",
-                "valid": lambda r: int(r) <= 10,
+                "valid": lambda m: int(m.content) <= 10,
                 "out": None
             }
         ]

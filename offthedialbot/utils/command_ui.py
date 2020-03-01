@@ -66,7 +66,7 @@ class CommandUI:
         key = {
             'message': {
                 "check": utils.checks.msg(self.ctx),
-                "delete": lambda r: r.delete()
+                "delete": lambda m: m.delete()
             },
             'reaction_add': {
                 "check": utils.checks.react(self.ctx, self.ui, valids=valid_reactions),

@@ -90,7 +90,7 @@ async def set_status_field(ui, profile, key, field_index) -> None:
     }
     ui.embed.description = instructions[key]
     reply = await ui.get_valid_message(
-        valid=lambda r: parse_reply(key, r.content), error_fields={
+        valid=lambda m: parse_reply(key, m.content), error_fields={
             "title": f"Invalid {key}",
             "description": instructions[key]
         }
@@ -106,7 +106,7 @@ async def set_rank_field(ui: utils.CommandUI, profile: utils.Profile, field_inde
     for key in profile.get_ranks().keys():
         ui.embed.description = create_instructions(key)
         reply: discord.Message = await ui.get_valid_message(
-            valid=lambda r: parse_reply("Ranks", r.content),
+            valid=lambda m: parse_reply("Ranks", m.content),
             error_fields={
                 "title": "Invalid Rank",
                 "description": create_instructions(key)
