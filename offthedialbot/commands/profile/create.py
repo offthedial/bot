@@ -57,7 +57,7 @@ async def get_user_stylepoints(ui: utils.CommandUI) -> list:
 def create_stylepoints_embed(ctx) -> discord.Embed:
     """Create embed for asking stylepoints."""
     embed: discord.Embed = discord.Embed(
-        title=f"{ctx.author.display_name}'s Style Points",
+        title=f"{ctx.author.display_name}'s Stylepoints",
         description=
         f"Enter all of the playstyles below that apply to you, Type it again to remove it.\nClick the \u23ed\ufe0f when done.",
         color=utils.colors.DIALER
