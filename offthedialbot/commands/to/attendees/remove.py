@@ -9,7 +9,7 @@ from offthedialbot import utils
 async def main(ctx):
     """Remove an attendee from the tournament."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Remove attendees.", description="Mention each attendee you want to remove.", color=utils.colors.COMPETING))
-    reply = await ui.get_reply()
+    reply = await ui.get_valid_message(lambda m: len(m.mentions) == 1, {"title": "Invalid Message", "description": "Make sure to send a **mention** of the attendee."})
 
     for attendee in reply.mentions:
 
