@@ -142,8 +142,8 @@ class Profile:
     def set_cxp(self, cxp: int):
         self.profile["cxp"] = cxp
 
-    def inc_ss(self, ss: int):
-        self.profile["signal_strength"] += ss
+    def set_ss(self, ss: int):
+        self.profile["signal_strength"] = ss
 
     def set_competing(self, competing: bool):
         self.profile["meta"]["competing"] = competing

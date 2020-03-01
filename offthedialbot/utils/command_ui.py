@@ -47,7 +47,7 @@ class CommandUI:
 
         # Get message and check if it's valid
         reply: discord.Message = await self.get_reply(**get_reply_params)
-        if self.check_valid(valid, reply.content):
+        if self.check_valid(valid, reply):
             await self.delete_alert()
         else:
             reply: discord.Message = await self.get_valid_message(valid=valid, _alert_params=_alert_params)
@@ -165,7 +165,7 @@ class CommandUI:
     def check_valid(valid: Union[str, Callable], reply: discord.Message) -> bool:
         """Check if a user's reply is valid."""
         if isinstance(valid, str):
-            return bool(re.search(valid, reply))
+            return bool(re.search(valid, reply.content))
         else:
             try:
                 return valid(reply)

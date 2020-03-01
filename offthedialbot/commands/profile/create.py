@@ -47,7 +47,7 @@ async def get_user_stylepoints(ui: utils.CommandUI) -> list:
     error_fields: dict = {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}
 
     coros: list = [
-        lambda: ui.get_valid_message(lambda r: r.lower() in utils.Profile.playstyles.keys(), error_fields),
+        lambda: ui.get_valid_message(lambda r: r.content.lower() in utils.Profile.playstyles.keys(), error_fields),
         lambda: ui.get_reply("reaction_add", valid_reactions=['\u23ed\ufe0f'], cancel=False)
     ]
     return await wait_user_playstyles(ui, coros)  # Check if user has selected atleast 1 of the 3
@@ -90,7 +90,7 @@ async def set_status_field(ui, profile, key, field_index) -> None:
     }
     ui.embed.description = instructions[key]
     reply = await ui.get_valid_message(
-        valid=lambda r: parse_reply(key, r), error_fields={
+        valid=lambda r: parse_reply(key, r.content), error_fields={
             "title": f"Invalid {key}",
             "description": instructions[key]
         }
@@ -106,7 +106,7 @@ async def set_rank_field(ui: utils.CommandUI, profile: utils.Profile, field_inde
     for key in profile.get_ranks().keys():
         ui.embed.description = create_instructions(key)
         reply: discord.Message = await ui.get_valid_message(
-            valid=lambda r: parse_reply("Ranks", r),
+            valid=lambda r: parse_reply("Ranks", r.content),
             error_fields={
                 "title": "Invalid Rank",
                 "description": create_instructions(key)

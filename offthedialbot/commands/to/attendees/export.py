@@ -13,24 +13,24 @@ from . import attendee_and_profile
 async def main(ctx):
     """Export attendee profiles to a csv."""
     await ctx.trigger_typing()
-    await export_attendees(ctx)
+    await export_attendees(ctx, attendee_and_profile(ctx))
 
 
-async def export_attendees(ctx):
-    file = create_file(ctx)
+async def export_attendees(ctx, rows):
+    file = create_file(ctx, rows)
     await send_file(ctx, file)
 
 
-def create_file(ctx):
+def create_file(ctx, rows):
     """Create StringIO file."""
     file = StringIO()
     writer: csv.writer = csv.writer(file)
     csv_profiles = []
 
-    for attendee, profile in attendee_and_profile(ctx):
+    for attendee, profile in rows:
 
         csv_profiles.append([
-            f'@{attendee.name}#{attendee.discriminator}' if attendee else "ATTENDEE-NOT-FOUND",
+            f'@{attendee.name}#{attendee.discriminator}' if attendee else "NOT-FOUND",
             profile.get_status()["IGN"],
             f"'{profile.get_status()['SW']}'",
             *[profile.convert_rank_power(rank) for rank in profile.get_ranks().values()],
@@ -38,11 +38,12 @@ def create_file(ctx):
             profile.get_stylepoints(),
             profile.get_cxp(),
             profile.get_ss(),
+            profile.get_competing(),
             profile.get_banned(),
-            f"'{attendee.id}'" if attendee else "ATTENDEE-NOT-FOUND"
+            f"'{attendee.id}'" if attendee else "NOT-FOUND"
         ])
     writer.writerows([["Discord Mention", "IGN", "SW", "SZ", "RM", "TC", "CB", "Cumulative ELO", "Stylepoints", "CXP",
-                       "Signal Strength", "Droppout Ban", "Discord ID"], []] + csv_profiles)
+                       "Signal Strength", "Competing", "Droppout Ban", "Discord ID"], []] + csv_profiles)
     file.seek(0)
     return discord.File(file, filename="profiles.csv")
 
