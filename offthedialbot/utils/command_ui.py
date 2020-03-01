@@ -131,7 +131,7 @@ class CommandUI:
             await self.alert.delete()
             self.alert = None
 
-    async def run_command(self, main):
+    async def run_command(self, main, *args):
         """Run an external command, from a command ui."""
         @asynccontextmanager
         async def hide_x():
@@ -143,7 +143,7 @@ class CommandUI:
 
         try:
             async with hide_x():
-                await main(self.ctx)
+                await main(self.ctx, *args)
         except utils.exc.CommandCancel as e:
             if e.ui:
                 await e.ui.ui.delete()

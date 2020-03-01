@@ -17,7 +17,9 @@ async def main(ctx):
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
 
     profile = await set_user_status(ui, profile)
+    ui.embed = create_stylepoints_embed(ui.ctx)
     profile.set_stylepoints(await get_user_stylepoints(ui))
+    ui.embed = create_cxp_embed(ui.ctx)
     profile.set_cxp(await get_user_cxp(ui))
     profile.write()
     await ui.end(True)
@@ -43,7 +45,6 @@ async def set_user_status(ui: utils.CommandUI, profile: utils.Profile) -> utils.
 
 async def get_user_stylepoints(ui: utils.CommandUI) -> list:
     """Get the user's playstyle and calculate their, style points."""
-    ui.embed = create_stylepoints_embed(ui.ctx)
     error_fields: dict = {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}
 
     coros: list = [
@@ -56,7 +57,7 @@ async def get_user_stylepoints(ui: utils.CommandUI) -> list:
 def create_stylepoints_embed(ctx) -> discord.Embed:
     """Create embed for asking stylepoints."""
     embed: discord.Embed = discord.Embed(
-        title=f"{ctx.author.display_name}'s Style Points",
+        title=f"{ctx.author.display_name}'s Stylepoints",
         description=
         f"Enter all of the playstyles below that apply to you, Type it again to remove it.\nClick the \u23ed\ufe0f when done.",
         color=utils.colors.DIALER
@@ -67,7 +68,6 @@ def create_stylepoints_embed(ctx) -> discord.Embed:
 
 async def get_user_cxp(ui: utils.CommandUI) -> int:
     """Get the user's playstyle and calculate their, style points."""
-    ui.embed = create_cxp_embed(ui.ctx)
     error_fields: dict = {"title": "Invalid number.", "description": "Please enter a valid number of tournaments."}
     reply: discord.Message = await ui.get_valid_message(r'^\d+$', error_fields)
     return int(reply.content)

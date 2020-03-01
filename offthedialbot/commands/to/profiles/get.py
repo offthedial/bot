@@ -10,21 +10,24 @@ from offthedialbot.commands.profile import create_status_embed
 async def main(ctx):
     """Get a specific profile."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed=discord.Embed())
-    profile, member = await get_profile(ui)
-    await ctx.send(embed=create_status_embed(member.display_name, profile))
+    for profile, member in await get_profile(ui):
+        await ctx.send(embed=create_status_embed(member.display_name, profile))
+
     await ui.end(None)
 
 
 async def get_profile(ui):
     ui.embed = discord.Embed(
-        title="Get Profile",
-        description="Mention the user you want to get the profile of",
+        title="Get Profiles",
+        description="Mention each user you want to get.",
         color=utils.colors.DIALER
     )
-    reply = await ui.get_valid_message(lambda m: len(m.mentions) == 1, {"title": "Invalid Message", "description": "Make sure to send a **mention** of **1** user."})
-    member: discord.Member = reply.mentions[0]
-    try:
-        return utils.Profile(member.id), member
-    except utils.Profile.NotFound:
-        await utils.Alert(ui.ctx, utils.Alert.Style.DANGER, title="Invalid User", description="That user doesn't have a profile.")
-        await ui.end(None)
+    reply = await ui.get_valid_message(lambda m: len(m.mentions), {"title": "Invalid Message", "description": "Make sure to **mention** each user."})
+    
+    profiles = []
+    for member in reply.mentions:
+        try:
+            profiles.append((utils.Profile(member.id), member))
+        except utils.Profile.NotFound:
+            await utils.Alert(ui.ctx, utils.Alert.Style.DANGER, title="Invalid User", description=f"{member.display_name} doesn't have a profile.")
+    return profiles
