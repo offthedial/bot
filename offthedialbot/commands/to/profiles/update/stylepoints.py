@@ -6,6 +6,7 @@ from ..get import get_profile
 from offthedialbot.commands.profile.update import *
 
 
+@utils.deco.require_role("Organiser")
 async def main(ctx):
     """Update user's stylepoints."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed())

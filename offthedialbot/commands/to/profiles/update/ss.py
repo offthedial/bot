@@ -4,6 +4,8 @@ import discord
 from offthedialbot import utils
 from ..get import get_profile
 
+
+@utils.deco.require_role("Organiser")
 async def main(ctx):
     """Set a user's signal strength."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed())
