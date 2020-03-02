@@ -2,7 +2,7 @@
 import discord
 
 from offthedialbot import utils
-from ..get import get_profile
+from ..get import get_profiles
 from offthedialbot.commands.profile.update import *
 
 
@@ -10,7 +10,7 @@ from offthedialbot.commands.profile.update import *
 async def main(ctx):
     """Update user's stylepoints."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed())
-    profiles = await get_profile(ui)
+    profiles = await get_profiles(ui)
     ui.embed = discord.Embed(title="Updating profiles...", color=utils.colors.DIALER)
     for profile, member in profiles:
         await ui.run_command(update_stylepoints, profile, member.display_name)
