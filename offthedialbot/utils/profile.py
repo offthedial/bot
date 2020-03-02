@@ -153,7 +153,7 @@ class Profile:
     def set_smashgg(self, smashgg):
         self.profile["meta"]["smashgg"] = smashgg
 
-    def set_banned(self, banned: datetime):
+    def set_banned(self, banned: Union[None, datetime]):
         self.profile["meta"]["banned"] = banned
 
     # Getters
@@ -196,7 +196,9 @@ class Profile:
     def get_smashgg(self):
         return self.profile["meta"]["smashgg"]
 
-    def get_banned(self) -> bool:
+    def get_banned(self) -> Union[None, datetime]:
         banned = self.profile["meta"]["banned"]
-        if banned and datetime.utcnow() < banned:
+        if isinstance(banned, datetime) and datetime.utcnow() < banned:
+            return banned
+        elif banned is True:
             return banned

@@ -39,7 +39,7 @@ async def remove_smashgg(ui, attendee):
 
 async def set_ban_length(ui: utils.CommandUI, attendee, profile):
     """Get ban length and set it inside of the profile."""
-    ui.embed.description = f"Specify the length of the ban."
+    ui.embed.description = f"Specify the length of the ban. or enter 'forever' for a permanent ban."
     ui.embed.add_field(name="Supported symbols:", value="\n".join([
         "- years: `Y`, `y`, `yrs`, `year`, `years`",
         "- months: `m`, `mon`, `month`, `months`",
@@ -50,7 +50,8 @@ async def set_ban_length(ui: utils.CommandUI, attendee, profile):
         "- seconds: `S`, `s`, `sec`, `second`, `seconds`", "",
         "Units must be provided in descending order of magnitude."
     ]))
-    reply = await ui.get_valid_message(lambda m: utils.time.Parse.user(m.content), {"title": "Invalid Length", "description": "Please check the `Supported symbols` and make sure your input is correct."})
-    banned = utils.time.Parse.user(duration=reply.content)
-    profile.set_banned(banned)  # + relativedelta(weeks=2))
+    parse = lambda m: utils.time.Parse.user(m.content) if m.content != "forever" else True
+    reply = await ui.get_valid_message(parse, {"title": "Invalid Length", "description": "Please check the `Supported symbols` and make sure your input is correct."})
+
+    profile.set_banned(parse(reply))  # + relativedelta(weeks=2))
     ui.embed.remove_field(0)
