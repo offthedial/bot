@@ -19,12 +19,15 @@ async def main(ctx):
             continue
         
         await remove_smashgg(ui, attendee)
-        await set_ban_length(ui, attendee, profile)
+        until = await set_ban_length(ui, attendee, profile)
         await remove.remove_attendee(ctx, attendee, profile, reason=f"attendee manually banned by {ctx.author.display_name}.")
 
         # Complete ban
         profile.write()
-        await utils.Alert(ctx, utils.Alert.Style.SUCCESS, title="Ban attendee complete", description=f"`{attendee.display_name}` is now banned.")
+        await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
+            title="Ban attendee complete",
+            description=f"`{attendee.display_name}` is now banned {f'until `{until} UTC`' if until != True else 'forever'}."
+        )
 
     await ui.end(None)
 
@@ -52,6 +55,7 @@ async def set_ban_length(ui: utils.CommandUI, attendee, profile):
     ]))
     parse = lambda m: utils.time.Parse.user(m.content) if m.content != "forever" else True
     reply = await ui.get_valid_message(parse, {"title": "Invalid Length", "description": "Please check the `Supported symbols` and make sure your input is correct."})
-
-    profile.set_banned(parse(reply))  # + relativedelta(weeks=2))
+    until = parse(reply)
+    profile.set_banned(until)
     ui.embed.remove_field(0)
+    return until
