@@ -40,7 +40,7 @@ async def main(ctx):
 
 async def check_prerequisites(ctx):
     """Check to make sure the user fits all the prerequisites."""
-    link = utils.dbh.get_tourney()["link"]
+    link = utils.dbh.get_tourney()["link"] if utils.dbh.get_tourney() else None
     try:
         profile = utils.Profile(ctx.author.id)
     except utils.Profile.NotFound:

@@ -15,7 +15,7 @@ async def main(ctx):
     for attendee in reply.mentions:
 
         # Check to make sure the attendee is valid
-        if not (profile := await remove.check_valid_attendee(ctx, attendee)):
+        if not (profile := await remove.check_valid_attendee(ctx, attendee, competing=False)):
             continue
         
         await remove_smashgg(ui, attendee)

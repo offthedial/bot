@@ -34,7 +34,7 @@ async def remove_smashgg(ui, attendee):
     await ui.get_reply("reaction_add", valid_reactions=["\u2705"])
 
 
-async def check_valid_attendee(ctx, attendee):
+async def check_valid_attendee(ctx, attendee, competing=True):
     """Check if the attendee is valid or not."""
     try:
         profile = utils.Profile(attendee.id)
@@ -42,8 +42,10 @@ async def check_valid_attendee(ctx, attendee):
         profile = None
     check = {
         (lambda: not profile): f"`{attendee.display_name}` does not own a profile.",
-        (lambda: not profile or not profile.get_competing()): f"`{attendee.display_name}` is not competing."
     }
+    if competing:
+        check[(lambda: not profile or not profile.get_competing())] = f"`{attendee.display_name}` is not competing."
+
     if any(values := [value for key, value in check.items() if key()]):
         await utils.Alert(ctx, utils.Alert.Style.WARNING, title="Removal Failed.", description=values[0])
         return False
