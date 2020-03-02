@@ -2,14 +2,14 @@
 import discord
 
 from offthedialbot import utils
-from ..get import get_profile
+from ..get import get_profiles
 
 
 @utils.deco.require_role("Organiser")
 async def main(ctx):
     """Set a user's signal strength."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed())
-    profiles = await get_profile(ui)
+    profiles = await get_profiles(ui)
     ui.embed = discord.Embed(title="Updating profiles...", color=utils.colors.DIALER)
     for profile, member in profiles:
         await ui.run_command(update_ss, profile, member.display_name)
