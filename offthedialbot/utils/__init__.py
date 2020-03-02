@@ -5,6 +5,7 @@ from . import colors
 from . import emojis
 from . import channels
 from . import roles
+from . import time
 from . import exceptions as exc
 from .db import dbh
 from .alert import Alert

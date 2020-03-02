@@ -17,18 +17,25 @@ async def main(ctx):
         if not (profile := await check_valid_attendee(ctx, attendee)):
             continue
         
-        # Remove attendee from smash.gg
-        link = utils.dbh.get_tourney()["link"]
-        ui.embed.description = f"Remove `{attendee.display_name}` from smash.gg at **<{link}/attendees>**, then hit the \u2705."
-        await ui.get_reply("reaction_add", valid_reactions=["\u2705"])
-        # Remove attendee from discord
+        await remove_smashgg(ui, attendee)
         await remove_attendee(ctx, attendee, profile, reason=f"attendee manually removed by {ctx.author.display_name}.")
 
+        # Complete ban
+        profile.write()
         await utils.Alert(ctx, utils.Alert.Style.SUCCESS, title="Remove attendee complete", description=f"`{attendee.display_name}` is no longer competing.")
+    
     await ui.end(None)
 
 
+async def remove_smashgg(ui, attendee):
+    """Remove attendee from smash.gg."""
+    link = utils.dbh.get_tourney()["link"]
+    ui.embed.description = f"Remove `{attendee.display_name}` from smash.gg at **<{link}/attendees>**, then hit the \u2705."
+    await ui.get_reply("reaction_add", valid_reactions=["\u2705"])
+
+
 async def check_valid_attendee(ctx, attendee):
+    """Check if the attendee is valid or not."""
     try:
         profile = utils.Profile(attendee.id)
     except utils.Profile.NotFound:
@@ -46,9 +53,6 @@ async def check_valid_attendee(ctx, attendee):
 
 async def remove_attendee(ctx, attendee, profile, *, reason="attendee isn't competing anymore."):
     """Remove competing from attendee's profile and discord roles."""
-    # Profile
-    profile.set_competing(False)
-    profile.write()
-    # Discord roles
-    if attendee:
+    profile.set_competing(False)  # Profile
+    if attendee:  # Roles
         await attendee.remove_roles(*[utils.roles.get(ctx, name=name) for name in ["Competing", "Checked In"]], reason=reason)

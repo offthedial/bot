@@ -1,5 +1,7 @@
 """Contains Profile class."""
 from typing import Union
+from datetime import datetime
+
 from offthedialbot.utils import dbh
 
 
@@ -151,7 +153,7 @@ class Profile:
     def set_smashgg(self, smashgg):
         self.profile["meta"]["smashgg"] = smashgg
 
-    def set_banned(self, banned):
+    def set_banned(self, banned: datetime):
         self.profile["meta"]["banned"] = banned
 
     # Getters
@@ -194,5 +196,7 @@ class Profile:
     def get_smashgg(self):
         return self.profile["meta"]["smashgg"]
 
-    def get_banned(self):
-        return self.profile["meta"]["banned"]
+    def get_banned(self) -> bool:
+        banned = self.profile["meta"]["banned"]
+        if banned and datetime.utcnow() < banned:
+            return banned

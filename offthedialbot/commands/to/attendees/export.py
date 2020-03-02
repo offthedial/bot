@@ -43,7 +43,7 @@ def create_file(ctx, rows):
             f"'{attendee.id}'" if attendee else "NOT-FOUND"
         ])
     writer.writerows([["Discord Mention", "IGN", "SW", "SZ", "RM", "TC", "CB", "Cumulative ELO", "Stylepoints", "CXP",
-                       "Signal Strength", "Competing", "Droppout Ban", "Discord ID"], []] + csv_profiles)
+                       "Signal Strength", "Competing", "Banned", "Discord ID"], []] + csv_profiles)
     file.seek(0)
     return discord.File(file, filename="profiles.csv")
 
