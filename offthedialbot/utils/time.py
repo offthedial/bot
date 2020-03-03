@@ -9,10 +9,22 @@ from dateutil.relativedelta import relativedelta
 # Persist past bot restart
 
 
-class Parse:
-    """Convert times to datetime objects."""
+class User:
+    """Tools for dealing with users and times."""
 
-    user_c = re.compile(
+    symbols = """
+    - years: `Y`, `y`, `yrs`, `year`, `years`
+    - months: `m`, `mon`, `month`, `months`
+    - weeks: `w`, `W`, `week`, `weeks`
+    - days: `d`, `D`, `day`, `days`
+    - hours: `H`, `h`, `hrs`, `hour`, `hours`
+    - minutes: `M`, `min`, `minute`, `minutes`
+    - seconds: `S`, `s`, `sec`, `second`, `seconds`
+    
+    Units must be provided in descending order of magnitude.
+    """
+    
+    complied = re.compile(
         r"((?P<years>\d+?) ?(years|year|yrs|Y|y) ?)?"
         r"((?P<months>\d+?) ?(months|month|mon|m) ?)?"
         r"((?P<weeks>\d+?) ?(weeks|week|W|w) ?)?"
@@ -23,9 +35,9 @@ class Parse:
     )
 
     @classmethod
-    def user(cls, duration: str):
-        """Parse user-inputted times, (3d, 5M, 2y)."""
-        match = cls.user_c.fullmatch(duration)
+    def parse(cls, duration: str):
+        """Convert user-inputted times to datetime objects, (3d, 5M, 2y)."""
+        match = cls.complied.fullmatch(duration)
         if not match:
             return False
 
