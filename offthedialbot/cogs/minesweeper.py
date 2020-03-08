@@ -90,7 +90,7 @@ class Minesweeper(commands.Cog):
 
         def set_bombs(self, board):
             """Place the bombs in random places on the map."""
-            bombs = Map._prob_round(self.ALGORITHM())
+            bombs = self._prob_round(self.ALGORITHM())
             placed = 0
             while placed < bombs:
                 x = random.randint(0, self.size - 1)
