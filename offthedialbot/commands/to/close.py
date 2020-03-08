@@ -2,6 +2,7 @@
 import discord
 
 from offthedialbot import utils
+from .attendees import attendee_and_profile
 
 
 @utils.deco.require_role("Organiser")
@@ -30,3 +31,15 @@ async def start_checkin(ui):
     await ui.update()
     checkin_cmd = ui.ctx.bot.get_command("checkin")
     checkin_cmd.enabled = True
+    await warn_attendees(ui.ctx)
+
+
+async def warn_attendees(ctx):
+    """Warn attendees who have not checked in yet."""
+    for attendee, profile in attendee_and_profile(ctx):
+        await utils.time.Timer.schedule(utils.time.relativedelta(hours=18) + utils.time.datetime.utcnow(),
+            attendee.id, ctx.me.id,
+            style=utils.Alert.Style.WARNING,
+            title="You have not checked in yet!",
+            description="There are approximately 6 hours left to check-in, so make sure you check-in soon or you will be automatically disqualified."
+        )
