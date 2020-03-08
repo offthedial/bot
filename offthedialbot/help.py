@@ -10,15 +10,27 @@ class HelpCommand(commands.DefaultHelpCommand):
 
     async def send_bot_help(self, mapping):
         """Send bot command page."""
+        commands = [
+            command for cog in [
+                await self.filter_commands(cog_commands)
+                for cog, cog_commands in mapping.items()
+                if cog is not None and await self.filter_commands(cog_commands)
+            ] for command in cog
+        ]
         embed = self.create_embed(
             title="`$help`",
             description="All the commands for Off the Dial Bot!",
             fields=[{
-                "name": f"{f'{cog.qualified_name.capitalize()} ' if cog else ''}Commands:",
+                "name": "Commands:",
                 "value": "\n".join([
                     f'`{self.clean_prefix}{command}` {command.help}'
-                    for command in await self.filter_commands(cog_commands) if command.help
-                ])} for cog, cog_commands in mapping.items() if await self.filter_commands(cog_commands)][::-1]
+                    for command in await self.filter_commands(mapping[None]) if command.help])
+            }, {
+                "name": "Misc Commands:",
+                "value": "\n".join([
+                    f'`{self.clean_prefix}{command}` {command.help}'
+                    for command in commands])
+            }]
         )
         await self.get_destination().send(embed=embed)
 

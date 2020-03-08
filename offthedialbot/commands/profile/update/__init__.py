@@ -11,7 +11,7 @@ async def main(ctx):
 
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
 
-    reply = await ui.get_reply("reaction_add", valid_reactions=emojis)
+    reply = await ui.get_valid_reaction(emojis)
     index: int = emojis.index(reply.emoji)
     field = create.clean_status_key(profile, list(profile.get_status().keys())[index])
     await wait_profile_field(ui, profile, index, field)
@@ -46,7 +46,7 @@ def create_update_embed(ctx, profile: utils.Profile):
     """Create status embed, with some adjustments."""
     embed = create_status_embed(ctx.author.display_name, profile)
     emojis: list = []
-    for (index, field), emoji in zip(enumerate(embed.fields), utils.emojis.digits()):
+    for (index, field), emoji in zip(enumerate(embed.fields), utils.emojis.digits):
         embed.set_field_at(index, name=(f"{emoji} " + field.name), value=field.value,
                            inline=True if field.name != "Ranks" else False)
         emojis.append(emoji)

@@ -42,3 +42,34 @@ class User:
         now = datetime.utcnow()
         return now + delta
 
+
+class Timer:
+    """Tools for dealing with timers."""
+
+    timers = utils.dbh.timers
+
+    @classmethod
+    def schedule(cls, when: int, /, destination: int, author: int, *, style, title: str, description: str):
+        """Schedule a [coro]utine at [when], and return timer id."""
+        timer = cls.timers.insert_one({
+            "when": when,
+            "destination": destination,
+            "author": author,
+            "alert": {
+                "style": style,
+                "title": title,
+                "description": description
+        }})
+        return timer.inserted_id
+    
+    @classmethod
+    def delete(cls, id=None, /, **kwargs):
+        """Delete a timer given their id."""
+        if id:  kwargs["_id"] = id
+        return cls.timers.delete_one(kwargs)
+    
+    @classmethod
+    def get(cls, query={}):
+        if "timers" not in utils.dbh.db.list_collection_names():
+            return []
+        return utils.dbh.timers.find(query)

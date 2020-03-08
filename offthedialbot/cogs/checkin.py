@@ -22,7 +22,9 @@ class Checkin(commands.Cog, command_attrs={'hidden': True}):
             role = await ui.ctx.guild.create_role(name="Checked In")
         
         # Check the attendee in
-        await ui.ctx.author.add_roles(role)
+        await ui.ctx.author.add_roles(role)  # Add roles
+        await utils.time.Timer.delete(destination=ctx.author.id, author=ctx.me.id)  # Remove warning
+        
         await ui.end(True)
     
     @checkin.error

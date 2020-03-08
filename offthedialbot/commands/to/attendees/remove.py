@@ -9,7 +9,7 @@ from offthedialbot import utils
 async def main(ctx):
     """Remove an attendee from the tournament."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Remove attendees.", description="Mention each attendee you want to remove.", color=utils.colors.COMPETING))
-    reply = await ui.get_valid_message(lambda m: len(m.mentions) == 1, {"title": "Invalid Message", "description": "Make sure to send a **mention** of the attendee."})
+    reply = await ui.get_valid_message(lambda m: len(m.mentions) == 1, {"title": "Invalid Mention", "description": "Make sure to send a **mention** of the attendee."})
 
     for attendee in reply.mentions:
 
@@ -31,7 +31,7 @@ async def remove_smashgg(ui, attendee):
     """Remove attendee from smash.gg."""
     link = utils.dbh.get_tourney()["link"]
     ui.embed.description = f"Remove `{attendee.display_name}` from smash.gg at **<{link}/attendees>**, then hit the \u2705."
-    await ui.get_reply("reaction_add", valid_reactions=["\u2705"])
+    await ui.get_valid_reaction(["\u2705"])
 
 
 async def check_valid_attendee(ctx, attendee, competing=True):
