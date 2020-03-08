@@ -37,6 +37,7 @@ class CommandUI:
 
     async def get_valid_message(self, valid: Union[str, Callable], error_fields: dict = {}, *, _alert_params=None, **get_reply_params) -> discord.Message:
         """Get message reply with validity checks."""
+        await self.update()
         # Check if it's the function's first run
         if _alert_params is None:  # Initilize error params
             _alert_params: dict = {"title": "Invalid Message", **error_fields, "style": utils.Alert.Style.DANGER}
@@ -56,6 +57,7 @@ class CommandUI:
 
     async def get_valid_reaction(self, valid: list, error_fields: dict = {}, *, _alert_params=None, **get_reply_params) -> discord.Reaction:
         """Get reaction with validity checks."""
+        await self.update()
         # Check if it's the function's first run
         if _alert_params is None:  # Initilize error params
             _alert_params: dict = {"title": "Invalid Option", "description": "Please choose one of the supported options", **error_fields, "style": utils.Alert.Style.DANGER}
