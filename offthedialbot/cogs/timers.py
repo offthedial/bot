@@ -72,7 +72,7 @@ class Timers(commands.Cog):
         ui.embed.title = "Delete Timer."
         ui.embed.description = "React with the emoji corresponding to the timer you want to delete."
         timer = await self.choose_timer(ui, timers)
-        utils.dbh.timers.delete_one(timer)
+        utils.time.Timer.delete(timer["_id"])
     
     async def get_params(self, ui):
         ui.embed.description = "When do you want to be reminded?"
@@ -96,11 +96,13 @@ class Timers(commands.Cog):
         return timer
 
     async def call(self, timer):
-        destination = await self.get_destination(timer["destination"])
+        if (destination := await self.get_destination(timer["destination"])) is None:
+            return
         await destination.send(embed=utils.Alert.create_embed(**timer["alert"]))
 
     async def get_destination(self, id):
-        if not (dest := self.bot.get_channel(id)):
-            if not (dest := self.bot.get_user(id)):
-                raise TypeError("The id is not of channel or user.")
-        return dest
+        if any(dest := [
+            self.bot.get_channel(id),
+            self.bot.get_user(id),
+        ]):
+            return [d for d in dest if d is not None][0]
