@@ -24,7 +24,7 @@ async def update_profile(ctx, profile, username):
 
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
 
-    reply = await ui.get_reply("reaction_add", valid_reactions=emojis)
+    reply = await ui.get_valid_reaction(emojis)
     index: int = emojis.index(reply.emoji)
     field = create.clean_status_key(profile, list(profile.get_status().keys())[index])
     await wait_profile_field(ui, profile, index, field)

@@ -10,7 +10,7 @@ from . import remove
 async def main(ctx):
     """Ban an attendee from the tournament."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Ban attendees.", description="Mention each attendee you want to ban.", color=utils.Alert.Style.DANGER))
-    reply = await ui.get_valid_message(lambda m: len(m.mentions) == 1, {"title": "Invalid Message", "description": "Make sure to send a **mention** of the attendee."})
+    reply = await ui.get_valid_message(lambda m: len(m.mentions) == 1, {"title": "Invalid Mention", "description": "Make sure to send a **mention** of the attendee."})
 
     for attendee in reply.mentions:
 

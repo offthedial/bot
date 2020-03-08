@@ -22,7 +22,7 @@ async def get_profiles(ui):
         description="Mention each user you want to get.",
         color=utils.colors.DIALER
     )
-    reply = await ui.get_valid_message(lambda m: len(m.mentions), {"title": "Invalid Message", "description": "Make sure to **mention** each user."})
+    reply = await ui.get_valid_message(lambda m: len(m.mentions), {"title": "Invalid Mention", "description": "Make sure to **mention** each user."})
     
     profiles = []
     for member in reply.mentions:

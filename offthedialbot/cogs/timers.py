@@ -41,7 +41,7 @@ class Timers(commands.Cog):
                 for timer in timers
             ]) if timers else "You currently don't have any ongoing timers."
         )
-        reply = await ui.get_reply('reaction_add', valid_reactions=list(options.values()))
+        reply = await ui.get_valid_reaction(list(options.values()))
         ui.embed.clear_fields()
         await {
             options["create"]: lambda: self.create(ui, timers),
@@ -90,7 +90,7 @@ class Timers(commands.Cog):
                 f"{emoji} `{timer['when']}`: {timer['alert']['description']}"
                 for timer, emoji in zip(timers, utils.emojis.digits)
         ]))
-        reply = await ui.get_reply('reaction_add', valid_reactions=list(utils.emojis.digits[:len(timers)]))
+        reply = await ui.get_valid_reaction(list(utils.emojis.digits[:len(timers)]))
         timer = timers[utils.emojis.digits.index(reply.emoji)]
         ui.embed.remove_field((len(ui.embed.fields)-1))
         return timer
