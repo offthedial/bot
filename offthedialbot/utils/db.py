@@ -18,6 +18,7 @@ class DatabaseHandler:
         # Collections
         self.profiles = self.db["profiles"]
         self.to = self.db["to"]
+        self.timers = self.db["timers"]
 
     def new_tourney(self, link: str, reg: bool = True):
         return self.to.insert_one({
