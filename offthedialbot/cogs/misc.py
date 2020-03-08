@@ -1,14 +1,18 @@
 """cogs.Misc"""
-from discord.ext import commands
-import discord
 import random
 import numpy as np
+
+from discord.ext import tasks, commands
+import discord
 
 from offthedialbot import utils
 
 
 class Misc(commands.Cog, name='misc'):
     """All of the miscellaneous commands."""
+    def __init__(self, bot):
+        self.bot = bot
+        self.timer_loop.start()
 
     @commands.command(aliases=["mines"])
     async def minesweeper(self, ctx: commands.Context):
@@ -118,10 +122,7 @@ class Misc(commands.Cog, name='misc'):
                 except ValueError:
                     print("Error! Value given is not a number!")
 
-        embed: discord.Embed = discord.Embed(color=0x1c2a32)
-        embed.set_author(
-            name="Minesweeper!", icon_url="https://emojipedia-us.s3.amazonaws.com/thumbs/120/twitter/131/bomb_1f4a3.png"
-        )
+        embed: discord.Embed = discord.Embed(title="\U0001f4a3 Minesweeper!", color=0x1c2a32)
         ui = await utils.CommandUI(ctx, embed)
 
         # Keys used by the for loop to hold the unique data per loop.
@@ -130,25 +131,24 @@ class Misc(commands.Cog, name='misc'):
                 "type": "Size",
                 "desc": "Enter a size `6` to `32`",
                 "valid": lambda m: 6 <= int(m.content) <= 36,
-                "out": None
             }, {
                 "type": "Difficulty",
                 "desc": "Enter a difficulty `1` to `10`, or `0` for a random difficulty.",
                 "valid": lambda m: int(m.content) <= 10,
-                "out": None
             }
         ]
+        values = []
         # Get size & difficulty
         for key in keys:
             embed.description = key["desc"]
-            key["out"] = await ui.get_valid_message(
+            reply = await ui.get_valid_message(
                 valid=key["valid"], error_fields={
                     "title": f"Invalid {key['type']}",
                     "description": key["desc"]
-                }
-            )
+            })
+            values.append(int(reply.content))
         # Create minesweeper
-        mines = Map(int(keys[0]["out"].content), int(keys[1]["out"].content))
+        mines = Map(*values)
         map_list = mines.create_mines()
 
         # Send minesweeper
@@ -157,3 +157,97 @@ class Misc(commands.Cog, name='misc'):
 
         # Remove embed
         await ui.end(status=None)
+
+    @commands.command(aliases=["reminders"])
+    async def timers(self, ctx):
+        """List reminders that the user owns."""
+        timers = list(utils.time.Timer.get({"author": ctx.author.id}))
+        options = {"create": "\U0001f6e0"}
+        description = f"To create a new one, select {options['create']}."
+        if timers:
+            options.update({"edit": "\u270f", "delete": "\U0001f5d1"})
+            description = description + f" To edit an existing one, select {options['edit']}, to delete an existing one, select {options['delete']}"
+        ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(
+            title="\u23f0 Timers",
+            description=description
+        ))
+        ui.embed.add_field(
+            name="Current timers:",
+            value="\n".join([
+                f"`{timer['when']}`: {timer['alert']['description']}"
+                for timer in timers
+            ]) if timers else "You currently don't have any ongoing timers."
+        )
+        reply = await ui.get_reply('reaction_add', valid_reactions=list(options.values()))
+        ui.embed.clear_fields()
+        await {
+            options["create"]: lambda: self.timer_create(ui, timers),
+            options.get("edit"): lambda: self.timer_edit(ui, timers),
+            options.get("delete"): lambda: self.timer_delete(ui, timers),
+        }[reply.emoji]()
+
+        await ui.end(True)
+
+    async def timer_create(self, ui, timers):
+        max_timers = 5
+        if len(timers) >= max_timers:
+            await utils.Alert(ui.ctx, utils.Alert.Style.DANGER, title="Maximum timers reached", description=f"You can't have more than `{max_timers}` timers running at a time.")
+            await ui.end(None)
+        ui.embed.title = "New Timer."
+        ui.embed.description = "When do you want to be reminded?"
+        when, desc = await self.timer_getparams(ui)
+        utils.time.Timer.schedule(utils.time.User.parse(when), ui.ctx.author.id, ui.ctx.author.id, style=utils.Alert.Style.INFO, title="Time's up!", description=desc)
+    
+    async def timer_edit(self, ui, timers):
+        ui.embed.title = "Edit Timer."
+        ui.embed.description = "React with the emoji corresponding to the timer you want to edit."
+        timer = await self.choose_timer(ui, timers)
+        when, desc = await self.timer_getparams(ui)
+        utils.dbh.timers.delete_one(timer)
+        utils.time.Timer.schedule(utils.time.User.parse(when), ui.ctx.author.id, ui.ctx.author.id, style=utils.Alert.Style.INFO, title="Time's up!", description=desc)
+    
+    async def timer_delete(self, ui, timers):
+        ui.embed.title = "Delete Timer."
+        ui.embed.description = "React with the emoji corresponding to the timer you want to delete."
+        timer = await self.choose_timer(ui, timers)
+        utils.dbh.timers.delete_one(timer)
+    
+    async def timer_getparams(self, ui):
+        ui.embed.description = "When do you want to be reminded?"
+        when = await ui.get_valid_message(lambda m: utils.time.User.parse(m.content), {"title": "Invalid Time", "description": "That isn't a valid time."})
+        ui.embed.description = "What do you want to be reminded about?"
+        desc = await ui.get_reply()
+        return when.content, desc.content
+    
+    async def choose_timer(self, ui, timers):
+        if len(timers) == 1:
+            return timers[0]
+        ui.embed.add_field(
+            name="Current timers:",
+            value="\n".join([
+                f"{emoji} `{timer['when']}`: {timer['alert']['description']}"
+                for timer, emoji in zip(timers, utils.emojis.digits)
+        ]))
+        reply = await ui.get_reply('reaction_add', valid_reactions=list(utils.emojis.digits[:len(timers)]))
+        timer = timers[utils.emojis.digits.index(reply.emoji)]
+        ui.embed.remove_field((len(ui.embed.fields)-1))
+        return timer
+
+    @tasks.loop(seconds=2)
+    async def timer_loop(self):
+        """Task loop that calls timers."""
+        timers = utils.time.Timer.get()
+        for timer in timers:
+            if utils.time.datetime.utcnow() > timer["when"]:
+                await self.timer_call(timer)
+                utils.dbh.timers.delete_one(timer)
+
+    async def timer_call(self, timer):
+        destination = await self.timer_get_destination(timer["destination"])
+        await destination.send(embed=utils.Alert.create_embed(**timer["alert"]))
+
+    async def timer_get_destination(self, id):
+        if not (dest := self.bot.get_channel(id)):
+            if not (dest := self.bot.get_user(id)):
+                raise TypeError("The id is not of channel or user.")
+        return dest
