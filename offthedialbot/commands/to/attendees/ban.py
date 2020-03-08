@@ -43,19 +43,12 @@ async def remove_smashgg(ui, attendee):
 async def set_ban_length(ui: utils.CommandUI, attendee, profile):
     """Get ban length and set it inside of the profile."""
     ui.embed.description = f"Specify the length of the ban. or enter 'forever' for a permanent ban."
-    ui.embed.add_field(name="Supported symbols:", value="\n".join([
-        "- years: `Y`, `y`, `yrs`, `year`, `years`",
-        "- months: `m`, `mon`, `month`, `months`",
-        "- weeks: `w`, `W`, `week`, `weeks`",
-        "- days: `d`, `D`, `day`, `days`",
-        "- hours: `H`, `h`, `hrs`, `hour`, `hours`",
-        "- minutes: `M`, `min`, `minute`, `minutes`",
-        "- seconds: `S`, `s`, `sec`, `second`, `seconds`", "",
-        "Units must be provided in descending order of magnitude."
-    ]))
-    parse = lambda m: utils.time.Parse.user(m.content) if m.content != "forever" else True
+    ui.embed.add_field(name="Supported symbols:", value=utils.time.User.symbols)
+
+    parse = lambda m: utils.time.User.parse(m.content) if m.content != "forever" else True
     reply = await ui.get_valid_message(parse, {"title": "Invalid Length", "description": "Please check the `Supported symbols` and make sure your input is correct."})
     until = parse(reply)
     profile.set_banned(until)
+
     ui.embed.remove_field(0)
     return until
