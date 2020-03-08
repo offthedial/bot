@@ -76,7 +76,8 @@ class Timers(commands.Cog):
     
     async def get_params(self, ui):
         ui.embed.description = "When do you want to be reminded?"
-        when = await ui.get_valid_message(lambda m: utils.time.User.parse(m.content), {"title": "Invalid Time", "description": "That isn't a valid time."})
+        ui.embed.add_field(name="Supported symbols:", value=utils.time.User.symbols)
+        when = await ui.get_valid_message(lambda m: utils.time.User.parse(m.content), {"title": "Invalid Time", "description": f"Please check the `Supported symbols` and make sure your input is correct."})
         ui.embed.description = "What do you want to be reminded about?"
         desc = await ui.get_reply()
         return when.content, desc.content

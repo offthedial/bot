@@ -10,13 +10,13 @@ class User:
     """Tools for dealing with users and times."""
 
     symbols = """
-    - years: `Y`, `y`, `yr(s)`, `year(s)`
+    - years: `y/Y`, `yr(s)`, `year(s)`
     - months: `m`, `mon(s)`, `month(s)`
-    - weeks: `w`, `W`, `week(s)`
-    - days: `d`, `D`, `day(s)`
-    - hours: `H`, `h`, `hr(s)`, `hour(s)`
+    - weeks: `w/W`, `week(s)`
+    - days: `d/D`, `day(s)`
+    - hours: `h/H`, `hr(s)`, `hour(s)`
     - minutes: `M`, `min(s)`, `minute(s)`
-    - seconds: `S`, `s`, `sec(s)`, `second(s)`
+    - seconds: `s/S`, `sec(s)`, `second(s)`
     
     Units must be provided in descending order of magnitude.
     """
