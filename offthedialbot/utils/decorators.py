@@ -1,5 +1,5 @@
 """Contains custom decorators."""
-from offthedialbot import utils
+from offthedialbot import env, utils
 from functools import wraps
 
 
@@ -53,6 +53,8 @@ def otd_only(command):
     async def _(*args):
         ctx = args[-1]
         if ctx.guild and ctx.bot.OTD and ctx.guild.id == ctx.bot.OTD.id:
+            await command(*args)
+        elif env.get('debug'):
             await command(*args)
         else:
             await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Command Failed", description="This command must be performed in Off the Dial.")
