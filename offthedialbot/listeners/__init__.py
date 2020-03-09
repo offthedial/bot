@@ -18,10 +18,10 @@ def register_listeners(bot):
 def import_modules():
     """Imports all of the modules."""
     modules = []
-    for module in os.listdir(os.path.dirname(__file__)):
-        if module == '__init__.py' or not module.endswith('.py'):
+    for module in os.scandir(os.path.dirname(__file__)):
+        if module.name == '__init__.py' or not module.name.endswith('.py'):
             continue
-        modules.append(importlib.import_module(f"offthedialbot.listeners.{module[:-3]}"))
+        modules.append(importlib.import_module(f"offthedialbot.listeners.{module.name[:-3]}"))
     del module
 
     return modules
