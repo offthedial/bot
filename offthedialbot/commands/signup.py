@@ -12,12 +12,7 @@ async def main(ctx):
     """Sign up for the upcoming tournament!"""
     link, profile = await check_prerequisites(ctx)
 
-    ui: utils.CommandUI = await utils.CommandUI(
-        ctx,
-        discord.Embed(
-            title=f"Signup Form",
-            color=utils.colors.COMPETING
-    ))
+    ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(color=utils.colors.COMPETING))
     checklist = Checklist(ui, {
         "prerequisites": True,
         "profile is updated": False,
@@ -61,12 +56,12 @@ async def check_prerequisites(ctx):
 async def profile_updated(ui, profile):
     """Make sure the user's profiles are up-to-date."""
     if not profile:
-        ui.embed.description = "A profile is required to participate. To proceed with creating one, select \u2705."
+        ui.embed.title = "A profile is required to compete. To create one and proceed, select \u2705."
         await ui.get_valid_reaction(["\u2705"])
         await ui.run_command(create.main)
     else:
-        ui.embed.description = "Make sure your profile is up-to-date. Select \u270f\ufe0f to update it, or select \u2705 if it is up-to-date."
-        reply = await ui.get_valid_reaction(["\u270f\ufe0f", "\u2705"])
+        ui.embed.title = "Is your profile up-to-date? Select \u2705 if it is, or select \u270f\ufe0f to update it."
+        reply = await ui.get_valid_reaction(["\u2705", "\u270f\ufe0f"])
         if reply.emoji == "\u270f\ufe0f":
             await ui.run_command(update.main)
     return utils.Profile(ui.ctx.author.id)
@@ -76,7 +71,8 @@ async def smashgg(ui, link):
     """Make sure the user has signed up on smash.gg."""
     # Uses OAuth2 to link user's smash.gg account
     # Give signup code to sign up on smash.gg
-    ui.embed.description = f"Sign up on smash.gg at **<{link}/register>**.\nOnce you are finished, enter your confirmation code you recieved in the email (`#F1PN28`)."
+    ui.embed.title = f"Sign up on smash.gg at **<{link}/register>**."
+    ui.embed.description = "Once finished, enter the confirmation code you recieved in the email (`#F1PN28`)."
     code = await ui.get_valid_message(r"^#?([A-Za-z0-9]){6}$", {"title": "Invalid Confirmation Code", "description": "The code you entered was not valid, please try again."}, timeout=540)
     # Save code to show in exported profiles
 
