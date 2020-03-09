@@ -50,5 +50,5 @@ def create_update_embed(ctx, profile: utils.Profile):
         embed.set_field_at(index, name=(f"{emoji} " + field.name), value=field.value,
                            inline=True if field.name != "Ranks" else False)
         emojis.append(emoji)
-    embed.description = "React with the field you would like to change."
+    embed.title = "React with the field you would like to change."
     return embed, emojis

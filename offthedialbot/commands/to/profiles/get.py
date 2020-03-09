@@ -11,7 +11,7 @@ async def main(ctx):
     """Get a specific profile."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed=discord.Embed())
     for profile, member in await get_profiles(ui):
-        await ctx.send(embed=create_status_embed(member.display_name, profile))
+        await ctx.send(embed=create_status_embed(member.display_name, profile, True))
 
     await ui.end(None)
 
