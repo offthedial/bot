@@ -91,11 +91,11 @@ def clean_status_key(profile: utils.Profile, key: str) -> tuple:
 
 async def get_user_stylepoints(ui: utils.CommandUI) -> list:
     """Get the user's playstyle and calculate their, style points."""
-    coros: list = [
-        lambda: ui.get_valid_message(lambda r: r.content.lower() in utils.Profile.playstyles.keys(),
+    coros: dict = {
+        "get_stylepoints": lambda: ui.get_valid_message(lambda r: r.content.lower() in utils.Profile.playstyles.keys(),
             {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}),
-        lambda: ui.get_valid_reaction(['\u23ed\ufe0f'], cancel=False)
-    ]
+        "finished_stylepoints": lambda: ui.get_valid_reaction(['\u23ed\ufe0f'], cancel=False)
+    }
     return await wait_user_playstyles(ui, coros)  # Check if user has selected atleast 1 of the 3
 
 
@@ -157,7 +157,7 @@ async def wait_user_playstyles(ui, coros) -> list:
 
     complete: bool = False
     while not complete:
-        tasks: list = [asyncio.create_task(coro()) for coro in coros]
+        tasks: list = [asyncio.create_task(coro(), name=name) for name, coro in coros.items()]
         task, reply = await ui.wait_tasks(tasks)
         await ui.delete_alert()
         if task == tasks[0]:

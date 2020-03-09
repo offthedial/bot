@@ -108,7 +108,7 @@ class CommandUI:
             }
         }
         # Create tasks
-        reply_task: asyncio.Task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]))
+        reply_task: asyncio.Task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]), name="ui.reply")
         cancel_task: asyncio.Task = self.create_cancel_task(kwargs.get("timeout"))
 
         # Await tasks
@@ -188,7 +188,7 @@ class CommandUI:
                 'reaction_add',
                 check=utils.checks.react(self.ctx, self.ui, valids='❌'),
                 timeout=(timeout if timeout else 120)
-            )
+            ), name="ui.cancel"
         )
 
     @staticmethod
