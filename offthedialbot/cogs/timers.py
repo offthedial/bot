@@ -79,6 +79,7 @@ class Timers(commands.Cog):
         when = await ui.get_valid_message(lambda m: utils.time.User.parse(m.content), {"title": "Invalid Time", "description": f"Please check the `Supported symbols` and make sure your input is correct."})
         # What
         ui.embed.title = "What do you want to be reminded about?"
+        ui.embed.clear_fields()
         desc = await ui.get_reply()
         return when.content, desc.content
     
