@@ -37,7 +37,7 @@ async def start_checkin(ui):
 async def warn_attendees(ctx):
     """Warn attendees who have not checked in yet."""
     for attendee, profile in attendee_and_profile(ctx):
-        await utils.time.Timer.schedule(utils.time.relativedelta(hours=18) + utils.time.datetime.utcnow(),
+        utils.time.Timer.schedule(utils.time.relativedelta(hours=18) + utils.time.datetime.utcnow(),
             attendee.id, ctx.me.id,
             style=utils.Alert.Style.WARNING,
             title="You have not checked in yet!",
