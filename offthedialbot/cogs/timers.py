@@ -35,7 +35,7 @@ class Timers(commands.Cog):
             description=description
         ))
         ui.embed.add_field(
-            name="Current timers:",
+            name="Ongoing timers:",
             value="\n".join([
                 f"`{timer['when']}`: {timer['alert']['description']}"
                 for timer in timers
