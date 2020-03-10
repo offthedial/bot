@@ -18,12 +18,11 @@ async def main(ctx):
         if not (profile := await remove.check_valid_attendee(ctx, attendee, competing=False)):
             continue
         
-        await remove_smashgg(ui, attendee)
         until = await set_ban_length(ui, attendee, profile)
+        await remove_smashgg(ui, attendee)
         await remove.remove_attendee(ctx, attendee, profile, reason=f"attendee manually banned by {ctx.author.display_name}.")
 
         # Complete ban
-        profile.write()
         await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
             title="Ban attendee complete",
             description=f"`{attendee.display_name}` is now banned {f'until `{until} UTC`' if until != True else 'forever'}."

@@ -21,7 +21,6 @@ async def main(ctx):
         await remove_attendee(ctx, attendee, profile, reason=f"attendee manually removed by {ctx.author.display_name}.")
 
         # Complete ban
-        profile.write()
         await utils.Alert(ctx, utils.Alert.Style.SUCCESS, title="Remove attendee complete", description=f"`{attendee.display_name}` is no longer competing.")
     
     await ui.end(None)
@@ -55,6 +54,9 @@ async def check_valid_attendee(ctx, attendee, competing=True):
 
 async def remove_attendee(ctx, attendee, profile, *, reason="attendee isn't competing anymore."):
     """Remove competing from attendee's profile and discord roles."""
-    profile.set_competing(False)  # Profile
+    # Profile
+    profile.set_competing(False)
+    profile.set_cc(None)
+    profile.write()
     if attendee:  # Roles
         await attendee.remove_roles(*[utils.roles.get(ctx, name) for name in ["Competing", "Checked In"] if utils.roles.get(ctx, name)], reason=reason)
