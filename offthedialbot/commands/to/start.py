@@ -13,7 +13,7 @@ async def main(ctx):
 
     await end_checkin(ui)
     await remove_inactives(ctx)
-    await attendees.export.export_attendees(ctx)
+    await attendees.export.export_attendees(ctx, attendees.attendee_and_profile(ctx))
     await ui.end(None)
 
 
