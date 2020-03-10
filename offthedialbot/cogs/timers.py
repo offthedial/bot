@@ -35,14 +35,14 @@ class Timers(commands.Cog):
             description=description
         ))
         ui.embed.add_field(
-            name="Current timers:",
+            name="Ongoing timers:",
             value="\n".join([
                 f"`{timer['when']}`: {timer['alert']['description']}"
                 for timer in timers
             ]) if timers else "You currently don't have any ongoing timers."
         )
         reply = await ui.get_valid_reaction(list(options.values()))
-        ui.embed.clear_fields()
+
         await {
             options["create"]: lambda: self.create(ui, timers),
             options.get("edit"): lambda: self.edit(ui, timers),
@@ -52,33 +52,31 @@ class Timers(commands.Cog):
         await ui.end(True)
 
     async def create(self, ui, timers):
-        if len(timers) >= self.MAX_TIMERS:
-            await utils.Alert(ui.ctx, utils.Alert.Style.DANGER, title="Maximum timers reached", description=f"You can't have more than `{self.MAX_TIMERS}` timers running at a time.")
-            await ui.end(None)
-        ui.embed.title = "New Timer."
-        ui.embed.description = "When do you want to be reminded?"
+        await self.max_timers(ui, timers)  # Check if the user has the maximum timers allowed
+        ui.embed = discord.Embed(title="When do you want to be reminded?")
         when, desc = await self.get_params(ui)
         utils.time.Timer.schedule(utils.time.User.parse(when), ui.ctx.author.id, ui.ctx.author.id, style=utils.Alert.Style.INFO, title="Time's up!", description=desc)
     
     async def edit(self, ui, timers):
-        ui.embed.title = "Edit Timer."
-        ui.embed.description = "React with the emoji corresponding to the timer you want to edit."
+        ui.embed = discord.Embed(title="React with the emoji corresponding to the timer you want to edit.")
         timer = await self.choose_timer(ui, timers)
         when, desc = await self.get_params(ui)
         utils.dbh.timers.delete_one(timer)
         utils.time.Timer.schedule(utils.time.User.parse(when), ui.ctx.author.id, ui.ctx.author.id, style=utils.Alert.Style.INFO, title="Time's up!", description=desc)
     
     async def delete(self, ui, timers):
-        ui.embed.title = "Delete Timer."
-        ui.embed.description = "React with the emoji corresponding to the timer you want to delete."
+        ui.embed = discord.Embed(title="React with the emoji corresponding to the timer you want to delete.")
         timer = await self.choose_timer(ui, timers)
         utils.time.Timer.delete(timer["_id"])
     
     async def get_params(self, ui):
-        ui.embed.description = "When do you want to be reminded?"
+        # When
+        ui.embed.title = "When do you want to be reminded?"
         ui.embed.add_field(name="Supported symbols:", value=utils.time.User.symbols)
         when = await ui.get_valid_message(lambda m: utils.time.User.parse(m.content), {"title": "Invalid Time", "description": f"Please check the `Supported symbols` and make sure your input is correct."})
-        ui.embed.description = "What do you want to be reminded about?"
+        # What
+        ui.embed.title = "What do you want to be reminded about?"
+        ui.embed.clear_fields()
         desc = await ui.get_reply()
         return when.content, desc.content
     
@@ -100,6 +98,11 @@ class Timers(commands.Cog):
         if (destination := await self.get_destination(timer["destination"])) is None:
             return
         await destination.send(embed=utils.Alert.create_embed(**timer["alert"]))
+
+    async def max_timers(self, ui, timers):
+        if len(timers) >= self.MAX_TIMERS:
+            await utils.Alert(ui.ctx, utils.Alert.Style.DANGER, title="Maximum timers reached", description=f"You can't have more than `{self.MAX_TIMERS}` timers running at a time.")
+            await ui.end(None)
 
     async def get_destination(self, id):
         if any(dest := [

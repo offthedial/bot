@@ -17,10 +17,10 @@ def register_cogs(bot):
 def import_modules():
     """Imports all of the modules."""
     modules = []
-    for module in os.listdir(os.path.dirname(__file__)):
-        if module == '__init__.py' or module[-3:] != '.py':
+    for module in os.scandir(os.path.dirname(__file__)):
+        if module.name == '__init__.py' or not module.name.endswith('.py'):
             continue
-        modules.append(importlib.import_module(f"offthedialbot.cogs.{module[:-3]}"))
+        modules.append(importlib.import_module(f"offthedialbot.cogs.{module.name[:-3]}"))
     del module
 
     return modules

@@ -2,7 +2,7 @@
 import asyncio
 import re
 from contextlib import asynccontextmanager
-from typing import Union, Callable, Optional, Tuple
+from typing import List, Tuple, Callable, Optional, Union
 
 import discord
 from discord.ext.commands import Context
@@ -18,7 +18,7 @@ class CommandUI:
         self.ctx: Context = ctx
         self.embed: discord.Embed = embed
         self.reply_task: Optional[asyncio.Task] = None
-        self.alert: Optional[utils.Alert] = None
+        self.alerts: List[utils.Alert] = []
 
     async def __new__(cls, ctx: Context, embed: discord.Embed):
         """Use async to create embed and passive task on class creation."""
@@ -40,16 +40,20 @@ class CommandUI:
         await self.update()
         # Check if it's the function's first run
         if _alert_params is None:  # Initilize error params
+            first = True
             _alert_params: dict = {"title": "Invalid Message", **error_fields, "style": utils.Alert.Style.DANGER}
         else:
+            first = False
             await self.update()
             await self.delete_alert()
             await self.create_alert(**_alert_params)
 
-        # Get message and check if it's valid
+        # Get message
         reply: discord.Message = await self.get_reply(**get_reply_params)
+        
+        # Make sure it's valid
         if self.check_valid(valid, reply):
-            await self.delete_alert()
+            if not first:  await self.delete_alert()
         else:
             reply: discord.Message = await self.get_valid_message(valid=valid, _alert_params=_alert_params)
 
@@ -60,28 +64,31 @@ class CommandUI:
         await self.update()
         # Check if it's the function's first run
         if _alert_params is None:  # Initilize error params
+            first = True
             _alert_params: dict = {"title": "Invalid Option", "description": "Please choose one of the supported options", **error_fields, "style": utils.Alert.Style.DANGER}
             for react in valid:  # Add reactions
                 await self.ui.add_reaction(react)
         else:
+            first = False
             await self.update()
             await self.delete_alert()
             await self.create_alert(**_alert_params)
 
-        # Get reaction and check if it's valid
+        # Get reaction
         reply: discord.Reaction = await self.get_reply("reaction_add", **get_reply_params)
+        
+        # Make sure it's valid
         if self.check_valid(valid, reply):
-            await self.delete_alert()
+            if not first:  await self.delete_alert()
+            # Remove reactions
+            if len(valid) < 3:
+                for react in valid:
+                    await self.ui.remove_reaction(react, self.ctx.me)
+            else:
+                await self.ui.clear_reactions()
+                await self.ui.add_reaction('❌')
         else:
             reply: discord.Reaction = await self.get_valid_reaction(valid=valid, _alert_params=_alert_params)
-
-        # Remove reactions
-        if len(valid) < 3:
-            for react in valid:
-                await self.ui.remove_reaction(react, self.ctx.me)
-        else:
-            await self.ui.clear_reactions()
-            await self.ui.add_reaction('❌')
 
         return reply
 
@@ -101,7 +108,7 @@ class CommandUI:
             }
         }
         # Create tasks
-        reply_task: asyncio.Task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]))
+        reply_task: asyncio.Task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]), name="ui.reply")
         cancel_task: asyncio.Task = self.create_cancel_task(kwargs.get("timeout"))
 
         # Await tasks
@@ -135,20 +142,24 @@ class CommandUI:
             await self.ui.clear_reactions()
         else:
             await self.ui.delete()
-        await self.delete_alert()
+        await self.delete_alerts()
 
         # Raise exception to cancel command
         raise utils.exc.CommandCancel(status, self)
 
     async def create_alert(self, style: utils.Alert.Style, title: str, description: str) -> None:
         """Create an alert with a given color to determine the style."""
-        self.alert = await utils.Alert(self.ctx, style, title=title, description=description)
+        self.alerts.append(await utils.Alert(self.ctx, style, title=title, description=description))
 
-    async def delete_alert(self) -> None:
-        """Delete an alert associated with the command ui if it exists."""
-        if self.alert:
-            await self.alert.delete()
-            self.alert = None
+    async def delete_alert(self, index=-1) -> None:
+        """Delete an alert associated with the command ui if it exists, defaults the the latest alert."""
+        if self.alerts:
+            await self.alerts[index].delete()
+
+    async def delete_alerts(self) -> None:
+        """Delete all alerts associated with the command ui if it exists."""
+        for alert in self.alerts:
+            await alert.delete()
 
     async def run_command(self, main, *args):
         """Run an external command, from a command ui."""
@@ -177,7 +188,7 @@ class CommandUI:
                 'reaction_add',
                 check=utils.checks.react(self.ctx, self.ui, valids='❌'),
                 timeout=(timeout if timeout else 120)
-            )
+            ), name="ui.cancel"
         )
 
     @staticmethod

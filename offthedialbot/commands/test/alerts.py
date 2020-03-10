@@ -15,7 +15,6 @@ async def main(ctx):
 
     for style in alert_styles:
         await ui.create_alert(style, title="This is a test alert", description="Check it out!")
-        await ui.get_valid_reaction(['\U0001f44c'])
-        await ui.delete_alert()
 
+    await ui.get_valid_reaction(['\U0001f44c'])
     await ui.end(status=True)
