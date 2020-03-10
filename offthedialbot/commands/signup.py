@@ -27,7 +27,7 @@ async def main(ctx):
     with checklist.checking("profile is updated"):
         profile = await profile_updated(ui, profile)
     with checklist.checking("smash.gg integration"):
-        await smashgg(ui, tourney["link"])
+        await smashgg(ui, profile, tourney["link"])
     with checklist.checking("final confirmation"):
         await confirm_signup(ui)
 
@@ -78,14 +78,14 @@ async def profile_updated(ui, profile):
     return utils.Profile(ui.ctx.author.id)
 
 
-async def smashgg(ui, link):
+async def smashgg(ui, profile, link):
     """Make sure the user has signed up on smash.gg."""
     # Uses OAuth2 to link user's smash.gg account
     # Give signup code to sign up on smash.gg
     ui.embed.title = f"Sign up on smash.gg at **<{link}/register>**."
     ui.embed.description = "Once finished, enter the confirmation code you recieved in the email (`#F1PN28`)."
     code = await ui.get_valid_message(r"^#?([A-Za-z0-9]){6}$", {"title": "Invalid Confirmation Code", "description": "The code you entered was not valid, please try again."}, timeout=540)
-    # Save code to show in exported profiles
+    profile.set_cc(code.content)
 
 
 async def confirm_signup(ui):

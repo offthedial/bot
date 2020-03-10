@@ -24,6 +24,7 @@ async def main(ctx):
             "competing": False,
             "smashgg": None,
             "banned": None,
+            "confirmation_code": None,
         }
     }
 
