@@ -65,6 +65,7 @@ async def accepted_rules(ui, rules):
 
 async def profile_updated(ui, profile):
     """Make sure the user's profiles are up-to-date."""
+    ui.embed.description = "Your profile will be saved for future use."
     if not profile:
         ui.embed.title = "A profile is required to compete. To create one and proceed, select \u2705."
         await ui.get_valid_reaction(["\u2705"])
