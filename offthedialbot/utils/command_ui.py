@@ -2,7 +2,7 @@
 import asyncio
 import re
 from contextlib import asynccontextmanager
-from typing import List, Tuple, Callable, Optional, Union
+from typing import List, Tuple, Set, Callable, Optional, Union, Any
 
 import discord
 from discord.ext.commands import Context
@@ -44,7 +44,6 @@ class CommandUI:
             _alert_params: dict = {"title": "Invalid Message", **error_fields, "style": utils.Alert.Style.DANGER}
         else:
             first = False
-            await self.update()
             await self.delete_alert()
             await self.create_alert(**_alert_params)
 
@@ -55,7 +54,7 @@ class CommandUI:
         if self.check_valid(valid, reply):
             if not first:  await self.delete_alert()
         else:
-            reply: discord.Message = await self.get_valid_message(valid=valid, _alert_params=_alert_params)
+            reply: discord.Message = await self.get_valid_message(valid=valid, _alert_params=_alert_params, **get_reply_params)
 
         return reply
 
@@ -70,7 +69,6 @@ class CommandUI:
                 await self.ui.add_reaction(react)
         else:
             first = False
-            await self.update()
             await self.delete_alert()
             await self.create_alert(**_alert_params)
 
@@ -88,7 +86,7 @@ class CommandUI:
                 await self.ui.clear_reactions()
                 await self.ui.add_reaction('❌')
         else:
-            reply: discord.Reaction = await self.get_valid_reaction(valid=valid, _alert_params=_alert_params)
+            reply: discord.Reaction = await self.get_valid_reaction(valid=valid, _alert_params=_alert_params, **get_reply_params)
 
         return reply
 
@@ -108,13 +106,14 @@ class CommandUI:
             }
         }
         # Create tasks
-        reply_task: asyncio.Task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]), name="ui.reply")
-        cancel_task: asyncio.Task = self.create_cancel_task(kwargs.get("timeout"))
+        reply_task: asyncio.Task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]), name="CommandUI.reply_task")
+        cancel_task: Optional[asyncio.Task] = None
 
         # Await tasks
         if kwargs.get("cancel") is False:
-            task, reply = reply_task, await reply_task
+            task, reply = await self.wait_tasks({reply_task})
         else:
+            cancel_task = self.create_cancel_task(kwargs.get("timeout"))
             task, reply = await self.wait_tasks({reply_task, cancel_task})
 
         # Get result
@@ -183,20 +182,17 @@ class CommandUI:
 
     def create_cancel_task(self, timeout=None) -> asyncio.Task:
         """Create a task that checks if the user canceled the command."""
-        return asyncio.create_task(
-            self.ctx.bot.wait_for(
-                'reaction_add',
-                check=utils.checks.react(self.ctx, self.ui, valids='❌'),
-                timeout=(timeout if timeout else 120)
-            ), name="ui.cancel"
-        )
+        return asyncio.create_task(self.ctx.bot.wait_for('reaction_add',
+            check=utils.checks.react(self.ctx, self.ui, valids='❌'),
+            timeout=(timeout if timeout else 15)
+        ), name="CommandUI.cancel_task")
 
     @staticmethod
-    def check_valid(valid: Union[str, Callable, list], reply: discord.Message) -> bool:
+    def check_valid(valid, reply: discord.Message) -> bool:
         """Check if a user's reply is valid."""
         if isinstance(valid, str):
             return bool(re.search(valid, reply.content))
-        elif isinstance(valid, list):
+        if getattr(valid, "__contains__", False):
             return reply.emoji in valid
         else:
             try:
@@ -205,19 +201,19 @@ class CommandUI:
                 return False
 
     @staticmethod
-    async def wait_tasks(tasks: set) -> Tuple[asyncio.Future, Optional[discord.Message]]:
+    async def wait_tasks(tasks: Set[asyncio.Task]) -> Tuple[asyncio.Future, Any]:
         """Try block to asyncio.wait a set of tasks with timeout handling, and return the first completed."""
         done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
         task: asyncio.Future = done.pop()
 
         # Get reply
         try:
-            reply: Optional[discord.Message] = task.result()
+            reply = task.result()
         except asyncio.TimeoutError:
-            reply: Optional[discord.Message] = None
-
-        # Cancel the other still pending tasks
-        for rest in pending:
-            rest.cancel()
+            reply = None
+        finally:
+            # Cancel the other still pending tasks
+            for rest in pending:
+                rest.cancel()
 
         return task, reply

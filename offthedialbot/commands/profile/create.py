@@ -91,12 +91,26 @@ def clean_status_key(profile: utils.Profile, key: str) -> tuple:
 
 async def get_user_stylepoints(ui: utils.CommandUI) -> list:
     """Get the user's playstyle and calculate their, style points."""
-    coros: dict = {
-        "get_stylepoints": lambda: ui.get_valid_message(lambda r: r.content.lower() in utils.Profile.playstyles.keys(),
-            {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}),
-        "finished_stylepoints": lambda: ui.get_valid_reaction(['\u23ed\ufe0f'], cancel=False)
-    }
-    return await wait_user_playstyles(ui, coros)  # Check if user has selected atleast 1 of the 3
+    user_playstyles: list = []
+    message_task_params = [lambda r: r.content.lower() in utils.Profile.playstyles.keys(), {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}]
+    while True:
+        message_task = asyncio.create_task(ui.get_valid_message(*message_task_params), name="create.message_task")
+        done_task = asyncio.create_task(ui.get_valid_reaction({'\u23ed\ufe0f'}, cancel=False), name="create.done_task")
+
+        ui.embed.set_field_at(0, name="Playstyles", value=create_playstyle_list(user_playstyles))
+        task, reply = await ui.wait_tasks({message_task, done_task})
+        await ui.delete_alert()
+
+        if task == message_task:
+            content: str = reply.content.lower()
+            user_playstyles.remove(content) if content in user_playstyles else user_playstyles.append(content)
+        else:
+            if not user_playstyles:
+                await ui.create_alert(utils.Alert.Style.DANGER, title="No Playstyles Selected", description="You did not select any playstyles.")
+            else:
+                break
+
+    return user_playstyles
 
 
 async def get_user_cxp(ui: utils.CommandUI) -> int:
@@ -149,32 +163,6 @@ def parse_reply(key, value):
             return utils.Profile.convert_rank_power(value)
 
     return False
-
-
-async def wait_user_playstyles(ui, coros) -> list:
-    """Constantly wait for the user to input playstyles."""
-    user_playstyles: list = []
-
-    complete: bool = False
-    while not complete:
-        tasks: list = [asyncio.create_task(coro(), name=name) for name, coro in coros.items()]
-        task, reply = await ui.wait_tasks(tasks)
-        await ui.delete_alert()
-        if task == tasks[0]:
-            content: str = reply.content.lower()
-
-            if content not in user_playstyles:
-                user_playstyles.append(content)
-            else:
-                user_playstyles.remove(content)
-        else:
-            if not user_playstyles:
-                await ui.create_alert(utils.Alert.Style.DANGER, title="No Playstyles Selected", description="You did not select any playstyles.")
-            else:
-                complete = True
-        ui.embed.set_field_at(0, name="Playstyles", value=create_playstyle_list(user_playstyles))
-
-    return user_playstyles
 
 
 def create_playstyle_list(profile_playstyles=()) -> str:
