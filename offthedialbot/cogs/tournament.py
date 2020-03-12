@@ -6,15 +6,15 @@ from offthedialbot import utils
 from offthedialbot.commands.signup import profile_updated
 
 
-class Checkin(commands.Cog, command_attrs={'hidden': True}):
-    """Cog holding check-in command for easy disabling."""
+class Tournament(commands.Cog, command_attrs={'hidden': True}):
+    """Cog holding tournament-related misc commands."""
 
     @commands.command(enabled=False)
     @utils.deco.otd_only
     @utils.deco.tourney(open=False)
     @utils.deco.profile_required(competing=True)
     async def checkin(self, ctx: commands.Context):
-        """Check in."""
+        """Check in for the tournament."""
         # Get Checked In role, or create it.
         ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Check-in Form", color=utils.colors.COMPETING))
         await profile_updated(ui, True)
@@ -36,3 +36,14 @@ class Checkin(commands.Cog, command_attrs={'hidden': True}):
             )
         else:
             raise error
+    
+    @commands.command(aliases=["competing", "registered"])
+    @utils.deco.tourney()
+    async def signedup(self, ctx):
+        """Get number of people currently signed up for the tournament."""
+        num = utils.dbh.profiles.count({"meta.competing": True})
+        await ctx.send(embed=discord.Embed(
+            title="Currently Signed-up:",
+            description=f"`{num}`",
+            color=utils.colors.COMPETING
+        ))
