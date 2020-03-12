@@ -200,9 +200,14 @@ class CommandUI:
             except ValueError:
                 return False
 
-    @staticmethod
-    async def wait_tasks(tasks: Set[asyncio.Task]) -> Tuple[asyncio.Future, Any]:
+    @classmethod
+    async def wait_tasks(cls, tasks: Set[asyncio.Task]) -> Tuple[asyncio.Future, Any]:
         """Try block to asyncio.wait a set of tasks with timeout handling, and return the first completed."""
+        # Shortcut for 1-task sets
+        if len(tasks) == 1:
+            task = tasks.pop()
+            return task, await cls.wait_task(task)
+
         done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
         task: asyncio.Future = done.pop()
 
@@ -217,3 +222,11 @@ class CommandUI:
                 rest.cancel()
 
         return task, reply
+
+    @staticmethod
+    async def wait_task(task: asyncio.Task):
+        """Try block to wait a singular task with timeout handling."""
+        try:
+            return await task
+        except asyncio.TimeoutError:
+            return None
