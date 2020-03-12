@@ -174,7 +174,7 @@ class CommandUI:
             async with hide_x():
                 await main(self.ctx, *args)
         except utils.exc.CommandCancel as e:
-            if e.ui:
+            if e.ui and e.status != None:
                 await e.ui.ui.delete()
             if e.status == False:
                 await self.end(e.status)
