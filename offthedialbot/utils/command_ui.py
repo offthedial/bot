@@ -147,9 +147,9 @@ class CommandUI:
         # Raise exception to cancel command
         raise utils.exc.CommandCancel(status, self)
 
-    async def create_alert(self, style: utils.Alert.Style, title: str, description: str) -> None:
-        """Create an alert with a given color to determine the style."""
-        self.alerts.append(await utils.Alert(self.ctx, style, title=title, description=description))
+    async def create_alert(self, *args, **kwargs) -> None:
+        """Create an alert associated with the command ui."""
+        self.alerts.append(await utils.Alert(self.ctx, *args, **kwargs))
 
     async def delete_alert(self, index=-1) -> None:
         """Delete an alert associated with the command ui if it exists, defaults the the latest alert."""
