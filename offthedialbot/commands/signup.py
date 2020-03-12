@@ -1,10 +1,10 @@
 """$signup"""
-from contextlib import contextmanager
+from contextlib import contextmanager, asynccontextmanager
 
 import discord
 
 from offthedialbot import utils
-from offthedialbot.commands.profile import create, update
+from offthedialbot.commands.profile import create, update, create_status_embed
 
 
 @utils.deco.otd_only
@@ -22,7 +22,7 @@ async def main(ctx):
 
     # Check requirements
     with checklist.checking("profile is updated"):
-        profile = await profile_updated(ui, profile)
+        profile = await profile_uptodate(ui, profile)
     with checklist.checking("smash.gg integration"):
         await smashgg(ui, link)
     with checklist.checking("final confirmation"):
@@ -53,18 +53,41 @@ async def check_prerequisites(ctx):
     return link, profile
 
 
-async def profile_updated(ui, profile):
+async def profile_uptodate(ui, profile):
     """Make sure the user's profiles are up-to-date."""
     if not profile:
         ui.embed.title = "A profile is required to compete. To create one and proceed, select \u2705."
         await ui.get_valid_reaction(["\u2705"])
         await ui.run_command(create.main)
     else:
-        ui.embed.title = "Is your profile up-to-date? Select \u2705 if it is, or select \u270f\ufe0f to update it."
-        reply = await ui.get_valid_reaction(["\u2705", "\u270f\ufe0f"])
-        if reply.emoji == "\u270f\ufe0f":
-            await ui.run_command(update.main)
+        await profile_updated(ui, profile)
+
     return utils.Profile(ui.ctx.author.id)
+
+
+async def profile_updated(ui, profile):
+    emojis = {
+        "check": "\u2705",
+        "pencil": "\u270f\ufe0f"
+    }
+    ui.embed.title = "Is your profile up-to-date?"
+    ui.embed.description = f"Select {emojis['check']} if it is, or select {emojis['pencil']} to update it."
+    async with show_preview(ui.ctx, profile):
+        reply = await ui.get_valid_reaction(list(emojis.values()))
+    if reply.emoji == emojis["pencil"]:
+        await ui.run_command(update.main)
+
+
+@asynccontextmanager
+async def show_preview(ctx, profile):
+    """Show a preview for profile update."""
+    try:
+        embed = create_status_embed(ctx.author.display_name, profile, True)
+        embed.title, embed.description = "Preview:", f"**{embed.title}**"
+        preview = await ctx.send(embed=embed)
+        yield
+    finally:
+        await preview.delete()
 
 
 async def smashgg(ui, link):
