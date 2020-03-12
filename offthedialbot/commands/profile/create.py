@@ -92,18 +92,22 @@ def clean_status_key(profile: utils.Profile, key: str) -> tuple:
 async def get_user_stylepoints(ui: utils.CommandUI) -> list:
     """Get the user's playstyle and calculate their, style points."""
     user_playstyles: list = []
-    message_task_params = [lambda r: r.content.lower() in utils.Profile.playstyles.keys(), {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}]
+    create_tasks = (
+        lambda: asyncio.create_task(ui.get_valid_message(lambda m: m.content.lower() in utils.Profile.playstyles.keys(), {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}, cancel=False)),
+        lambda: asyncio.create_task(ui.get_valid_reaction({'\u23ed\ufe0f'}, cancel=False)),
+        lambda: ui.create_cancel_task()
+    )
     while True:
-        message_task = asyncio.create_task(ui.get_valid_message(*message_task_params), name="create.message_task")
-        done_task = asyncio.create_task(ui.get_valid_reaction({'\u23ed\ufe0f'}, cancel=False), name="create.done_task")
-
         ui.embed.set_field_at(0, name="Playstyles", value=create_playstyle_list(user_playstyles))
-        task, reply = await ui.wait_tasks({message_task, done_task})
+        tasks = [task() for task in create_tasks]
+        task, reply = await ui.wait_tasks(tasks)
         await ui.delete_alert()
 
-        if task == message_task:
+        if task == tasks[0]:
             content: str = reply.content.lower()
             user_playstyles.remove(content) if content in user_playstyles else user_playstyles.append(content)
+        elif task == tasks[2]:
+            await ui.end(False)
         else:
             if not user_playstyles:
                 await ui.create_alert(utils.Alert.Style.DANGER, title="No Playstyles Selected", description="You did not select any playstyles.")

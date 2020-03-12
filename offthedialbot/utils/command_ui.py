@@ -184,7 +184,7 @@ class CommandUI:
         """Create a task that checks if the user canceled the command."""
         return asyncio.create_task(self.ctx.bot.wait_for('reaction_add',
             check=utils.checks.react(self.ctx, self.ui, valids='❌'),
-            timeout=(timeout if timeout else 15)
+            timeout=(timeout if timeout else 120)
         ), name="CommandUI.cancel_task")
 
     @staticmethod
