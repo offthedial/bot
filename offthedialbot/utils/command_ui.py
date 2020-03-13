@@ -39,7 +39,7 @@ class CommandUI:
         """Get message reply with validity checks."""
         await self.update()
         # Check if it's the function's first run
-        if _alert_params is None:  # Initilize error params
+        if _alert_params is None:  # Initialize error params
             first = True
             _alert_params: dict = {"title": "Invalid Message", **error_fields, "style": utils.Alert.Style.DANGER}
         else:
@@ -59,10 +59,10 @@ class CommandUI:
         return reply
 
     async def get_valid_reaction(self, valid: list, error_fields: dict = {}, *, _alert_params=None, **get_reply_params) -> discord.Reaction:
-        """Get reaction with validity checks."""
+        """Get reaction reply with validity checks."""
         await self.update()
         # Check if it's the function's first run
-        if _alert_params is None:  # Initilize error params
+        if _alert_params is None:  # Initialize error params
             first = True
             _alert_params: dict = {"title": "Invalid Option", "description": "Please choose one of the supported options", **error_fields, "style": utils.Alert.Style.DANGER}
             for react in valid:  # Add reactions

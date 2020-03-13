@@ -98,8 +98,8 @@ async def get_user_stylepoints(ui: utils.CommandUI) -> list:
         lambda: ui.create_cancel_task()
     )
     while True:
-        ui.embed.set_field_at(0, name="Playstyles", value=create_playstyle_list(user_playstyles))
         tasks = [task() for task in create_tasks]
+        ui.embed.set_field_at(0, name="Playstyles", value=create_playstyle_list(user_playstyles))
         task, reply = await ui.wait_tasks(tasks)
         await ui.delete_alert()
 
