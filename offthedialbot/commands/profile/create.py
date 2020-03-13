@@ -106,13 +106,13 @@ async def get_user_stylepoints(ui: utils.CommandUI) -> list:
         if task == tasks[0]:
             content: str = reply.content.lower()
             user_playstyles.remove(content) if content in user_playstyles else user_playstyles.append(content)
-        elif task == tasks[2]:
-            await ui.end(False)
-        else:
+        elif task == tasks[1]:
             if not user_playstyles:
                 await ui.create_alert(utils.Alert.Style.DANGER, title="No Playstyles Selected", description="You did not select any playstyles.")
             else:
                 break
+        else:
+            await ui.end(False)
 
     return user_playstyles
 
