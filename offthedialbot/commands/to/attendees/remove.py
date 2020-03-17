@@ -56,7 +56,7 @@ async def remove_attendee(ctx, attendee, profile, *, reason="attendee isn't comp
     """Remove competing from attendee's profile and discord roles."""
     # Profile
     profile.set_competing(False)
-    profile.set_cc(None)
+    # profile.set_cc(None)
     profile.write()
     if attendee:  # Roles
         await attendee.remove_roles(*[utils.roles.get(ctx, name) for name in ["Competing", "Checked In"] if utils.roles.get(ctx, name)], reason=reason)
