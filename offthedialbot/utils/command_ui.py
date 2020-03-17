@@ -90,7 +90,7 @@ class CommandUI:
 
         return reply
 
-    async def get_reply(self, event: str = 'message', /, **kwargs) -> discord.Message:
+    async def get_reply(self, event: str = 'message', /, **kwargs) -> Union[discord.Message, discord.Reaction]:
         """Get the reply from the user."""
         await self.update()
 
@@ -174,9 +174,9 @@ class CommandUI:
             async with hide_x():
                 await main(self.ctx, *args)
         except utils.exc.CommandCancel as e:
-            if e.ui and e.status != None:
+            if e.ui and e.status is not None:
                 await e.ui.ui.delete()
-            if e.status == False:
+            if not e.status:
                 await self.end(e.status)
             return e
 
@@ -188,12 +188,13 @@ class CommandUI:
         ), name="CommandUI.cancel_task")
 
     @staticmethod
-    def check_valid(valid, reply: discord.Message) -> bool:
+    def check_valid(valid, reply: Union[discord.Message, discord.Reaction]) -> bool:
         """Check if a user's reply is valid."""
         if isinstance(valid, str):
             return bool(re.search(valid, reply.content))
         if getattr(valid, "__contains__", False):
             return reply.emoji in valid
+
         else:
             try:
                 return valid(reply)
@@ -224,7 +225,7 @@ class CommandUI:
         return task, reply
 
     @staticmethod
-    async def wait_task(task: asyncio.Task):
+    async def wait_task(task: Union[asyncio.Task, asyncio.Future]):
         """Try block to wait a singular task with timeout handling."""
         try:
             return await task

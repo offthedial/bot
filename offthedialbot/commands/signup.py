@@ -54,7 +54,7 @@ async def check_prerequisites(ctx):
 
 
 async def profile_uptodate(ui, profile):
-    """Make sure the user's profiles are up-to-date."""
+    """Make sure the user's has a profile, and it is up-to-date."""
     if not profile:
         ui.embed.title = "A profile is required to compete. To create one and proceed, select \u2705."
         await ui.get_valid_reaction(["\u2705"])
@@ -66,6 +66,7 @@ async def profile_uptodate(ui, profile):
 
 
 async def profile_updated(ui, profile):
+    """Make sure the user's profile is updated."""
     emojis = {
         "check": "\u2705",
         "pencil": "\u270f\ufe0f"
