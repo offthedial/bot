@@ -151,4 +151,3 @@ class Checklist:
     def create(cls, checklist):
         """Create the checklist string."""
         return "\n".join(f"{cls.emojis[value]} Checking {name}..." for name, value in checklist.items())
-    
