@@ -17,6 +17,7 @@ async def main(ctx):
 
 
 async def export_attendees(ctx, rows):
+    """Create and send attendees csv."""
     file = create_file(ctx, rows)
     await send_file(ctx, file)
 
@@ -49,6 +50,7 @@ def create_file(ctx, rows):
 
 
 async def send_file(ctx, file):
+    """Send an alert and upload the file to discord."""
     await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
         title=":incoming_envelope: *Exporting attendees complete!*",
         description="Download the spreadsheet below. \U0001f4e5"
