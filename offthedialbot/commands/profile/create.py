@@ -94,7 +94,7 @@ async def get_user_stylepoints(ui: utils.CommandUI) -> list:
     user_playstyles: list = []
     create_tasks = (
         lambda: asyncio.create_task(ui.get_valid_message(lambda m: m.content.lower() in utils.Profile.playstyles.keys(), {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}, cancel=False)),
-        lambda: asyncio.create_task(ui.get_valid_reaction({'\u23ed\ufe0f'}, cancel=False)),
+        lambda: asyncio.create_task(ui.get_valid_reaction(['\u23ed\ufe0f'], cancel=False)),
         lambda: ui.create_cancel_task()
     )
     while True:
