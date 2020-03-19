@@ -21,11 +21,13 @@ async def main(ctx):
 
 
 async def remove_all_attendees(ctx):
+    """Loop over each attendee and remove each one from competing."""
     for attendee, profile in attendees.attendee_and_profile(ctx):
-        await attendees.remove.remove_attendee(ctx, attendee, profile, reason="tournament has ended.")
+        await attendees.remove.from_competing(ctx, attendee, profile, reason="tournament has ended.")
 
 
 async def check_tourney_started(ctx):
+    """Make sure the tournament has started so it is able to be ended."""
     if ctx.bot.get_command("checkin").enabled:
         await utils.Alert(ctx, utils.Alert.Style.DANGER,
             title="Command Failed",

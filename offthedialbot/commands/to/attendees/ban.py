@@ -1,9 +1,8 @@
 """$to attendees ban"""
 import discord
-from dateutil.relativedelta import relativedelta
 
-from offthedialbot import utils, log
-from . import remove
+from offthedialbot import utils
+from . import check_valid_attendee, remove
 
 
 @utils.deco.require_role("Organiser")
@@ -15,12 +14,12 @@ async def main(ctx):
     for attendee in reply.mentions:
 
         # Check to make sure the attendee is valid
-        if not (profile := await remove.check_valid_attendee(ctx, attendee, competing=False)):
+        if not (profile := await check_valid_attendee(ctx, attendee, competing=False)):
             continue
         
-        until = await set_ban_length(ui, attendee, profile)
+        until = await set_ban_length(ui, profile)
         await remove_smashgg(ui, attendee)
-        await remove.remove_attendee(ctx, attendee, profile, reason=f"attendee manually banned by {ctx.author.display_name}.")
+        await remove.from_competing(ctx, attendee, profile, reason=f"attendee manually banned by {ctx.author.display_name}.")
 
         # Complete ban
         await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
@@ -34,12 +33,12 @@ async def main(ctx):
 async def remove_smashgg(ui, attendee):
     """Remove attendee from smash.gg if applicable."""
     try:
-        await remove.remove_smashgg(ui, attendee)
+        await remove.from_smashgg(ui, attendee)
     except TypeError:
         pass
 
 
-async def set_ban_length(ui: utils.CommandUI, attendee, profile):
+async def set_ban_length(ui: utils.CommandUI, profile):
     """Get ban length and set it inside of the profile."""
     ui.embed.description = f"Specify the length of the ban. or enter 'forever' for a permanent ban."
     ui.embed.add_field(name="Supported symbols:", value=utils.time.User.symbols)

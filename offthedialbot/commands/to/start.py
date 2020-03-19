@@ -12,7 +12,7 @@ async def main(ctx):
     ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Commencing tournament...", color=utils.colors.COMPETING))
 
     await end_checkin(ui)
-    await remove_inactives(ctx)
+    await attendees.remove.disqualified(ctx, checkin=True)
     await attendees.export.export_attendees(ctx, attendees.attendee_and_profile(ctx))
     await ui.end(None)
 
@@ -23,11 +23,3 @@ async def end_checkin(ui):
     await ui.update()
     checkin_cmd = ui.ctx.bot.get_command("checkin")
     checkin_cmd.enabled = False
-
-
-async def remove_inactives(ctx):
-    """Remove attendees who have not checked in."""
-    for attendee, profile in attendees.attendee_and_profile(ctx):
-
-        if (attendee is None) or (not "Checked In" in [role.name for role in attendee.roles]):
-            await attendees.remove.remove_attendee(ctx, attendee, profile, reason="attendee failed to check-in.")
