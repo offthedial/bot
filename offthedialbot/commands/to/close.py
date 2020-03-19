@@ -14,7 +14,8 @@ async def main(ctx):
     # Steps
     await close_signup(ui)
     await attendees.remove.disqualified(ctx, left=True)
-    await start_checkin(ui)
+    await enable_checkin(ui)
+    await warn_attendees(ui.ctx)
 
     await ui.end(True)
 
@@ -26,13 +27,12 @@ async def close_signup(ui):
     utils.dbh.set_tourney_reg(False)
 
 
-async def start_checkin(ui):
+async def enable_checkin(ui):
     """Enable the checkin command."""
     ui.embed.description = "Enabling `$checkin`..."
     await ui.update()
     checkin_cmd = ui.ctx.bot.get_command("checkin")
     checkin_cmd.enabled = True
-    await warn_attendees(ui.ctx)
 
 
 async def warn_attendees(ctx):

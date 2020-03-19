@@ -19,6 +19,7 @@ async def main(ctx):
 
 
 async def update_profile(ctx, profile, username):
+    """Modified $profile update command."""
     embed, emojis = create_update_embed(ctx, profile)
     embed.title = f"{username}'s Status"
 

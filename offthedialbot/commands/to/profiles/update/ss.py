@@ -18,6 +18,7 @@ async def main(ctx):
 
 
 async def update_ss(ctx, profile, username):
+    """Modified $profile update command with signal strength."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(
         title=f"Set {username}'s Signal Strength",
         description=f"Enter what you want {username}'s signal strength to be, append with a `+` if you want to add signal strength."

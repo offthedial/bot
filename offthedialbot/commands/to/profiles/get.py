@@ -16,6 +16,7 @@ async def main(ctx):
 
 
 async def get_profiles(ui):
+    """Return a list of profile, member tuples that the user specifies."""
     ui.embed = discord.Embed(
         title="Get Profiles",
         description="Mention each user you want to get.",

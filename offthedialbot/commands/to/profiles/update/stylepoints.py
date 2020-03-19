@@ -19,6 +19,7 @@ async def main(ctx):
 
 
 async def update_stylepoints(ctx, profile, username):
+    """Modified $profile update stylepoints command."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, create.create_stylepoints_embed(ctx))
     ui.embed.title = f"{username}'s Stylepoints"
 
