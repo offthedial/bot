@@ -2,7 +2,6 @@
 import discord
 
 from offthedialbot import utils
-
 from offthedialbot.commands.profile import create_status_embed
 
 

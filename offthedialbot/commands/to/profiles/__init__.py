@@ -2,12 +2,14 @@
 from discord.ext import commands
 
 from offthedialbot import utils
+from .. import attendees
 
 
 @utils.deco.require_role("Organiser")
 async def main(ctx):
     """Command tools for managing profiles."""
     raise commands.TooManyArguments
+
 
 def user_and_profile(ctx):
     """Create a list of tuples containing an user's member object, and profile."""
