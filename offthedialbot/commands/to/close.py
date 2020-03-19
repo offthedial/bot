@@ -2,7 +2,7 @@
 import discord
 
 from offthedialbot import utils
-from .attendees import attendee_and_profile
+from . import attendees
 
 
 @utils.deco.require_role("Organiser")
@@ -13,6 +13,7 @@ async def main(ctx):
 
     # Steps
     await close_signup(ui)
+    await attendees.remove.disqualified(ctx, left=True)
     await start_checkin(ui)
 
     await ui.end(True)
@@ -36,7 +37,7 @@ async def start_checkin(ui):
 
 async def warn_attendees(ctx):
     """Warn attendees who have not checked in yet."""
-    for attendee, profile in attendee_and_profile(ctx):
+    for attendee, profile in attendees.attendee_and_profile(ctx):
         utils.time.Timer.schedule(utils.time.relativedelta(hours=18) + utils.time.datetime.utcnow(),
             attendee.id, ctx.me.id,
             style=utils.Alert.Style.WARNING,
