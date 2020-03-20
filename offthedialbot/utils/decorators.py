@@ -16,7 +16,10 @@ def profile_required(reverse=False, competing=False):
                 except utils.Profile.NotFound:
                     await command(*args)
                 else:
-                    await utils.Alert(args[-1], utils.Alert.Style.DANGER, title="Command Failed", description="Existing profile found. You can edit it using `$profile update`.")
+                    await utils.Alert(args[-1], utils.Alert.Style.DANGER,
+                        title="Command Failed",
+                        description="Existing profile found. You can edit it using `$profile update`.")
+
             return _
 
     elif competing:
@@ -30,7 +33,10 @@ def profile_required(reverse=False, competing=False):
                 if profile and profile.get_competing():
                     await command(*args)
                 else:
-                    await utils.Alert(args[-1], utils.Alert.Style.DANGER, title="Command Failed", description="You are not currently competing.")
+                    await utils.Alert(args[-1], utils.Alert.Style.DANGER,
+                        title="Command Failed",
+                        description="You are not currently competing.")
+
             return _
 
     else:
@@ -40,9 +46,12 @@ def profile_required(reverse=False, competing=False):
                 try:
                     utils.Profile(args[-1].author.id)
                 except utils.Profile.NotFound:
-                    await utils.Alert(args[-1], utils.Alert.Style.DANGER, title="Command Failed", description="No profile found. You can create one using `$profile create`.")
+                    await utils.Alert(args[-1], utils.Alert.Style.DANGER,
+                        title="Command Failed",
+                        description="No profile found. You can create one using `$profile create`.")
                 else:
                     await command(*args)
+
             return _
 
     return deco
@@ -50,6 +59,7 @@ def profile_required(reverse=False, competing=False):
 
 def otd_only(command):
     """Make sure the command is only called in Off the Dial."""
+
     @wraps(command)
     async def _(*args):
         ctx = args[-1]
@@ -58,8 +68,10 @@ def otd_only(command):
         elif env.get('debug'):
             await command(*args)
         else:
-            await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Command Failed", description="This command must be performed in Off the Dial.")
-    
+            await utils.Alert(ctx, utils.Alert.Style.DANGER,
+                title="Command Failed",
+                description="This command must be performed in Off the Dial.")
+
     return _
 
 
@@ -68,13 +80,17 @@ def require_role(role: str):
 
     def deco(command):
         """Make sure the command is only callable by tournament organisers."""
+
         @wraps(command)
         async def _(*args):
             ctx = args[-1]
             if ctx.guild and utils.roles.has(ctx.author, role):
                 await command(*args)
             else:
-                await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Permission Denied", description=f"This command is only avaliable to {role}s.")
+                await utils.Alert(ctx, utils.Alert.Style.DANGER,
+                    title="Permission Denied",
+                    description=f"This command is only avaliable to {role}s.")
+
         _.hidden = True
         return _
 
@@ -90,7 +106,8 @@ def tourney(open=(True, False)):
         True: Tournament registration is open
         False: Tournament registration is closed
     """
-    error_msg = lambda ctx, d="Tournament does not exist.": utils.Alert(ctx, utils.Alert.Style.DANGER, title="Command Failed", description=d)
+    error_msg = lambda ctx, d="Tournament does not exist.": \
+        utils.Alert(ctx, utils.Alert.Style.DANGER, title="Command Failed", description=d)
 
     if open == (True, False):
         def deco(command):
@@ -100,6 +117,7 @@ def tourney(open=(True, False)):
                     await command(*args)
                 else:
                     await error_msg(args[-1])
+
             return _
 
     elif open is None:
@@ -110,32 +128,35 @@ def tourney(open=(True, False)):
                     await command(*args)
                 else:
                     await error_msg(args[-1], "Tournament already exists.")
+
             return _
 
     elif open is True:
         def deco(command):
             @wraps(command)
             async def _(*args):
-                if (tourney := utils.dbh.get_tourney()):
-                    if tourney["reg"]:
+                if t := utils.dbh.get_tourney():
+                    if t["reg"]:
                         await command(*args)
                     else:
                         await error_msg(args[-1], "Tournament registration is not open.")
                 else:
                     await error_msg(args[-1])
+
             return _
 
     elif open is False:
         def deco(command):
             @wraps(command)
             async def _(*args):
-                if (tourney := utils.dbh.get_tourney()):
-                    if not tourney["reg"]:
+                if t := utils.dbh.get_tourney():
+                    if not t["reg"]:
                         await command(*args)
                     else:
                         await error_msg(args[-1], "Tournament registration is currently open.")
                 else:
                     await error_msg(args[-1])
+
             return _
 
     return deco

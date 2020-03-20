@@ -28,8 +28,7 @@ async def disabled_command(ctx, error):
     if isinstance(error, commands.errors.DisabledCommand):
         await utils.Alert(ctx, utils.Alert.Style.DANGER,
             title="Command Disabled",
-            description="You can't use this command right now."
-        )
+            description="You can't use this command right now.")
         return True
 
 

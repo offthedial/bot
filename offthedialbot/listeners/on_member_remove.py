@@ -7,7 +7,7 @@ async def on_member_remove(client, member):
     # Check if it's the correct the server
     if member.guild != client.OTD:
         return
-    
+
     await warn_if_competing(member)
 
 

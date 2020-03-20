@@ -29,7 +29,6 @@ def create_file(ctx, rows):
     csv_profiles = []
 
     for attendee, profile in rows:
-
         csv_profiles.append([
             f'@{attendee.name}#{attendee.discriminator}' if attendee else "NOT-FOUND",
             profile.get_status()["IGN"],
@@ -56,6 +55,5 @@ async def send_file(ctx, file):
     """Send an alert and upload the file to discord."""
     await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
         title=":incoming_envelope: *Exporting attendees complete!*",
-        description="Download the spreadsheet below. \U0001f4e5"
-    )
+        description="Download the spreadsheet below. \U0001f4e5")
     await ctx.send(file=file)

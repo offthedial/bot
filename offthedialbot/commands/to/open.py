@@ -8,8 +8,9 @@ from offthedialbot import utils
 @utils.deco.tourney(None)
 async def main(ctx):
     """Open registration for a new tournament!"""
-    ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Opening registration for a new tournament...", color=utils.colors.COMPETING))
-    
+    ui: utils.CommandUI = await utils.CommandUI(ctx,
+        discord.Embed(title="Opening registration for a new tournament...", color=utils.colors.COMPETING))
+
     # Steps
     link = await get_tourney_link(ui)
     rules = await get_rules_link(ui)
@@ -23,6 +24,7 @@ async def get_tourney_link(ui):
     ui.embed.description = "Enter the new link to the tournament. (https://smash.gg/slug)"
     reply = await ui.get_reply()
     return reply.content
+
 
 async def get_rules_link(ui):
     """Set the rules for the next tournament."""

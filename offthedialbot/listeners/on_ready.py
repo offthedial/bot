@@ -5,7 +5,7 @@ from collections import defaultdict
 async def on_ready(client):
     """When the bot is ready."""
     set_vars(client)
-    
+
     # Ready!
     client.logger.info(f'Logged in as: {client.user.name}')
 

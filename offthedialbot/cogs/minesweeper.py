@@ -38,7 +38,7 @@ class Minesweeper(commands.Cog):
                 valid=key["valid"], error_fields={
                     "title": f"Invalid {key['type']}",
                     "description": key["desc"]
-            })
+                })
             values.append(int(reply.content))
         # Create minesweeper
         mines = self.Map(*values)

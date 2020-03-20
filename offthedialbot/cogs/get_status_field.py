@@ -16,11 +16,9 @@ class GetStatusField(commands.Cog, command_attrs={'hidden': True}):
             profile: utils.Profile = utils.Profile(ctx.author.id)
         except utils.exc.CommandCancel:
             return
-        await utils.Alert(
-            ctx, utils.Alert.Style.INFO,
+        await utils.Alert(ctx, utils.Alert.Style.INFO,
             title=f"`{profile.get_status()['IGN']}`'s Friend Code:",
-            description=f"{display_field('SW', profile.get_status()['SW'])}"
-        )
+            description=f"{display_field('SW', profile.get_status()['SW'])}")
 
     @commands.command()
     @utils.deco.profile_required()
@@ -30,11 +28,9 @@ class GetStatusField(commands.Cog, command_attrs={'hidden': True}):
             profile: utils.Profile = utils.Profile(ctx.author.id)
         except utils.exc.CommandCancel:
             return
-        await utils.Alert(
-            ctx, utils.Alert.Style.INFO,
+        await utils.Alert(ctx, utils.Alert.Style.INFO,
             title=f"{ctx.author.display_name}'s IGN:",
-            description=f"{display_field('IGN', profile.get_status()['IGN'])}"
-        )
+            description=f"{display_field('IGN', profile.get_status()['IGN'])}")
 
     @commands.command()
     @utils.deco.profile_required()
@@ -44,8 +40,6 @@ class GetStatusField(commands.Cog, command_attrs={'hidden': True}):
             profile: utils.Profile = utils.Profile(ctx.author.id)
         except utils.exc.CommandCancel:
             return
-        await utils.Alert(
-            ctx, utils.Alert.Style.INFO,
+        await utils.Alert(ctx, utils.Alert.Style.INFO,
             title=f"`{profile.get_status()['IGN']}`'s Ranks:",
-            description=f"{display_field('Ranks', profile.get_status()['Ranks'])}"
-        )
+            description=f"{display_field('Ranks', profile.get_status()['Ranks'])}")

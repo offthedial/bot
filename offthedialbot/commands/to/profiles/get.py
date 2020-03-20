@@ -22,12 +22,14 @@ async def get_profiles(ui):
         description="Mention each user you want to get.",
         color=utils.colors.DIALER
     )
-    reply = await ui.get_valid_message(lambda m: len(m.mentions), {"title": "Invalid Mention", "description": "Make sure to **mention** each user."})
-    
+    reply = await ui.get_valid_message(lambda m: len(m.mentions),
+        {"title": "Invalid Mention", "description": "Make sure to **mention** each user."})
+
     profiles = []
     for member in reply.mentions:
         try:
             profiles.append((utils.Profile(member.id), member))
         except utils.Profile.NotFound:
-            await utils.Alert(ui.ctx, utils.Alert.Style.DANGER, title="Invalid User", description=f"{member.display_name} doesn't have a profile.")
+            await utils.Alert(ui.ctx, utils.Alert.Style.DANGER,
+                title="Invalid User", description=f"{member.display_name} doesn't have a profile.")
     return profiles

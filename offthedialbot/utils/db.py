@@ -1,6 +1,7 @@
 """Contains the DatabaseHandler class."""
 
 from offthedialbot import env
+
 if env.get("debug"):
     import mongomock as pymongo
 else:
@@ -26,13 +27,13 @@ class DatabaseHandler:
             "rules": rules,
             "reg": reg
         })
-    
+
     def get_tourney(self):
         return self.to.find_one({"_id": 0})
 
     def end_tourney(self):
         return self.to.find_one_and_delete({"_id": 0})
-    
+
     def set_tourney_reg(self, reg):
         return self.to.update_one({"_id": 0}, {"$set": {"reg": reg}})
 

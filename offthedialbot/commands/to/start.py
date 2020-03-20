@@ -9,7 +9,8 @@ from . import attendees
 @utils.deco.tourney(False)
 async def main(ctx):
     """Start the tournament!"""
-    ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(title="Commencing tournament...", color=utils.colors.COMPETING))
+    ui: utils.CommandUI = await utils.CommandUI(ctx,
+        discord.Embed(title="Commencing tournament...", color=utils.colors.COMPETING))
 
     await end_checkin(ui)
     await attendees.remove.disqualified(ctx, checkin=True)
