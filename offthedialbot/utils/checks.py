@@ -8,8 +8,12 @@ def msg(ctx):
 
 def react(ctx, message, valids=None):
     """Check if the reaction is on the correct message, and is by the same author."""
-    return lambda r, u: (r.message.id, u) == (message.id, ctx.author) and \
-        isinstance(r.emoji, str) and ((valids is None and r.emoji != '❌') or (valids is not None and r.emoji in valids))
+    return lambda r, u: \
+        (r.message.id, u) == (message.id, ctx.author) and \
+        isinstance(r.emoji, str) and \
+        (
+                (valids is None and r.emoji != '❌') or
+                (valids is not None and r.emoji in valids))
 
 
 def member(mem):

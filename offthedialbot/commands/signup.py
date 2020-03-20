@@ -32,7 +32,6 @@ async def main(ctx):
         await confirm_signup(ui)
 
     await finalize_signup(ui, profile)
-    
     await ui.end(True)
 
 
@@ -46,7 +45,8 @@ async def check_prerequisites(ctx):
 
     check = {
         (lambda: not tourney): "Registration is not open.",
-        (lambda: profile and profile.get_banned()): "You are currently banned from competing in Off the Dial tournaments.",
+        (lambda: profile and profile.get_banned()):
+            "You are currently banned from competing in Off the Dial tournaments.",
         (lambda: profile and profile.get_competing()): "You are already signed up!"
     }
     if any(values := [value for key, value in check.items() if key()]):
@@ -110,13 +110,16 @@ async def smashgg(ui, profile, link):
     # Give signup code to sign up on smash.gg
     ui.embed.title = f"Sign up on smash.gg at **<{link}/register>**."
     ui.embed.description = "Once finished, enter the confirmation code you recieved in the email (`#F1PN28`)."
-    code = await ui.get_valid_message(r"^#?([A-Za-z0-9]){6}$", {"title": "Invalid Confirmation Code", "description": "The code you entered was not valid, please try again."}, timeout=600)
+    code = await ui.get_valid_message(r"^#?([A-Za-z0-9]){6}$",
+        {"title": "Invalid Confirmation Code", "description": "The code you entered was not valid, please try again."},
+        timeout=600)
     profile.set_cc(code.content)
 
 
 async def confirm_signup(ui):
     """Confirm user signup."""
-    confirm = utils.Alert.create_embed(utils.Alert.Style.WARNING, "Confirm Signup", "Are you ready to sign up? You will not be able to undo without first contacting the organisers.")
+    confirm = utils.Alert.create_embed(utils.Alert.Style.WARNING, "Confirm Signup",
+        "Are you ready to sign up? You will not be able to undo without first contacting the organisers.")
     ui.embed.title, ui.embed.description, ui.embed.color = confirm.title, confirm.description, confirm.color
     await ui.get_valid_reaction(["\u2705"])
 
@@ -143,12 +146,12 @@ class Checklist:
     def __init__(self, ui, checklist):
         self.ui = ui
         self.checklist = checklist
-        
+
         self.ui.embed.add_field(name="Requirements:", value=self.create(self.checklist))
 
     @contextmanager
     def checking(self, field):
-        """Check a requirement as a context manager.""" 
+        """Check a requirement as a context manager."""
         try:
             self.update({field: None})
             yield

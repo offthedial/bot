@@ -1,8 +1,8 @@
 """Dynamically import and generate discord.ext listeners."""
 import importlib
 import inspect
-from functools import wraps
 import os
+from functools import wraps
 
 from offthedialbot import logger
 

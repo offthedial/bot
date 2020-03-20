@@ -35,7 +35,8 @@ class CommandUI:
         await ui.add_reaction('❌')
         return ui
 
-    async def get_valid_message(self, valid: Union[str, Callable], error_fields: dict = None, *, _alert_params=None, **get_reply_params) -> discord.Message:
+    async def get_valid_message(self, valid: Union[str, Callable], error_fields: dict = None, *,
+                                _alert_params=None, **get_reply_params) -> discord.Message:
         """Get message reply with validity checks."""
         await self.update()
         # Check if it's the function's first run
@@ -53,16 +54,18 @@ class CommandUI:
 
         # Get message
         reply: discord.Message = await self.get_reply(**get_reply_params)
-        
+
         # Make sure it's valid
         if self.check_valid(valid, reply):
             if not first:  await self.delete_alert()
         else:
-            reply: discord.Message = await self.get_valid_message(valid=valid, _alert_params=_alert_params, **get_reply_params)
-
+            reply: discord.Message = await self.get_valid_message(
+                valid=valid, _alert_params=_alert_params, **get_reply_params
+            )
         return reply
 
-    async def get_valid_reaction(self, valid: list, error_fields: dict = None, *, _alert_params=None, **get_reply_params) -> discord.Reaction:
+    async def get_valid_reaction(self, valid: list, error_fields: dict = None, *,
+                                 _alert_params=None, **get_reply_params) -> discord.Reaction:
         """Get reaction reply with validity checks."""
         await self.update()
         # Check if it's the function's first run
@@ -83,7 +86,7 @@ class CommandUI:
 
         # Get reaction
         reply: discord.Reaction = await self.get_reply("reaction_add", **get_reply_params)
-        
+
         # Make sure it's valid
         if self.check_valid(valid, reply):
             if not first:  await self.delete_alert()
@@ -95,8 +98,9 @@ class CommandUI:
                 await self.ui.clear_reactions()
                 await self.ui.add_reaction('❌')
         else:
-            reply: discord.Reaction = await self.get_valid_reaction(valid=valid, _alert_params=_alert_params, **get_reply_params)
-
+            reply: discord.Reaction = await self.get_valid_reaction(
+                valid=valid, _alert_params=_alert_params, **get_reply_params
+            )
         return reply
 
     async def get_reply(self, event: str = 'message', /, **kwargs) -> Union[discord.Message, discord.Reaction]:
@@ -115,7 +119,8 @@ class CommandUI:
             }
         }
         # Create tasks
-        reply_task: asyncio.Task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]), name="CommandUI.reply_task")
+        reply_task: asyncio.Task = asyncio.create_task(
+            self.ctx.bot.wait_for(event, check=key[event]["check"]), name="CommandUI.reply_task")
         cancel_task: Optional[asyncio.Task] = None
 
         # Await tasks
@@ -171,6 +176,7 @@ class CommandUI:
 
     async def run_command(self, main, *args):
         """Run an external command, from a command ui."""
+
         @asynccontextmanager
         async def hide_x():
             try:
@@ -191,10 +197,10 @@ class CommandUI:
 
     def create_cancel_task(self, timeout=None) -> asyncio.Task:
         """Create a task that checks if the user canceled the command."""
-        return asyncio.create_task(self.ctx.bot.wait_for('reaction_add',
-            check=utils.checks.react(self.ctx, self.ui, valids='❌'),
-            timeout=(timeout if timeout else 180)
-        ), name="CommandUI.cancel_task")
+        return asyncio.create_task(
+            self.ctx.bot.wait_for('reaction_add',
+                check=utils.checks.react(self.ctx, self.ui, valids='❌'),
+                timeout=(timeout if timeout else 180)), name="CommandUI.cancel_task")
 
     @staticmethod
     def check_valid(valid, reply: Union[discord.Message, discord.Reaction]) -> bool:

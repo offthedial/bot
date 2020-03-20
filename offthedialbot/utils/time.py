@@ -1,6 +1,7 @@
-"""Contains tools to help with managing times.""" 
+"""Contains tools to help with managing times."""
 import re
 from datetime import datetime
+
 from dateutil.relativedelta import relativedelta
 
 from offthedialbot import utils
@@ -20,7 +21,7 @@ class User:
     
     Units must be provided in descending order of magnitude.
     """
-    
+
     complied = re.compile(
         r"((?P<years>\d+?) ?(years|year|yrs|yr|Y|y) ?)?"
         r"((?P<months>\d+?) ?(months|month|mons|mon|m) ?)?"
@@ -59,15 +60,15 @@ class Timer:
                 "style": style,
                 "title": title,
                 "description": description
-        }})
+            }})
         return timer.inserted_id
-    
+
     @classmethod
     def delete(cls, id=None, /, **kwargs):
         """Delete a timer given their id."""
         if id:  kwargs["_id"] = id
         return cls.timers.delete_one(kwargs)
-    
+
     @classmethod
     def get(cls, query={}):
         if "timers" not in utils.dbh.db.list_collection_names():

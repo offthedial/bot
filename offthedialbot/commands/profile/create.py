@@ -51,7 +51,7 @@ async def set_status_field(ui, profile, key, field_index) -> None:
         valid=lambda m: parse_reply(key, m.content), error_fields={
             "title": f"Invalid {key}",
             "description": instructions[key]
-    })
+        })
     field_value: str = parse_reply(key, reply.content)
     profile.set_status(key, field_value)
     ui.embed.set_field_at(field_index, name=key, value=display_field(key, field_value))
@@ -61,16 +61,17 @@ async def set_rank_field(ui: utils.CommandUI, profile: utils.Profile, field_inde
     """Prompt the user for each of the rank fields."""
     instructions = lambda k: f'Enter your **__{k}__ Rank**, `(C, A-, S+0, X2350.0)`'
     for key in profile.get_ranks().keys():
-
         ui.embed.title = instructions(key)
         reply: discord.Message = await ui.get_valid_message(
             valid=lambda m: parse_reply("Ranks", m.content),
             error_fields={
                 "title": "Invalid Rank",
                 "description": instructions(key)
-        })
+            })
         profile.set_rank(key, parse_reply("Ranks", reply.content))
-        ui.embed.set_field_at(field_index, name="Ranks", value=display_field("Ranks", profile.get_ranks()), inline=False)
+        ui.embed.set_field_at(field_index,
+            name="Ranks",
+            value=display_field("Ranks", profile.get_ranks()), inline=False)
 
 
 def clean_status_key(profile: utils.Profile, key: str) -> tuple:
@@ -93,7 +94,9 @@ async def get_user_stylepoints(ui: utils.CommandUI) -> list:
     """Get the user's playstyle and calculate their, style points."""
     user_playstyles: list = []
     create_tasks = (
-        lambda: asyncio.create_task(ui.get_valid_message(lambda m: m.content.lower() in utils.Profile.playstyles.keys(), {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}, cancel=False)),
+        lambda: asyncio.create_task(ui.get_valid_message(
+            lambda m: m.content.lower() in utils.Profile.playstyles.keys(),
+            {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}, cancel=False)),
         lambda: asyncio.create_task(ui.get_valid_reaction(['\u23ed\ufe0f'], cancel=False)),
         lambda: ui.create_cancel_task()
     )
@@ -108,7 +111,9 @@ async def get_user_stylepoints(ui: utils.CommandUI) -> list:
             user_playstyles.remove(content) if content in user_playstyles else user_playstyles.append(content)
         elif task == tasks[1]:
             if not user_playstyles:
-                await ui.create_alert(utils.Alert.Style.DANGER, title="No Playstyles Selected", description="You did not select any playstyles.")
+                await ui.create_alert(utils.Alert.Style.DANGER,
+                    title="No Playstyles Selected",
+                    description="You did not select any playstyles.")
             else:
                 break
         else:
@@ -119,7 +124,8 @@ async def get_user_stylepoints(ui: utils.CommandUI) -> list:
 
 async def get_user_cxp(ui: utils.CommandUI) -> int:
     """Get the user's playstyle and calculate their, style points."""
-    reply: discord.Message = await ui.get_valid_message(r'^\d+$', {"title": "Invalid number.", "description": "Please enter a valid number of tournaments."})
+    reply: discord.Message = await ui.get_valid_message(r'^\d+$',
+        {"title": "Invalid number.", "description": "Please enter a valid number of tournaments."})
     return int(reply.content)
 
 
@@ -127,8 +133,7 @@ def create_stylepoints_embed(ctx) -> discord.Embed:
     """Create embed for asking stylepoints."""
     embed: discord.Embed = discord.Embed(color=utils.colors.DIALER,
         title="Enter all of the playstyles below that apply to you",
-        description=f"Re-enter a playstyle to remove it. Click the \u23ed\ufe0f when done.",
-    )
+        description=f"Re-enter a playstyle to remove it. Click the \u23ed\ufe0f when done.")
     embed.add_field(name="Playstyles", value=create_playstyle_list())
     return embed
 
@@ -136,17 +141,14 @@ def create_stylepoints_embed(ctx) -> discord.Embed:
 def create_cxp_embed(ctx) -> discord.Embed:
     """Create embed for asking competitive experience."""
     return discord.Embed(color=utils.colors.DIALER,
-        title=f"How many tournaments, with at-least 16 teams, have your competed in?"
-    )
+        title=f"How many tournaments, with at-least 16 teams, have your competed in?")
 
 
 async def confirm_profile(ui) -> bool:
     """Confirms user profile and returns status."""
-    alert_embed: discord.Embed = utils.Alert.create_embed(
-        utils.Alert.Style.WARNING,
+    alert_embed: discord.Embed = utils.Alert.create_embed(utils.Alert.Style.WARNING,
         title="Confirm?",
-        description="To confirm your profile, react with \u2611\ufe0f. To reenter your profile, react with \u23ea."
-    )
+        description="To confirm your profile, react with \u2611\ufe0f. To reenter your profile, react with \u23ea.")
     ui.embed.title, ui.embed.description, ui.embed.color = alert_embed.title, alert_embed.description, alert_embed.color
     reply = await ui.get_valid_reaction(['\u2611\ufe0f', '\u23ea'])
     return reply.emoji == '\u2611\ufe0f'

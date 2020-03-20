@@ -23,8 +23,10 @@ async def update_ss(ctx, profile, username):
         title=f"Set {username}'s Signal Strength",
         description=f"Enter what you want {username}'s signal strength to be, append with a `+` if you want to add signal strength."
     ))
-    reply = await ui.get_valid_message(r'^\+?\-?\d{1,}$', {"title": "Invalid Signal Strength", "description": f"Enter what you want {username}'s signal strength to be, append with a `+` if you want to add signal strength."})
-    
+    reply = await ui.get_valid_message(r'^\+?\-?\d{1,}$', {
+        "title": "Invalid Signal Strength",
+        "description": f"Enter what you want {username}'s signal strength to be, append with a `+` if you want to add signal strength."})
+
     if reply.content.startswith("+"):
         ss = profile.get_ss() + int(reply.content[1:])
     else:

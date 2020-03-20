@@ -10,7 +10,7 @@ class HelpCommand(commands.DefaultHelpCommand):
 
     async def send_bot_help(self, mapping):
         """Send bot command page."""
-        commands = [
+        list_commands = [
             command for cog in [
                 await self.filter_commands(cog_commands)
                 for cog, cog_commands in mapping.items()
@@ -29,7 +29,7 @@ class HelpCommand(commands.DefaultHelpCommand):
                 "name": "Misc Commands:",
                 "value": "\n".join([
                     f'`{self.clean_prefix}{command}` {command.help}'
-                    for command in commands])
+                    for command in list_commands])
             }]
         )
         await self.get_destination().send(embed=embed)
@@ -86,14 +86,17 @@ class HelpCommand(commands.DefaultHelpCommand):
 
     async def send_error_message(self, error):
         """Send error message, override to support sending embeds."""
-        await self.get_destination().send(embed=utils.Alert.create_embed(utils.Alert.Style.DANGER, title="Command/Subcommand not found.", description=error))
+        await self.get_destination().send(
+            embed=utils.Alert.create_embed(utils.Alert.Style.DANGER,
+                title="Command/Subcommand not found.", description=error))
 
     def create_embed(self, fields: list = (), **kwargs):
         """Create help embed."""
         embed = discord.Embed(color=utils.Alert.Style.DANGER, **kwargs)
         for field in fields:
             embed.add_field(**field, inline=False)
-        embed.set_footer(text=f"Type {self.clean_prefix}help command for more info on a command. You can also type {self.clean_prefix}help category for more info on a category.")
+        embed.set_footer(
+            text=f"Type {self.clean_prefix}help command for more info on a command. You can also type {self.clean_prefix}help category for more info on a category.")
         return embed
 
 

@@ -1,9 +1,8 @@
 """$to profiles update cxp"""
 import discord
 
-from offthedialbot import utils
-from ..get import get_profiles
 from offthedialbot.commands.profile.update import *
+from ..get import get_profiles
 
 
 @utils.deco.require_role("Organiser")

@@ -6,7 +6,7 @@ from functools import wraps
 
 from discord.ext import commands
 
-from offthedialbot import utils, logger
+from offthedialbot import logger
 
 
 def register_commands(bot):

@@ -1,6 +1,4 @@
 """$test"""
-import discord
-
 from offthedialbot import utils
 
 
@@ -12,4 +10,4 @@ async def main(ctx):
             "All directions are __in the embed__!",
             "That means, to navigate the commands, simply read the bot message!",
             "If you are still stuck, you can ask for help in #helpdesk."
-    ]))
+        ]))
