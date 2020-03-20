@@ -102,6 +102,7 @@ async def show_preview(ctx, profile):
         await preview.delete()
 
 
+async def smashgg(ui, profile, link):
     """Make sure the user has signed up on smash.gg."""
     # Uses OAuth2 to link user's smash.gg account
     # Give signup code to sign up on smash.gg
