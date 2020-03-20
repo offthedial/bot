@@ -10,21 +10,24 @@ from offthedialbot.commands.profile import create, update, create_status_embed
 @utils.deco.otd_only
 async def main(ctx):
     """Sign up for the upcoming tournament!"""
-    link, profile = await check_prerequisites(ctx)
+    tourney, profile = await check_prerequisites(ctx)
 
     ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(color=utils.colors.COMPETING))
     checklist = Checklist(ui, {
         "prerequisites": True,
+        "accepted rules": False,
         "profile is updated": False,
         "smash.gg integration": False,
         "final confirmation": False
     })
 
     # Check requirements
+    with checklist.checking("accepted rules"):
+        await accepted_rules(ui, tourney["rules"])
     with checklist.checking("profile is updated"):
         profile = await profile_uptodate(ui, profile)
     with checklist.checking("smash.gg integration"):
-        await smashgg(ui, link)
+        await smashgg(ui, profile, tourney["link"])
     with checklist.checking("final confirmation"):
         await confirm_signup(ui)
 
@@ -35,14 +38,14 @@ async def main(ctx):
 
 async def check_prerequisites(ctx):
     """Check to make sure the user fits all the prerequisites."""
-    link = utils.dbh.get_tourney()["link"] if utils.dbh.get_tourney() else None
+    tourney = utils.dbh.get_tourney()
     try:
         profile = utils.Profile(ctx.author.id)
     except utils.Profile.NotFound:
         profile = None
 
     check = {
-        (lambda: not link): "Registration is not open.",
+        (lambda: not tourney): "Registration is not open.",
         (lambda: profile and profile.get_banned()): "You are currently banned from competing in Off the Dial tournaments.",
         (lambda: profile and profile.get_competing()): "You are already signed up!"
     }
@@ -50,13 +53,21 @@ async def check_prerequisites(ctx):
         await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Registration Failed.", description=values[0])
         raise utils.exc.CommandCancel
 
-    return link, profile
+    return tourney, profile
+
+
+async def accepted_rules(ui, rules):
+    """Make sure the user has accepted the tournament rules."""
+    ui.embed.title = f"Read over the rules at **<{rules}>**."
+    ui.embed.description = "Once finished, select \u2705. By proceeding, you accept and agree to the rules."
+    await ui.get_valid_reaction(["\u2705"])
 
 
 async def profile_uptodate(ui, profile):
     """Make sure the user's has a profile, and it is up-to-date."""
     if not profile:
         ui.embed.title = "A profile is required to compete. To create one and proceed, select \u2705."
+        ui.embed.description = "Your profile will be saved for future use."
         await ui.get_valid_reaction(["\u2705"])
         await ui.run_command(create.main)
     else:
@@ -91,14 +102,13 @@ async def show_preview(ctx, profile):
         await preview.delete()
 
 
-async def smashgg(ui, link):
     """Make sure the user has signed up on smash.gg."""
     # Uses OAuth2 to link user's smash.gg account
     # Give signup code to sign up on smash.gg
     ui.embed.title = f"Sign up on smash.gg at **<{link}/register>**."
     ui.embed.description = "Once finished, enter the confirmation code you recieved in the email (`#F1PN28`)."
     code = await ui.get_valid_message(r"^#?([A-Za-z0-9]){6}$", {"title": "Invalid Confirmation Code", "description": "The code you entered was not valid, please try again."}, timeout=600)
-    # Save code to show in exported profiles
+    profile.set_cc(code.content)
 
 
 async def confirm_signup(ui):

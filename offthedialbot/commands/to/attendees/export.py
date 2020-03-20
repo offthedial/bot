@@ -41,12 +41,13 @@ def create_file(ctx, rows):
             profile.get_ss(),
             profile.get_competing(),
             profile.get_banned(),
+            profile.get_cc(),
             f"'{attendee.id}'" if attendee else "NOT-FOUND"
         ])
     csv_profiles.sort(key=lambda row: row[7])
 
     writer.writerows([["Discord Mention", "IGN", "SW", "SZ", "RM", "TC", "CB", "Cumulative ELO", "Stylepoints", "CXP",
-                       "Signal Strength", "Competing", "Banned", "Discord ID"], []] + csv_profiles)
+                       "Signal Strength", "Competing", "Banned", "Confirmation Code", "Discord ID"], []] + csv_profiles)
     file.seek(0)
     return discord.File(file, filename="profiles.csv")
 

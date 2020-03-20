@@ -12,7 +12,8 @@ async def main(ctx):
     
     # Steps
     link = await get_tourney_link(ui)
-    utils.dbh.new_tourney(link)
+    rules = await get_rules_link(ui)
+    utils.dbh.new_tourney(link, rules)
 
     await ui.end(True)
 
@@ -20,5 +21,11 @@ async def main(ctx):
 async def get_tourney_link(ui):
     """Set the smash.gg link for the next tournament."""
     ui.embed.description = "Enter the new link to the tournament. (https://smash.gg/slug)"
+    reply = await ui.get_reply()
+    return reply.content
+
+async def get_rules_link(ui):
+    """Set the rules for the next tournament."""
+    ui.embed.description = "Enter the link of the rules to the tournament. (https://docs.google.com/document/d/rules/edit?usp=sharing)"
     reply = await ui.get_reply()
     return reply.content
