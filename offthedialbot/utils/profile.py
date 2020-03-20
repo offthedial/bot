@@ -34,6 +34,7 @@ class Profile:
                     "competing": False,
                     "smashgg": None,
                     "banned": None,
+                    "confirmation_code": None,
                 }
             }
         else:
@@ -156,6 +157,9 @@ class Profile:
     def set_banned(self, banned: Union[None, datetime]):
         self.profile["meta"]["banned"] = banned
 
+    def set_cc(self, cc: str):
+        self.profile["meta"]["confirmation_code"] = cc
+
     # Getters
     def get_status(self) -> dict:
         return self.profile["status"]
@@ -202,3 +206,6 @@ class Profile:
             return banned
         elif banned is True:
             return banned
+
+    def get_cc(self) -> str:
+        return self.profile["meta"]["confirmation_code"]

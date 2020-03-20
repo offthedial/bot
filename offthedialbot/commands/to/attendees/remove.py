@@ -32,7 +32,7 @@ async def disqualified(ctx, **kwargs):
     for attendee, profile in attendee_and_profile(ctx):
         checks: list = [{
             "left": (lambda a, p: a is None, "attendee left the server"),
-            "checkin": (lambda a, p: "Checked In" not in [role.name for role in getattr(attendee, 'roles', [])], "attendee failed to check-in"),
+            "checkin": (lambda a, p: not utils.roles.has(ctx.author, "Checked In"), "attendee failed to check-in"),
         }[key] for key in kwargs.keys()]
 
         disq = [(check, reason) for check, reason in checks if check(attendee, profile)]
@@ -45,7 +45,7 @@ async def from_competing(ctx, attendee, profile, *, reason="attendee isn't compe
     """Remove competing from attendee's profile and discord roles."""
     # Profile
     profile.set_competing(False)
-    # profile.set_cc(None)
+    profile.set_cc(None)
     profile.write()
     if attendee:  # Roles
         await attendee.remove_roles(*[utils.roles.get(ctx, name) for name in ["Competing", "Checked In"] if utils.roles.get(ctx, name)], reason=reason)

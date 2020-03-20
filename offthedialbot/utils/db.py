@@ -20,10 +20,11 @@ class DatabaseHandler:
         self.to = self.db["to"]
         self.timers = self.db["timers"]
 
-    def new_tourney(self, link: str, reg: bool = True):
+    def new_tourney(self, link: str, rules: str, reg: bool = True):
         return self.to.insert_one({
             "_id": 0,
             "link": link,
+            "rules": rules,
             "reg": reg
         })
     
