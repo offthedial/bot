@@ -1,6 +1,7 @@
 """Contains custom decorators."""
-from offthedialbot import env, utils
 from functools import wraps
+
+from offthedialbot import env, utils
 
 
 def profile_required(reverse=False, competing=False):

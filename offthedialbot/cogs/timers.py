@@ -1,6 +1,6 @@
 """cogs.Timers"""
-from discord.ext import tasks, commands
 import discord
+from discord.ext import tasks, commands
 
 from offthedialbot import utils
 

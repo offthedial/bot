@@ -1,5 +1,4 @@
 """Contains the DatabaseHandler class."""
-import os
 
 from offthedialbot import env
 if env.get("debug"):

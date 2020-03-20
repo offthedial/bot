@@ -3,7 +3,6 @@ import logging
 
 from offthedialbot import env
 
-
 logging.basicConfig(
     level=logging.DEBUG if env.get("debug") else logging.INFO,
     format='%(asctime)s: [%(levelname)s] %(message)s',

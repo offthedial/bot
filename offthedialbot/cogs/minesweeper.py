@@ -1,9 +1,9 @@
 """cogs.Minesweeper"""
 import random
-import numpy as np
 
-from discord.ext import commands
 import discord
+import numpy as np
+from discord.ext import commands
 
 from offthedialbot import utils
 
