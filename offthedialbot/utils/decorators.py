@@ -70,7 +70,7 @@ def require_role(role: str):
         @wraps(command)
         async def _(*args):
             ctx = args[-1]
-            if ctx.guild and role in [ for role in ctx.author.roles]:
+            if ctx.guild and utils.roles.has(ctx.author, role):
                 await command(*args)
             else:
                 await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Permission Denied", description=f"This command is only avaliable to {role}s.")
