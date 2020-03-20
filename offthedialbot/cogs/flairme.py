@@ -42,7 +42,7 @@ class Flairme(commands.Cog):
         if not flair:
             await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Role not found", description="I can't seem to find that role...")
         else:
-            if flair_name in [role.name for role in ctx.author.roles]:
+            if utils.roles.has(ctx.author, flair_name):
                 await ctx.author.remove_roles(flair)
                 title = "Removed Flair"
                 description = f"You no longer have the {flair_name} flair"

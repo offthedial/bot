@@ -21,6 +21,14 @@ def alerts(client):
 
 
 def get(ctx, name=None, /, **kwargs):
+    """Get the role object given their name, or other attribute."""
     if name:
         kwargs["name"] = name
-    return discord.utils.get(ctx.guild.roles, **kwargs)
+    roles = getattr(getattr(ctx, "guild", None), "roles", [])
+    return discord.utils.get(roles, **kwargs)
+
+
+def has(member, name=None, /, **kwargs):
+    """Check if a member has a given role by their name, or other attribute."""
+    role = get(member, name, **kwargs)
+    return role in member.roles

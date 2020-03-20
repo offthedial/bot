@@ -16,7 +16,7 @@ async def main(ctx):
     checklist = Checklist(ui, {
         "prerequisites": True,
         "accepted rules": False,
-        "profile is updated": False,
+        "profile is up-to-date": False,
         "smash.gg integration": False,
         "final confirmation": False
     })
@@ -24,7 +24,7 @@ async def main(ctx):
     # Check requirements
     with checklist.checking("accepted rules"):
         await accepted_rules(ui, tourney["rules"])
-    with checklist.checking("profile is updated"):
+    with checklist.checking("profile is up-to-date"):
         profile = await profile_uptodate(ui, profile)
     with checklist.checking("smash.gg integration"):
         await smashgg(ui, profile, tourney["link"])
@@ -64,7 +64,7 @@ async def accepted_rules(ui, rules):
 
 
 async def profile_uptodate(ui, profile):
-    """Make sure the user's has a profile, and it is up-to-date."""
+    """Make sure the user's has a profile, and it is updated."""
     if not profile:
         ui.embed.title = "A profile is required to compete. To create one and proceed, select \u2705."
         ui.embed.description = "Your profile will be saved for future use."
@@ -93,13 +93,15 @@ async def profile_updated(ui, profile):
 @asynccontextmanager
 async def show_preview(ctx, profile):
     """Show a preview for profile update."""
+    preview = None
     try:
         embed = create_status_embed(ctx.author.display_name, profile, True)
         embed.title, embed.description = "Preview:", f"**{embed.title}**"
         preview = await ctx.send(embed=embed)
         yield
     finally:
-        await preview.delete()
+        if preview:
+            await preview.delete()
 
 
 async def smashgg(ui, profile, link):
