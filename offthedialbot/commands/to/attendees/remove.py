@@ -27,7 +27,7 @@ async def main(ctx):
         await from_smashgg(ui, attendee)
         await from_competing(ctx, attendee, profile, reason=f"attendee manually removed by {ctx.author.display_name}.")
 
-        # Complete ban
+        # Complete removal
         await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
             title="Remove attendee complete",
             description=f"`{attendee.display_name}` is no longer competing.")
