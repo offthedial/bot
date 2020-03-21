@@ -15,8 +15,8 @@ async def main(ctx):
             description="Mention each attendee you want to remove.",
             color=utils.colors.COMPETING)
     )
-    reply = await ui.get_valid_message(lambda m: len(m.mentions) == 1,
-        {"title": "Invalid Mention", "description": "Make sure to send a **mention** of the attendee."})
+    reply = await ui.get_valid_message(lambda m: len(m.mentions) >= 1,
+        {"title": "Invalid Mention", "description": "Make sure to send a **mention** of the attendees."})
 
     for attendee in reply.mentions:
 
