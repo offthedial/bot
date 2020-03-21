@@ -40,9 +40,11 @@ async def disqualified(ctx, **kwargs):
     for attendee, profile in attendee_and_profile(ctx):
         checks: list = [{
             "left": (
-                lambda a, p: a is None, "attendee left the server"),
+                lambda a, p: a is None,
+                "attendee left the server"),
             "checkin": (
-                lambda a, p: not utils.roles.has(ctx.author, "Checked In"), "attendee failed to check-in"),
+                lambda a, p: not utils.roles.has(a, "Checked In"),
+                "attendee failed to check-in"),
 
         }[key] for key in kwargs.keys()]
         disq = [(check, reason) for check, reason in checks if check(attendee, profile)]

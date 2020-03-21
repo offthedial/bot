@@ -9,6 +9,8 @@ from . import attendees
 @utils.deco.tourney(False)
 async def main(ctx):
     """Start the tournament!"""
+    await check_tourney_checkin(ctx)
+
     ui: utils.CommandUI = await utils.CommandUI(ctx,
         discord.Embed(title="Commencing tournament...", color=utils.colors.COMPETING))
 
@@ -24,3 +26,12 @@ async def end_checkin(ui):
     await ui.update()
     checkin_cmd = ui.ctx.bot.get_command("checkin")
     checkin_cmd.enabled = False
+
+
+async def check_tourney_checkin(ctx):
+    """Make sure the tournament checkin is enabled so it is able to be started."""
+    if not ctx.bot.get_command("checkin").enabled:
+        await utils.Alert(ctx, utils.Alert.Style.DANGER,
+                          title="Command Failed",
+                          description="Tournament has already started.")
+        raise utils.exc.CommandCancel
