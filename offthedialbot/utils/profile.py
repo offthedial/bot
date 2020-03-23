@@ -56,11 +56,6 @@ class Profile:
         return stylepoints
 
     # Utility Methods
-    def read(self):
-        """Update profile from database."""
-        assert not new
-        self.profile = dbh.profiles.find_one(self.id)
-
     def write(self):
         """Write profile to database."""
         return dbh.profiles.replace_one({"_id": self.id}, self.profile, upsert=True)
