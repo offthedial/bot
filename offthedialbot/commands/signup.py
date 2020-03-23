@@ -44,7 +44,7 @@ async def check_prerequisites(ctx):
         profile = None
 
     check = {
-        (lambda: not tourney): "Registration is not open.",
+        (lambda: not tourney or tourney["reg"] is False): "Registration is not open.",
         (lambda: profile and profile.get_banned()):
             "You are currently banned from competing in Off the Dial tournaments.",
         (lambda: profile and profile.get_competing()): "You are already signed up!"
