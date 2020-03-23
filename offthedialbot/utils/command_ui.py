@@ -110,18 +110,18 @@ class CommandUI:
         # Key that determines which check to use for the event
         key = {
             'message': {
-                "check": utils.checks.msg(self.ctx),
+                "check": utils.checks.msg(self.ctx.author, self.ctx.channel),
                 "delete": lambda m: m.delete()
             },
             'reaction_add': {
-                "check": utils.checks.react(self.ctx, self.ui),
+                "check": utils.checks.react(self.ctx.author, self.ui),
                 "delete": lambda r: self.ui.remove_reaction(r[0].emoji, r[1])
             }
         }
         # Create tasks
+        cancel_task: Optional[asyncio.Task] = None
         reply_task: asyncio.Task = asyncio.create_task(
             self.ctx.bot.wait_for(event, check=key[event]["check"]), name="CommandUI.reply_task")
-        cancel_task: Optional[asyncio.Task] = None
 
         # Await tasks
         if kwargs.get("cancel") is False:
@@ -199,7 +199,7 @@ class CommandUI:
         """Create a task that checks if the user canceled the command."""
         return asyncio.create_task(
             self.ctx.bot.wait_for('reaction_add',
-                check=utils.checks.react(self.ctx, self.ui, valids={'❌'}),
+                check=utils.checks.react(self.ctx.author, self.ui, valids={'❌'}),
                 timeout=(timeout if timeout else 180)), name="CommandUI.cancel_task")
 
     @staticmethod

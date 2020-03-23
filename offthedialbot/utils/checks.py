@@ -1,19 +1,19 @@
 """Contains checks used for filtering replies."""
 
 
-def msg(ctx):
+def msg(mem, channel):
     """Check if the message is in the same channel, and is by the same author."""
-    return lambda m: m.channel == ctx.channel and m.author == ctx.author and not m.content.startswith("\\")
+    return lambda m: \
+        m.channel.id == channel.id and m.author.id == mem.id and \
+        not m.content.startswith("\\")  # User wants to escape the bot
 
 
-def react(ctx, message, valids=None):
+def react(mem, message, valids=None):
     """Check if the reaction is on the correct message, and is by the same author."""
     return lambda r, u: \
-        (r.message.id, u.id) == (message.id, ctx.author.id) and \
-        isinstance(r.emoji, str) and \
-        (
-                (valids is None and r.emoji != '❌') or
-                (valids is not None and r.emoji in valids))
+        (r.message.id, u.id) == (message.id, mem.id) and \
+        (r.emoji in valids if valids else r.emoji != '❌') and \
+        (isinstance(r.emoji, str))
 
 
 def member(mem):
