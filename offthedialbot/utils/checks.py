@@ -9,7 +9,7 @@ def msg(ctx):
 def react(ctx, message, valids=None):
     """Check if the reaction is on the correct message, and is by the same author."""
     return lambda r, u: \
-        (r.message.id, u) == (message.id, ctx.author) and \
+        (r.message.id, u.id) == (message.id, ctx.author.id) and \
         isinstance(r.emoji, str) and \
         (
                 (valids is None and r.emoji != '❌') or
