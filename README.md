@@ -20,7 +20,7 @@ This bot was created to help organize Off The Dial's tournaments easier and fast
 2. Create a `config.yml` in the repository root:
    ```
    token: XlcL5cwQ...haJQLQ5G
-   debug (optional): true/false
+   debug (optional): true
    ```
 
 ## Footnote
