@@ -3,3 +3,5 @@ services:
   offthedialbot:
     build: .
     image: offthedialbot:latest
+  mongo:
+    image: mongo
