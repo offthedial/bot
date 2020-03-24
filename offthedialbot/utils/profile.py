@@ -22,8 +22,8 @@ class Profile:
                     "SW": None,
                     "Ranks": {
                         "Splat Zones": None,
-                        "Rainmaker": None,
                         "Tower Control": None,
+                        "Rainmaker": None,
                         "Clam Blitz": None,
                     },
                 },
@@ -125,11 +125,11 @@ class Profile:
     def set_sz(self, sz: Union[int, float]):
         self.profile["status"]["Ranks"]["Splat Zones"] = sz
 
-    def set_rm(self, rm: Union[int, float]):
-        self.profile["status"]["Ranks"]["Rainmaker"] = rm
-
     def set_tc(self, tc: Union[int, float]):
         self.profile["status"]["Ranks"]["Tower Control"] = tc
+
+    def set_rm(self, rm: Union[int, float]):
+        self.profile["status"]["Ranks"]["Rainmaker"] = rm
 
     def set_cb(self, cb: Union[int, float]):
         self.profile["status"]["Ranks"]["Clam Blitz"] = cb
@@ -171,11 +171,11 @@ class Profile:
     def get_sz(self) -> Union[int, float]:
         return self.profile["status"]["Ranks"]["Splat Zones"]
 
-    def get_rm(self) -> Union[int, float]:
-        return self.profile["status"]["Ranks"]["Rainmaker"]
-
     def get_tc(self) -> Union[int, float]:
         return self.profile["status"]["Ranks"]["Tower Control"]
+
+    def get_rm(self) -> Union[int, float]:
+        return self.profile["status"]["Ranks"]["Rainmaker"]
 
     def get_cb(self) -> Union[int, float]:
         return self.profile["status"]["Ranks"]["Clam Blitz"]

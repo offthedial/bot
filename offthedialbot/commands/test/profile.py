@@ -12,8 +12,8 @@ async def main(ctx):
             "SW": '048922225689',
             "Ranks": {
                 "Splat Zones": 1000,
-                "Rainmaker": 2500.0,
                 "Tower Control": 1355.6,
+                "Rainmaker": 2500.0,
                 "Clam Blitz": 1260.8,
             },
         },

@@ -81,8 +81,8 @@ def clean_status_key(profile: utils.Profile, key: str) -> tuple:
         "SW": None,
         "Ranks": {
             "Splat Zones": None,
-            "Rainmaker": None,
             "Tower Control": None,
+            "Rainmaker": None,
             "Clam Blitz": None,
         },
     }
