@@ -3,16 +3,16 @@
 from offthedialbot import env
 
 if env.get("debug"):
-    import mongomock as pymongo
+    from mongomock import MongoClient
 else:
-    import pymongo
+    from pymongo import MongoClient
 
 
 class DatabaseHandler:
     """Custom database handler that works with mongodb."""
 
     def __init__(self):
-        self.client = pymongo.MongoClient("mongodb://localhost:27017/")
+        self.client = MongoClient("mongodb://mongodb:27017/")
         self.db = self.client["offthedialbot"]
 
         # Collections
