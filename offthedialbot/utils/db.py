@@ -12,7 +12,7 @@ class DatabaseHandler:
     """Custom database handler that works with mongodb."""
 
     def __init__(self):
-        self.client = MongoClient("mongodb://mongodb:27017/")
+        self.client = MongoClient("mongodb://mongo:27017/")
         self.db = self.client["offthedialbot"]
 
         # Collections
