@@ -6,7 +6,8 @@ async def on_message(client, message):
     """When a new message is sent."""
     if any({
         locked(client, message),
-        override_commands(client, message)
+        override_commands(client, message),
+        await no_command(client, message)
     }):
         return
 
@@ -28,8 +29,16 @@ def override_commands(client, message):
         return True
 
 
+async def no_command(client, message):
+    """The user isn't looking for a command."""
+    ctx = await client.get_context(message)
+    if ctx is None and not ctx.invoked_with:
+        return True
+
+
 @contextmanager
 def lock_command_access(client, message):
+    """Make sure the user can't call another command while in the middle of one."""
     try:
         client.ongoing_commands[message.channel.id].add(message.author.id)
         yield
