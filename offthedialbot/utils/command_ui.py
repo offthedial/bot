@@ -35,6 +35,13 @@ class CommandUI:
         await ui.add_reaction('❌')
         return ui
 
+    async def get_valid(self, event, /, *args, **kwargs):
+        """Get a reply with validity checks."""
+        return {
+            "message": self.get_valid_message(*args, **kwargs),
+            "reaction_add": self.get_valid_reaction(*args, **kwargs)
+        }[event]
+
     async def get_valid_message(self, valid: Union[str, Callable], error_fields: dict = None, *,
                                 _alert_params=None, **get_reply_params) -> discord.Message:
         """Get message reply with validity checks."""
@@ -140,26 +147,6 @@ class CommandUI:
 
         return reply
 
-    async def update(self) -> None:
-        """Update the ui with new information."""
-        await self.ui.edit(embed=self.embed)
-
-    async def end(self, status: Union[bool, None]) -> None:
-        """End UI interaction and display status."""
-        status_key: dict = {
-            True: discord.Embed(title="Success!", color=utils.Alert.Style.SUCCESS),
-            False: discord.Embed(title="Canceled.", color=utils.Alert.Style.DANGER),
-        }
-        if status_key.get(status):
-            await self.ui.edit(embed=status_key[status])
-            await self.ui.clear_reactions()
-        else:
-            await self.ui.delete()
-        await self.delete_alerts()
-
-        # Raise exception to cancel command
-        raise utils.exc.CommandCancel(status, self)
-
     async def create_alert(self, *args, **kwargs) -> None:
         """Create an alert associated with the command ui."""
         self.alerts.append(await utils.Alert(self.ctx, *args, **kwargs))
@@ -195,12 +182,32 @@ class CommandUI:
                 await self.end(e.status)
             return e
 
+    async def end(self, status: Union[bool, None]) -> None:
+        """End UI interaction and display status."""
+        status_key: dict = {
+            True: discord.Embed(title="Success!", color=utils.Alert.Style.SUCCESS),
+            False: discord.Embed(title="Canceled.", color=utils.Alert.Style.DANGER),
+        }
+        if status_key.get(status):
+            await self.ui.edit(embed=status_key[status])
+            await self.ui.clear_reactions()
+        else:
+            await self.ui.delete()
+        await self.delete_alerts()
+
+        # Raise exception to cancel command
+        raise utils.exc.CommandCancel(status, self)
+
     def create_cancel_task(self, timeout=None) -> asyncio.Task:
         """Create a task that checks if the user canceled the command."""
         return asyncio.create_task(
             self.ctx.bot.wait_for('reaction_add',
                 check=utils.checks.react(self.ctx.author, self.ui, valids={'❌'}),
                 timeout=(timeout if timeout else 180)), name="CommandUI.cancel_task")
+
+    async def update(self) -> None:
+        """Update the ui with new information."""
+        await self.ui.edit(embed=self.embed)
 
     @staticmethod
     def check_valid(valid, reply: Union[discord.Message, discord.Reaction]) -> bool:
