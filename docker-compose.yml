@@ -5,8 +5,10 @@ services:
   offthedialbot:
     build: .
     image: offthedialbot:latest
+    restart: always
 
   mongo:
     image: mongo
+    restart: always
     volumes:
       - ./data/db:/data/db
