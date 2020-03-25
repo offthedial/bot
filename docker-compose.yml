@@ -1,7 +1,12 @@
 version: "3.7"
+
 services:
+
   offthedialbot:
     build: .
     image: offthedialbot:latest
+
   mongo:
     image: mongo
+    volumes:
+      - ./data/db:/data/db
