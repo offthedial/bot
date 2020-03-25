@@ -163,8 +163,8 @@ def parse_reply(key, value):
         return value if len(value) == 12 else False
     elif key == "Ranks":
         value = value.upper()
-        if value in {"C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+", "S", "X"}:  # Standard rank, or default X
-            return utils.Profile.convert_rank_power(value) if value != "X" else 2000.0
+        if value in {"C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+", "S"}:  # Standard rank, or default X
+            return utils.Profile.convert_rank_power(value)
         elif re.search(r"(^S\+\d$)|(^X[1-9]\d{3}(\.\d)?$)", value.upper()):  # S+ or X(power)
             return utils.Profile.convert_rank_power(value)
 
