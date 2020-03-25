@@ -22,7 +22,7 @@ This bot was created to help organize Off The Dial's tournaments easier and fast
    token: XlcL5cwQ...haJQLQ5G
    debug (optional): true
    ```
-3. Run `docker-compose up --build`
+3. Run `docker-compose up --build` in the repository root.
 
 ## Footnote
 Find me - Discord: [`https://discord.gg/faUNrfP`](https://discord.gg/faUNrfP)  
