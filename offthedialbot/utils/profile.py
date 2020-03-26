@@ -156,6 +156,9 @@ class Profile:
         self.profile["meta"]["confirmation_code"] = cc
 
     # Getters
+    def get_id(self) -> int:
+        return self.profile["_id"]
+
     def get_status(self) -> dict:
         return self.profile["status"]
 
