@@ -61,10 +61,10 @@ def new_profiles(reader):
             },
             "stylepoints": eval(row[Column.SP]),
             "cxp": int(row[Column.CXP]),
-            "signal": int(row[Column.SS])
         })
         metaprofiles.append({
             "_id": _id,
+            "signal": int(row[Column.SS]),
             "smashgg": None,
             "banned": None,
             "reg": {

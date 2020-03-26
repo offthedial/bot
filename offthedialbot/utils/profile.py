@@ -16,6 +16,7 @@ class ProfileMeta:
         else:
             self.meta = {
                 "_id": self.id,
+                "signal": 0,
                 "banned": None,
                 "smashgg": None,
                 "reg": {
@@ -35,6 +36,9 @@ class ProfileMeta:
         pass
 
     # Setters
+    def set_ss(self, ss: int):
+        self.meta["signal"] = ss
+
     def set_banned(self, banned: Optional[datetime]):
         self.meta["banned"] = banned
 
@@ -45,6 +49,9 @@ class ProfileMeta:
         self.meta["reg"][key] = value
 
     # Getters
+    def get_ss(self) -> int:
+        return self.meta["signal"]
+
     def get_banned(self) -> Optional[datetime]:
         banned = self.meta["banned"]
         if isinstance(banned, datetime) and datetime.utcnow() < banned:
@@ -80,7 +87,6 @@ class Profile(ProfileMeta):
                 },
                 "stylepoints": [],
                 "cxp": 0,
-                "signal": 0,
             }
         else:
             raise self.NotFound
@@ -167,9 +173,6 @@ class Profile(ProfileMeta):
     def set_cxp(self, cxp: int):
         self.profile["cxp"] = cxp
 
-    def set_ss(self, ss: int):
-        self.profile["signal"] = ss
-
     # Getters
     def get_id(self) -> int:
         return self.profile["_id"]
@@ -188,6 +191,3 @@ class Profile(ProfileMeta):
 
     def get_cxp(self) -> int:
         return self.profile["cxp"]
-
-    def get_ss(self) -> int:
-        return self.profile["signal"]
