@@ -27,7 +27,7 @@ async def check_valid_attendee(ctx, attendee, competing=True):
         (lambda: not profile): f"`{attendee.display_name}` does not own a profile.",
         (lambda: not profile or not profile.get_competing()): f"`{attendee.display_name}` is not competing."
     }
-    if competing:
+    if not competing:
         check.popitem()
 
     if any(values := [value for key, value in check.items() if key()]):
