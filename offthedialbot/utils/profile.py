@@ -70,15 +70,13 @@ class Profile(ProfileMeta):
         elif new:
             self.profile: dict = {
                 "_id": self.id,
-                "status": {
-                    "IGN": None,
-                    "SW": None,
-                    "Ranks": {
-                        "Splat Zones": None,
-                        "Tower Control": None,
-                        "Rainmaker": None,
-                        "Clam Blitz": None,
-                    },
+                "IGN": None,
+                "SW": None,
+                "Ranks": {
+                    "Splat Zones": None,
+                    "Tower Control": None,
+                    "Rainmaker": None,
+                    "Clam Blitz": None,
                 },
                 "stylepoints": [],
                 "cxp": 0,
@@ -154,17 +152,14 @@ class Profile(ProfileMeta):
     }
 
     # Setters
-    def set_status(self, key, value):
-        self.profile["status"][key] = value
-
     def set_ign(self, ign: str):
-        self.profile["status"]["IGN"] = ign
+        self.profile["IGN"] = ign
 
     def set_sw(self, sw: int):
-        self.profile["status"]["SW"] = sw
+        self.profile["SW"] = sw
 
     def set_rank(self, key, rank: Union[int, float]):
-        self.profile["status"]["Ranks"][key] = rank
+        self.profile["Ranks"][key] = rank
 
     def set_stylepoints(self, sp: list):
         self.profile["stylepoints"] = sp
@@ -179,17 +174,14 @@ class Profile(ProfileMeta):
     def get_id(self) -> int:
         return self.profile["_id"]
 
-    def get_status(self) -> dict:
-        return self.profile["status"]
-
     def get_ign(self) -> str:
-        return self.profile["status"]["IGN"]
+        return self.profile["IGN"]
 
     def get_sw(self) -> int:
-        return self.profile["status"]["SW"]
+        return self.profile["SW"]
 
     def get_ranks(self) -> dict:
-        return self.profile["status"]["Ranks"]
+        return self.profile["Ranks"]
 
     def get_stylepoints(self) -> list:
         return self.profile["stylepoints"]
