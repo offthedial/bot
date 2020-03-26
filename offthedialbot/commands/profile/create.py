@@ -53,7 +53,10 @@ async def set_status_field(ui, profile, key, field_index) -> None:
             "description": instructions[key]
         })
     field_value: str = parse_reply(key, reply.content)
-    profile.set_status(key, field_value)
+    if key == "IGN":
+        profile.set_ign(field_value)
+    elif key == "SW":
+        profile.set_sw(field_value)
     ui.embed.set_field_at(field_index, name=key, value=display_field(key, field_value))
 
 
@@ -86,8 +89,8 @@ def clean_status_key(profile: utils.Profile, key: str) -> tuple:
             "Clam Blitz": None,
         },
     }
-    profile.set_status(key, clean_status[key])
-    return key, profile.get_status()[key]
+    profile.profile[key] = clean_status[key]
+    return key, profile.profile[key]
 
 
 async def get_user_stylepoints(ui: utils.CommandUI) -> list:

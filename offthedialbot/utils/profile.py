@@ -55,7 +55,7 @@ class ProfileMeta:
     def get_smashgg(self):
         return self.meta["smashgg"]
 
-    def get_reg(self, key="competing") -> Union[bool, str]:
+    def get_reg(self, key="reg") -> Union[bool, str]:
         return self.meta["reg"][key]
 
 

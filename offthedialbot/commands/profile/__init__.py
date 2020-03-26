@@ -20,7 +20,7 @@ def create_status_embed(name, profile, ss=False) -> discord.Embed:
     )
     if ss:
         embed.description = f"\U0001f4f6 Signal Strength: `{profile.get_ss() if profile.get_ss() != -1 else 'MAX'}`"
-    for key, value in profile.get_status().items():
+    for key, value in [('IGN', profile.get_ign()), ('SW', profile.get_sw()), ('Ranks', profile.get_ranks())]:
         value: str = display_field(key, value)
         embed.add_field(name=key, value=value, inline=True if key != "Ranks" else False)
 

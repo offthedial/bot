@@ -7,15 +7,13 @@ async def main(ctx):
     """Create a mock profile for the user."""
     profile: dict = {
         "_id": ctx.author.id,
-        "status": {
-            "IGN": "Dave",
-            "SW": '048922225689',
-            "Ranks": {
-                "Splat Zones": 2000,
-                "Tower Control": 1355.6,
-                "Rainmaker": 2500.0,
-                "Clam Blitz": 1260.8,
-            },
+        "IGN": "Dave",
+        "SW": '048922225689',
+        "Ranks": {
+            "Splat Zones": 2000,
+            "Tower Control": 1355.6,
+            "Rainmaker": 2500.0,
+            "Clam Blitz": 1260.8,
         },
         "stylepoints": ["flex", "slayer"],  # Groups A, B, and C.
         "cxp": 22,
