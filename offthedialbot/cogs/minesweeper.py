@@ -59,7 +59,7 @@ class Minesweeper(commands.Cog):
             self.size: int = size
             self.difficulty: int = random.randint(1, 10) if difficulty <= 0 else difficulty
 
-            self.ALGORITHM = lambda: (np.cbrt(difficulty) * 0.8) * np.square(self.size) / 13
+            self.ALGORITHM = lambda: (np.cbrt(self.difficulty) * 0.8) * np.square(self.size) / 13
 
         def create_mines(self) -> list:
             """
