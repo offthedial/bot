@@ -142,7 +142,8 @@ class CommandUI:
         if task == cancel_task:
             await self.end(status=False)
         else:
-            await key[event]["delete"](reply)
+            if kwargs.get("delete") is not False:
+                await key[event]["delete"](reply)
             if event.startswith('reaction'):
                 reply = reply[0]
 
