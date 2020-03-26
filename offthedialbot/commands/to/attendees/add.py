@@ -35,10 +35,10 @@ async def main(ctx):
     await ui.end(None)
 
 
-async def on_competing(ctx, attendee, profile, *, reason="attendee isn't competing anymore."):
+async def on_competing(ctx, attendee, profile: utils.ProfileMeta, *, reason="attendee isn't competing anymore."):
     """Add competing to attendee's profile and discord roles."""
     # Profile
-    profile.set_competing(True)
+    profile.set_reg()
     profile.write()
     if attendee:  # Roles
         await attendee.add_roles(

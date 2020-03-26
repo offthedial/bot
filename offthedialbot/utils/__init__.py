@@ -11,4 +11,4 @@ from . import exceptions as exc
 from . import decorators as deco
 from .alert import Alert
 from .command_ui import CommandUI
-from .profile import Profile
+from .profile import Profile, ProfileMeta

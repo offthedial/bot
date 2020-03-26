@@ -113,7 +113,7 @@ async def smashgg(ui, profile, link):
     code = await ui.get_valid_message(r"^#?([A-Za-z0-9]){6}$",
         {"title": "Invalid Confirmation Code", "description": "The code you entered was not valid, please try again."},
         timeout=600)
-    profile.set_cc(code.content)
+    profile.set_reg('code', code.content)
 
 
 async def confirm_signup(ui):
@@ -124,13 +124,13 @@ async def confirm_signup(ui):
     await ui.get_valid_reaction(["\u2705"])
 
 
-async def finalize_signup(ui, profile):
+async def finalize_signup(ui, profile: utils.Profile):
     """Finalize user signup, hand out roles, update profile, etc."""
     # Hand out competing role
     await ui.ctx.author.add_roles(utils.roles.get(ui.ctx, "Competing"))
 
     # Set profile to competing
-    profile.set_competing(True)
+    profile.set_reg()
     profile.write()
 
 

@@ -53,11 +53,11 @@ async def disqualified(ctx, **kwargs):
             await from_competing(ctx, attendee, profile, reason=disq[0][1])
 
 
-async def from_competing(ctx, attendee, profile, *, reason="attendee isn't competing anymore."):
+async def from_competing(ctx, attendee, profile: utils.ProfileMeta, *, reason="attendee isn't competing anymore."):
     """Remove competing from attendee's profile and discord roles."""
     # Profile
-    profile.set_competing(False)
-    profile.set_cc(None)
+    profile.set_reg(value=False)
+    profile.set_reg("code", None)
     profile.write()
     if attendee:  # Roles
         await attendee.remove_roles(
