@@ -37,10 +37,11 @@ class CommandUI:
 
     async def get_valid(self, event, /, *args, **kwargs):
         """Get a reply with validity checks."""
-        return {
-            "message": self.get_valid_message(*args, **kwargs),
-            "reaction_add": self.get_valid_reaction(*args, **kwargs)
+        coro = {
+            "message": lambda: self.get_valid_message(*args, **kwargs),
+            "reaction_add": lambda: self.get_valid_reaction(*args, **kwargs)
         }[event]
+        return await coro()
 
     async def get_valid_message(self, valid: Union[str, Callable], error_fields: dict = None, *,
                                 _alert_params=None, **get_reply_params) -> discord.Message:
