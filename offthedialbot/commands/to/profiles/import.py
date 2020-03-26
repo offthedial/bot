@@ -21,7 +21,7 @@ async def main(ctx):
 
     async with ctx.typing():
 
-        reader = csv.reader(await   create_file(reply))
+        reader = csv.reader(await create_file(reply))
         await reply.delete()
         utils.dbh.profiles.insert_many(new_profiles(reader))
 
