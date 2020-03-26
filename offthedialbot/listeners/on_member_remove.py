@@ -12,12 +12,10 @@ async def on_member_remove(client, member):
 
 
 async def warn_if_competing(member):
-    try:
-        profile = utils.Profile(member.id)
+    """Warn the user if they are still registered."""
+    profile = utils.ProfileMeta(member.id)
 
-    except utils.Profile.NotFound:
-        return
-    if not (profile.get_competing() and not profile.get_banned()):
+    if not (profile.get_reg() and not profile.get_banned()):
         return
     if not ((tourney := utils.dbh.get_tourney()) and tourney["reg"]):
         return

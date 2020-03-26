@@ -1,41 +1,86 @@
 """Contains Profile class."""
 from datetime import datetime
-from typing import Union
+from typing import Union, Optional
 
 from offthedialbot.utils import dbh
 
 
-class Profile:
+class ProfileMeta:
+    """Contains profile metadata uneditable to the user."""
+
+    def __init__(self, _id):
+        self.id = _id
+
+        if meta := dbh.metaprofiles.find_one(self.id):
+            self.meta = meta
+        else:
+            self.meta = {
+                "_id": self.id,
+                "banned": None,
+                "smashgg": None,
+                "reg": {
+                    "reg": False,
+                    "code": None,
+                }
+            }
+            dbh.metaprofiles.insert_one(self.meta)
+
+    # Utility Methods
+    def write(self):
+        """Write profile to database."""
+        return dbh.metaprofiles.replace_one({"_id": self.id}, self.meta, upsert=True)
+
+    class NotFound(Exception):
+        """Database doesn't return a profile."""
+        pass
+
+    # Setters
+    def set_banned(self, banned: Optional[datetime]):
+        self.meta["banned"] = banned
+
+    def set_smashgg(self, smashgg):
+        self.meta["smashgg"] = smashgg
+
+    def set_reg(self, key="reg", value: Union[bool, Optional[str]] = True):
+        self.meta["reg"][key] = value
+
+    # Getters
+    def get_banned(self) -> Optional[datetime]:
+        banned = self.meta["banned"]
+        if isinstance(banned, datetime) and datetime.utcnow() < banned:
+            return banned
+        elif banned is True:
+            return banned
+
+    def get_smashgg(self):
+        return self.meta["smashgg"]
+
+    def get_reg(self, key="reg") -> Union[bool, str]:
+        return self.meta["reg"][key]
+
+
+class Profile(ProfileMeta):
     """Wraps the DatabaseHandler and provides extra functionality for dealing with profiles."""
 
     def __init__(self, _id, new=False):
-        self.id = _id
-        self.new = new
+        super().__init__(_id)
 
         if profile := dbh.profiles.find_one(self.id):
             self.profile = profile
         elif new:
             self.profile: dict = {
-                "_id": _id,
-                "status": {
-                    "IGN": None,
-                    "SW": None,
-                    "Ranks": {
-                        "Splat Zones": None,
-                        "Tower Control": None,
-                        "Rainmaker": None,
-                        "Clam Blitz": None,
-                    },
+                "_id": self.id,
+                "IGN": None,
+                "SW": None,
+                "Ranks": {
+                    "Splat Zones": None,
+                    "Tower Control": None,
+                    "Rainmaker": None,
+                    "Clam Blitz": None,
                 },
                 "stylepoints": [],
                 "cxp": 0,
-                "signal_strength": 0,
-                "meta": {
-                    "competing": False,
-                    "smashgg": None,
-                    "banned": None,
-                    "confirmation_code": None,
-                }
+                "signal": 0,
             }
         else:
             raise self.NotFound
@@ -43,7 +88,7 @@ class Profile:
     # Profile Methods
     def calculate_elo(self) -> float:
         """Calculate the user's ELO."""
-        rank_powers = [rank for rank in self.profile["status"]["Ranks"].values()]
+        rank_powers = [rank for rank in self.profile["Ranks"].values()]
         return round(sum(rank_powers) / len(rank_powers), 1)
 
     def calculate_stylepoints(self, user_playstyles: list) -> list:
@@ -58,6 +103,7 @@ class Profile:
     # Utility Methods
     def write(self):
         """Write profile to database."""
+        super().write()
         return dbh.profiles.replace_one({"_id": self.id}, self.profile, upsert=True)
 
     @staticmethod
@@ -105,34 +151,15 @@ class Profile:
         "support": (0, 0, 0),
     }
 
-    class NotFound(Exception):
-        """Database doesn't return a profile."""
-        pass
-
     # Setters
-    def set_status(self, key, value):
-        self.profile["status"][key] = value
-
     def set_ign(self, ign: str):
-        self.profile["status"]["IGN"] = ign
+        self.profile["IGN"] = ign
 
     def set_sw(self, sw: int):
-        self.profile["status"]["SW"] = sw
+        self.profile["SW"] = sw
 
     def set_rank(self, key, rank: Union[int, float]):
-        self.profile["status"]["Ranks"][key] = rank
-
-    def set_sz(self, sz: Union[int, float]):
-        self.profile["status"]["Ranks"]["Splat Zones"] = sz
-
-    def set_tc(self, tc: Union[int, float]):
-        self.profile["status"]["Ranks"]["Tower Control"] = tc
-
-    def set_rm(self, rm: Union[int, float]):
-        self.profile["status"]["Ranks"]["Rainmaker"] = rm
-
-    def set_cb(self, cb: Union[int, float]):
-        self.profile["status"]["Ranks"]["Clam Blitz"] = cb
+        self.profile["Ranks"][key] = rank
 
     def set_stylepoints(self, sp: list):
         self.profile["stylepoints"] = sp
@@ -141,47 +168,20 @@ class Profile:
         self.profile["cxp"] = cxp
 
     def set_ss(self, ss: int):
-        self.profile["signal_strength"] = ss
-
-    def set_competing(self, competing: bool):
-        self.profile["meta"]["competing"] = competing
-
-    def set_smashgg(self, smashgg):
-        self.profile["meta"]["smashgg"] = smashgg
-
-    def set_banned(self, banned: Union[None, datetime]):
-        self.profile["meta"]["banned"] = banned
-
-    def set_cc(self, cc: str):
-        self.profile["meta"]["confirmation_code"] = cc
+        self.profile["signal"] = ss
 
     # Getters
     def get_id(self) -> int:
         return self.profile["_id"]
 
-    def get_status(self) -> dict:
-        return self.profile["status"]
-
     def get_ign(self) -> str:
-        return self.profile["status"]["IGN"]
+        return self.profile["IGN"]
 
     def get_sw(self) -> int:
-        return self.profile["status"]["SW"]
+        return self.profile["SW"]
 
     def get_ranks(self) -> dict:
-        return self.profile["status"]["Ranks"]
-
-    def get_sz(self) -> Union[int, float]:
-        return self.profile["status"]["Ranks"]["Splat Zones"]
-
-    def get_tc(self) -> Union[int, float]:
-        return self.profile["status"]["Ranks"]["Tower Control"]
-
-    def get_rm(self) -> Union[int, float]:
-        return self.profile["status"]["Ranks"]["Rainmaker"]
-
-    def get_cb(self) -> Union[int, float]:
-        return self.profile["status"]["Ranks"]["Clam Blitz"]
+        return self.profile["Ranks"]
 
     def get_stylepoints(self) -> list:
         return self.profile["stylepoints"]
@@ -190,20 +190,4 @@ class Profile:
         return self.profile["cxp"]
 
     def get_ss(self) -> int:
-        return self.profile["signal_strength"]
-
-    def get_competing(self) -> bool:
-        return self.profile["meta"]["competing"]
-
-    def get_smashgg(self):
-        return self.profile["meta"]["smashgg"]
-
-    def get_banned(self) -> Union[None, datetime]:
-        banned = self.profile["meta"]["banned"]
-        if isinstance(banned, datetime) and datetime.utcnow() < banned:
-            return banned
-        elif banned is True:
-            return banned
-
-    def get_cc(self) -> str:
-        return self.profile["meta"]["confirmation_code"]
+        return self.profile["signal"]

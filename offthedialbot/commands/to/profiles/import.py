@@ -24,7 +24,10 @@ async def main(ctx):
 
         reader = csv.reader(await create_file(reply))
         await reply.delete()
-        utils.dbh.profiles.insert_many(new_profiles(reader))
+
+        profiles, metaprofiles = new_profiles(reader)
+        utils.dbh.profiles.insert_many(profiles)
+        utils.dbh.metaprofiles.insert_many(metaprofiles)
 
     await ui.end(True)
 
@@ -40,6 +43,7 @@ async def create_file(reply):
 def new_profiles(reader):
     """Return a list of profiles from csv reader."""
     profiles = []
+    metaprofiles = []
 
     for i, row in enumerate(reader):
         if (_id := skip(i, row)) is True:
@@ -47,27 +51,28 @@ def new_profiles(reader):
 
         profiles.append({
             "_id": _id,
-            "status": {
-                "IGN": row[Column.IGN],
-                "SW": parse_reply('SW', row[Column.SW]),
-                "Ranks": {
-                    "Splat Zones": parse_reply('Ranks', row[Column.SZ]),
-                    "Tower Control": parse_reply('Ranks', row[Column.TC]),
-                    "Rainmaker": parse_reply('Ranks', row[Column.RM]),
-                    "Clam Blitz": parse_reply('Ranks', row[Column.CB]),
-                },
+            "IGN": row[Column.IGN],
+            "SW": parse_reply('SW', row[Column.SW]),
+            "Ranks": {
+                "Splat Zones": parse_reply('Ranks', row[Column.SZ]),
+                "Tower Control": parse_reply('Ranks', row[Column.TC]),
+                "Rainmaker": parse_reply('Ranks', row[Column.RM]),
+                "Clam Blitz": parse_reply('Ranks', row[Column.CB]),
             },
             "stylepoints": eval(row[Column.SP]),
             "cxp": int(row[Column.CXP]),
-            "signal_strength": int(row[Column.SS]),
-            "meta": {
-                "competing": False,
-                "smashgg": None,
-                "banned": None,
-                "confirmation_code": None,
+            "signal": int(row[Column.SS])
+        })
+        metaprofiles.append({
+            "_id": _id,
+            "smashgg": None,
+            "banned": None,
+            "reg": {
+                "reg": False,
+                "code": None,
             }
         })
-    return profiles
+    return profiles, metaprofiles
 
 
 def skip(i, row):

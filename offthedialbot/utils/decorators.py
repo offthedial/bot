@@ -26,11 +26,8 @@ def profile_required(reverse=False, competing=False):
         def deco(command):
             @wraps(command)
             async def _(*args):
-                try:
-                    profile = utils.Profile(args[-1].author.id)
-                except utils.Profile.NotFound:
-                    profile = None
-                if profile and profile.get_competing():
+                profile = utils.ProfileMeta(args[-1].author.id)
+                if profile.get_reg():
                     await command(*args)
                 else:
                     await utils.Alert(args[-1], utils.Alert.Style.DANGER,

@@ -22,10 +22,10 @@ async def check_valid_attendee(ctx, attendee, competing=True):
     try:
         profile = utils.Profile(attendee.id)
     except utils.Profile.NotFound:
-        profile = None
+        profile = utils.ProfileMeta(attendee.id)
     check = {
         (lambda: not profile): f"`{attendee.display_name}` does not own a profile.",
-        (lambda: not profile or not profile.get_competing()): f"`{attendee.display_name}` is not competing."
+        (lambda: not profile.get_reg()): f"`{attendee.display_name}` is not competing."
     }
     if not competing:
         check.popitem()
@@ -37,4 +37,4 @@ async def check_valid_attendee(ctx, attendee, competing=True):
     return profile
 
 
-from . import ban, export, remove
+from . import export, remove

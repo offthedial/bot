@@ -41,13 +41,13 @@ async def check_prerequisites(ctx):
     try:
         profile = utils.Profile(ctx.author.id)
     except utils.Profile.NotFound:
-        profile = None
+        profile = utils.ProfileMeta(ctx.author.id)
 
     check = {
         (lambda: not tourney or tourney["reg"] is False): "Registration is not open.",
         (lambda: profile and profile.get_banned()):
             "You are currently banned from competing in Off the Dial tournaments.",
-        (lambda: profile and profile.get_competing()): "You are already signed up!"
+        (lambda: profile and profile.get_reg()): "You are already signed up!"
     }
     if any(values := [value for key, value in check.items() if key()]):
         await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Registration Failed.", description=values[0])
@@ -65,7 +65,7 @@ async def accepted_rules(ui, rules):
 
 async def profile_uptodate(ui, profile):
     """Make sure the user's has a profile, and it is updated."""
-    if not profile:
+    if isinstance(profile, utils.ProfileMeta):
         ui.embed.title = "A profile is required to compete. To create one and proceed, select \u2705."
         ui.embed.description = "Your profile will be saved for future use."
         await ui.get_valid_reaction(["\u2705"])
@@ -113,7 +113,7 @@ async def smashgg(ui, profile, link):
     code = await ui.get_valid_message(r"^#?([A-Za-z0-9]){6}$",
         {"title": "Invalid Confirmation Code", "description": "The code you entered was not valid, please try again."},
         timeout=600)
-    profile.set_cc(code.content)
+    profile.set_reg('code', code.content)
 
 
 async def confirm_signup(ui):
@@ -124,13 +124,13 @@ async def confirm_signup(ui):
     await ui.get_valid_reaction(["\u2705"])
 
 
-async def finalize_signup(ui, profile):
+async def finalize_signup(ui, profile: utils.Profile):
     """Finalize user signup, hand out roles, update profile, etc."""
     # Hand out competing role
     await ui.ctx.author.add_roles(utils.roles.get(ui.ctx, "Competing"))
 
     # Set profile to competing
-    profile.set_competing(True)
+    profile.set_reg()
     profile.write()
 
 

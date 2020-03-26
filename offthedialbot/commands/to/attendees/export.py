@@ -29,25 +29,25 @@ def create_file(ctx, rows):
     csv_profiles = []
 
     for attendee, profile in rows:
-        sw = profile.get_status()['SW']
+        sw = profile.get_sw()
         csv_profiles.append([
             f'@{attendee.name}#{attendee.discriminator}' if attendee else "NOT-FOUND",
-            profile.get_status()["IGN"],
+            profile.get_ign(),
             f"SW-{sw[:4]}-{sw[4:8]}-{sw[8:]}",
             *[profile.convert_rank_power(rank) for rank in profile.get_ranks().values()],
             profile.calculate_elo(),
             profile.get_stylepoints(),
             profile.get_cxp(),
             profile.get_ss(),
-            profile.get_competing(),
             profile.get_banned(),
-            profile.get_cc(),
+            profile.get_reg(),
+            profile.get_reg('code'),
             f"<@{profile.get_id()}>"
         ])
     csv_profiles.sort(key=lambda row: row[7])
 
     writer.writerows([["Discord Mention", "IGN", "SW", "SZ", "TC", "RM", "CB", "Cumulative ELO", "Stylepoints", "CXP",
-                       "Signal Strength", "Competing", "Banned", "Confirmation Code", "Discord ID"], []] + csv_profiles)
+                       "Signal Strength", "Banned", "Competing", "Confirmation Code", "Discord ID"], []] + csv_profiles)
     file.seek(0)
     return discord.File(file, filename="profiles.csv")
 
