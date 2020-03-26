@@ -70,7 +70,7 @@ def new_profiles(reader):
             "smashgg": None,
             "banned": None,
             "reg": {
-                "competing": False,
+                "reg": False,
                 "code": None,
             }
         })

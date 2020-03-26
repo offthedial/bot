@@ -11,7 +11,7 @@ async def main(ctx):
             "IGN": "Dave",
             "SW": '048922225689',
             "Ranks": {
-                "Splat Zones": 1000,
+                "Splat Zones": 2000,
                 "Tower Control": 1355.6,
                 "Rainmaker": 2500.0,
                 "Clam Blitz": 1260.8,
@@ -26,7 +26,7 @@ async def main(ctx):
         "banned": None,
         "smashgg": None,
         "reg": {
-            "competing": False,
+            "reg": False,
             "code": None
         }
     }
