@@ -2,6 +2,7 @@
 from offthedialbot import utils
 
 
+@utils.deco.require_role("Developer")
 async def main(ctx):
     profiles = utils.dbh.profiles.find({})
 
