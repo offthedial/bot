@@ -37,4 +37,4 @@ async def check_valid_attendee(ctx, attendee, competing=True):
     return profile
 
 
-from . import ban, export, remove
+from . import export, remove
