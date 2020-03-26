@@ -7,6 +7,7 @@ import aiohttp
 import discord
 
 from offthedialbot import utils
+from offthedialbot.commands.profile.create import parse_reply
 
 
 async def main(ctx):
@@ -45,15 +46,15 @@ def new_profiles(reader):
             continue
 
         profiles.append({
-            "_id": _id,
+            "_id": _id[2:-1],
             "status": {
                 "IGN": row[Column.IGN],
-                "SW": eval(row[Column.SW]),
+                "SW": parse_reply('SW', row[Column.SW]),
                 "Ranks": {
-                    "Splat Zones": utils.Profile.convert_rank_power(row[Column.SZ]),
-                    "Tower Control": utils.Profile.convert_rank_power(row[Column.TC]),
-                    "Rainmaker": utils.Profile.convert_rank_power(row[Column.RM]),
-                    "Clam Blitz": utils.Profile.convert_rank_power(row[Column.CB]),
+                    "Splat Zones": parse_reply('Ranks', row[Column.SZ]),
+                    "Tower Control": parse_reply('Ranks', row[Column.TC]),
+                    "Rainmaker": parse_reply('Ranks', row[Column.RM]),
+                    "Clam Blitz": parse_reply('Ranks', row[Column.CB]),
                 },
             },
             "stylepoints": eval(row[Column.SP]),
