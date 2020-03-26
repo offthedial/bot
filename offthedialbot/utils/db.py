@@ -17,6 +17,7 @@ class DatabaseHandler:
 
         # Collections
         self.profiles = self.db["profiles"]
+        self.metaprofiles = self.db["metaprofiles"]
         self.to = self.db["to"]
         self.timers = self.db["timers"]
 
