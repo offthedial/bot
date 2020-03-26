@@ -33,3 +33,5 @@ async def main(ctx):
     utils.dbh.metaprofiles.remove({})
     utils.dbh.profiles.insert_many(ps)
     utils.dbh.metaprofiles.insert_many(mps)
+
+    await utils.Alert(ctx, utils.Alert.Style.SUCCESS, title="Mutate complete.", description="Remove this command as soon as possible")
