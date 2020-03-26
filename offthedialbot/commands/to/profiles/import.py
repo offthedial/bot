@@ -61,7 +61,7 @@ def new_profiles(reader):
             },
             "stylepoints": eval(row[Column.SP]),
             "cxp": int(row[Column.CXP]),
-            "signal_strength": int(row[Column.SS])
+            "signal": int(row[Column.SS])
         })
         metaprofiles.append({
             "_id": _id,

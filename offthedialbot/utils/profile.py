@@ -80,7 +80,7 @@ class Profile(ProfileMeta):
                 },
                 "stylepoints": [],
                 "cxp": 0,
-                "signal_strength": 0,
+                "signal": 0,
             }
         else:
             raise self.NotFound
@@ -168,7 +168,7 @@ class Profile(ProfileMeta):
         self.profile["cxp"] = cxp
 
     def set_ss(self, ss: int):
-        self.profile["signal_strength"] = ss
+        self.profile["signal"] = ss
 
     # Getters
     def get_id(self) -> int:
@@ -190,4 +190,4 @@ class Profile(ProfileMeta):
         return self.profile["cxp"]
 
     def get_ss(self) -> int:
-        return self.profile["signal_strength"]
+        return self.profile["signal"]

@@ -17,7 +17,7 @@ async def main(ctx):
         },
         "stylepoints": ["flex", "slayer"],  # Groups A, B, and C.
         "cxp": 22,
-        "signal_strength": 150,
+        "signal": 150,
     }
     profilemeta: dict = {
         "_id": ctx.author.id,
