@@ -51,15 +51,13 @@ def new_profiles(reader):
 
         profiles.append({
             "_id": _id,
-            "status": {
-                "IGN": row[Column.IGN],
-                "SW": parse_reply('SW', row[Column.SW]),
-                "Ranks": {
-                    "Splat Zones": parse_reply('Ranks', row[Column.SZ]),
-                    "Tower Control": parse_reply('Ranks', row[Column.TC]),
-                    "Rainmaker": parse_reply('Ranks', row[Column.RM]),
-                    "Clam Blitz": parse_reply('Ranks', row[Column.CB]),
-                },
+            "IGN": row[Column.IGN],
+            "SW": parse_reply('SW', row[Column.SW]),
+            "Ranks": {
+                "Splat Zones": parse_reply('Ranks', row[Column.SZ]),
+                "Tower Control": parse_reply('Ranks', row[Column.TC]),
+                "Rainmaker": parse_reply('Ranks', row[Column.RM]),
+                "Clam Blitz": parse_reply('Ranks', row[Column.CB]),
             },
             "stylepoints": eval(row[Column.SP]),
             "cxp": int(row[Column.CXP]),

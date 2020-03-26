@@ -88,7 +88,7 @@ class Profile(ProfileMeta):
     # Profile Methods
     def calculate_elo(self) -> float:
         """Calculate the user's ELO."""
-        rank_powers = [rank for rank in self.profile["status"]["Ranks"].values()]
+        rank_powers = [rank for rank in self.profile["Ranks"].values()]
         return round(sum(rank_powers) / len(rank_powers), 1)
 
     def calculate_stylepoints(self, user_playstyles: list) -> list:
