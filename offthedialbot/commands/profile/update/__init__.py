@@ -7,8 +7,14 @@ from .. import create, display_field, create_status_embed
 async def main(ctx):
     """Update your profile."""
     profile: utils.Profile = utils.Profile(ctx.author.id)
-    embed, emojis = create_update_embed(ctx, profile)
+    await update_profile(ctx, profile)
 
+
+async def update_profile(ctx, profile, title=None):
+    """Update profile given profile."""
+    embed, emojis = create_update_embed(ctx, profile)
+    if title:
+        embed.title = title
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
 
     reply = await ui.get_valid_reaction(emojis)
