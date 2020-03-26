@@ -13,7 +13,7 @@ async def main(ctx):
 
     reply = await ui.get_valid_reaction(emojis)
     index: int = emojis.index(reply.emoji)
-    field = create.clean_status_key(profile, list(profile.get_status().keys())[index])
+    field = create.clean_status_key(profile, ['IGN', 'SW', 'Ranks'][index])
     await wait_profile_field(ui, profile, index, field)
 
 

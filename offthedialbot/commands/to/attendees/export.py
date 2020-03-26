@@ -29,10 +29,10 @@ def create_file(ctx, rows):
     csv_profiles = []
 
     for attendee, profile in rows:
-        sw = profile.get_status()['SW']
+        sw = profile.get_sw()
         csv_profiles.append([
             f'@{attendee.name}#{attendee.discriminator}' if attendee else "NOT-FOUND",
-            profile.get_status()["IGN"],
+            profile.get_ign(),
             f"SW-{sw[:4]}-{sw[4:8]}-{sw[8:]}",
             *[profile.convert_rank_power(rank) for rank in profile.get_ranks().values()],
             profile.calculate_elo(),

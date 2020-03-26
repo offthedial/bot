@@ -27,7 +27,7 @@ async def main(ctx):
 
 async def set_user_status(ui: utils.CommandUI, profile: utils.Profile) -> utils.Profile:
     """Get valid message for each rank."""
-    for index, key in enumerate(profile.get_status().keys()):
+    for index, key in enumerate(['IGN', 'SW', 'Ranks']):
         clean_status_key(profile, key)
 
         if key != "Ranks":
