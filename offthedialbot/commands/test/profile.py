@@ -20,15 +20,19 @@ async def main(ctx):
         "stylepoints": ["flex", "slayer"],  # Groups A, B, and C.
         "cxp": 22,
         "signal_strength": 150,
-        "meta": {
+    }
+    profilemeta: dict = {
+        "_id": ctx.author.id,
+        "banned": None,
+        "smashgg": None,
+        "reg": {
             "competing": False,
-            "smashgg": None,
-            "banned": None,
-            "confirmation_code": None,
+            "code": None
         }
     }
-
     utils.dbh.profiles.replace_one({"_id": ctx.author.id}, profile, upsert=True)
+    utils.dbh.metaprofiles.replace_one({"_id": ctx.author.id}, profilemeta, upsert=True)
+
     await utils.Alert(
         ctx, utils.Alert.Style.SUCCESS,
         title="Created mock profile", description="Located under name: `Dave`"
