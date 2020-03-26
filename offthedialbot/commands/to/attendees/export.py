@@ -29,10 +29,11 @@ def create_file(ctx, rows):
     csv_profiles = []
 
     for attendee, profile in rows:
+        sw = profile.get_status()['SW']
         csv_profiles.append([
             f'@{attendee.name}#{attendee.discriminator}' if attendee else "NOT-FOUND",
             profile.get_status()["IGN"],
-            f"'{profile.get_status()['SW']}'",
+            f"SW-{sw[:4]}-{sw[4:8]}-{sw[8:]}",
             *[profile.convert_rank_power(rank) for rank in profile.get_ranks().values()],
             profile.calculate_elo(),
             profile.get_stylepoints(),
@@ -41,7 +42,7 @@ def create_file(ctx, rows):
             profile.get_competing(),
             profile.get_banned(),
             profile.get_cc(),
-            f"'{attendee.id}'" if attendee else "NOT-FOUND"
+            f"<@{profile.get_id()}>"
         ])
     csv_profiles.sort(key=lambda row: row[7])
 
