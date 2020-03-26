@@ -19,7 +19,7 @@ class ProfileMeta:
                 "banned": None,
                 "smashgg": None,
                 "reg": {
-                    "competing": False,
+                    "reg": False,
                     "code": None,
                 }
             }
@@ -41,7 +41,7 @@ class ProfileMeta:
     def set_smashgg(self, smashgg):
         self.meta["smashgg"] = smashgg
 
-    def set_reg(self, key="competing", value: Union[bool, Optional[str]] = True):
+    def set_reg(self, key="reg", value: Union[bool, Optional[str]] = True):
         self.meta["reg"][key] = value
 
     # Getters
