@@ -46,7 +46,7 @@ def new_profiles(reader):
             continue
 
         profiles.append({
-            "_id": _id[2:-1],
+            "_id": _id,
             "status": {
                 "IGN": row[Column.IGN],
                 "SW": parse_reply('SW', row[Column.SW]),
@@ -75,7 +75,7 @@ def skip(i, row):
     if i < 2:
         return True
     try:
-        _id = int(eval(row[Column.ID]))
+        _id = int(row[Column.ID][2:-1])
     except NameError:
         return True
     else:
