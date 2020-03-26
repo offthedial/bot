@@ -2,7 +2,7 @@
 import discord
 
 from offthedialbot import utils
-from . import check_valid_attendee, remove
+from ..attendees import remove
 
 
 @utils.deco.require_role("Organiser")
@@ -18,9 +18,7 @@ async def main(ctx):
 
     for attendee in reply.mentions:
 
-        # Check to make sure the attendee is valid
-        if not (profile := await check_valid_attendee(ctx, attendee, competing=False)):
-            continue
+        profile = utils.ProfileMeta(attendee.id)
 
         until = await set_ban_length(ui, profile)
         await remove_smashgg(ui, attendee)
