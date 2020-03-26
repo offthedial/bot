@@ -41,13 +41,13 @@ async def check_prerequisites(ctx):
     try:
         profile = utils.Profile(ctx.author.id)
     except utils.Profile.NotFound:
-        profile = None
+        profile = utils.ProfileMeta(ctx.author.id)
 
     check = {
         (lambda: not tourney or tourney["reg"] is False): "Registration is not open.",
         (lambda: profile and profile.get_banned()):
             "You are currently banned from competing in Off the Dial tournaments.",
-        (lambda: profile and profile.get_competing()): "You are already signed up!"
+        (lambda: profile and profile.get_reg()): "You are already signed up!"
     }
     if any(values := [value for key, value in check.items() if key()]):
         await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Registration Failed.", description=values[0])

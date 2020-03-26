@@ -16,7 +16,7 @@ def create_status_embed(name, profile, ss=False) -> discord.Embed:
     """Create profile embed to display user profile."""
     embed: discord.Embed = discord.Embed(
         title=f"{name}'s Status",
-        color=utils.colors.DIALER if not profile.get_competing() else utils.colors.COMPETING
+        color=utils.colors.DIALER if not profile.get_reg() else utils.colors.COMPETING
     )
     if ss:
         embed.description = f"\U0001f4f6 Signal Strength: `{profile.get_ss() if profile.get_ss() != -1 else 'MAX'}`"

@@ -21,13 +21,13 @@ async def add_roles(client, member):
     try:
         profile = utils.Profile(member.id)
     except utils.Profile.NotFound:
-        profile = None
+        profile = utils.ProfileMeta(member.id)
 
     roles = [
         utils.roles.dialer(client),
         utils.roles.alerts(client)
     ]
-    if profile and profile.get_competing():
+    if profile.get_reg():
         roles.append(utils.roles.get(member, "Competing"))
 
     await member.add_roles(*roles)
