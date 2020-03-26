@@ -65,7 +65,7 @@ async def accepted_rules(ui, rules):
 
 async def profile_uptodate(ui, profile):
     """Make sure the user's has a profile, and it is updated."""
-    if not profile:
+    if isinstance(profile, utils.ProfileMeta):
         ui.embed.title = "A profile is required to compete. To create one and proceed, select \u2705."
         ui.embed.description = "Your profile will be saved for future use."
         await ui.get_valid_reaction(["\u2705"])
