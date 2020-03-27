@@ -127,19 +127,15 @@ class CommandUI:
             }
         }
         # Create tasks
-        cancel_task: Optional[asyncio.Task] = None
-        reply_task: asyncio.Task = asyncio.create_task(
-            self.ctx.bot.wait_for(event, check=key[event]["check"]), name="CommandUI.reply_task")
+        reply_task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]), name="CommandUI.reply_task")
+        cancel_task = self.create_cancel_task() if kwargs.get("cancel", True) else None
 
         # Await tasks
-        if kwargs.get("cancel") is False:
-            task, reply = await self.wait_tasks({reply_task})
-        else:
-            cancel_task = self.create_cancel_task(kwargs.get("timeout"))
-            task, reply = await self.wait_tasks({reply_task, cancel_task})
+        tasks = {reply_task, cancel_task} if cancel_task else {reply_task}
+        task, reply = await self.wait_tasks(tasks, kwargs.get("timeout", 180))
 
         # Get result
-        if task == cancel_task:
+        if task in (None, cancel_task):
             await self.end(status=False)
         else:
             if kwargs.get("delete") is not False:
@@ -200,12 +196,12 @@ class CommandUI:
         # Raise exception to cancel command
         raise utils.exc.CommandCancel(status, self)
 
-    def create_cancel_task(self, timeout=None) -> asyncio.Task:
+    def create_cancel_task(self) -> asyncio.Task:
         """Create a task that checks if the user canceled the command."""
         return asyncio.create_task(
             self.ctx.bot.wait_for('reaction_add',
-                check=utils.checks.react(self.ctx.author, self.ui, valids={'❌'}),
-                timeout=(timeout if timeout else 180)), name="CommandUI.cancel_task")
+                check=utils.checks.react(self.ctx.author, self.ui, valids={'❌'})),
+            name="CommandUI.cancel_task")
 
     async def update(self) -> None:
         """Update the ui with new information."""
@@ -226,32 +222,18 @@ class CommandUI:
                 return False
 
     @classmethod
-    async def wait_tasks(cls, tasks: Set[asyncio.Task]) -> Tuple[asyncio.Future, Any]:
-        """Try block to asyncio.wait a set of tasks with timeout handling, and return the first completed."""
-        # Shortcut for 1-task sets
-        if len(tasks) == 1:
-            task = tasks.pop()
-            return task, await cls.wait_task(task)
+    async def wait_tasks(cls, tasks: Set[asyncio.Task], timeout=None) -> Tuple[Optional[asyncio.Future], Optional[Any]]:
+        """
+        Try block to asyncio.wait a set of tasks with timeout handling.
 
-        done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
-        task: asyncio.Future = done.pop()
+        :return: A tuple containing the task and the result. Both will be None if a timeout occurs.
+        """
+        done, pending = await asyncio.wait(tasks, timeout=timeout, return_when=asyncio.FIRST_COMPLETED)
+        for rest in pending:
+            rest.cancel()
 
-        # Get reply
-        try:
-            reply = task.result()
-        except asyncio.TimeoutError:
-            reply = None
-        finally:
-            # Cancel the other still pending tasks
-            for rest in pending:
-                rest.cancel()
+        if done:
+            task: asyncio.Future = done.pop()
+            return task, task.result()
 
-        return task, reply
-
-    @staticmethod
-    async def wait_task(task: Union[asyncio.Task, asyncio.Future]):
-        """Try block to wait a singular task with timeout handling."""
-        try:
-            return await task
-        except asyncio.TimeoutError:
-            return None
+        return None, None
