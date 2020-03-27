@@ -4,34 +4,17 @@ from offthedialbot import utils
 
 @utils.deco.require_role("Developer")
 async def main(ctx):
-    profiles = utils.dbh.profiles.find({})
-
-    ps = []
-    mps = []
-
+    profiles = utils.dbh.profiles.find({}, {"_id": True})
     for profile in profiles:
+        pid = profile["_id"]
+        metaprofile = utils.dbh.metaprofiles.find_one({"_id": pid})
 
-        ps.append({
-            "_id": profile["_id"],
-            "IGN": profile["status"]["IGN"],
-            "SW": profile["status"]["SW"],
-            "Ranks": profile["status"]["Ranks"],
-            "stylepoints": profile["stylepoints"],
-            "cxp": profile["cxp"],
-            "signal": profile["signal_strength"],
-        })
-        mps.append({
-            "_id": profile["_id"],
-            "banned": profile["meta"]["banned"],
-            "smashgg": profile["meta"]["smashgg"],
-            "reg": {
-                "reg": profile["meta"]["competing"],
-                "code": profile["meta"]["confirmation_code"],
-            }
-        })
-    utils.dbh.profiles.remove({})
-    utils.dbh.metaprofiles.remove({})
-    utils.dbh.profiles.insert_many(ps)
-    utils.dbh.metaprofiles.insert_many(mps)
+        utils.dbh.profiles.update_one({"_id": pid}, {"$unset": {"signal": True}})
+        utils.dbh.metaprofiles.replace_one({"_id": pid}, {
+            "_id": pid,
+            "signal": profile["signal"],
+            "banned": metaprofile["banned"],
+            "smashgg": metaprofile["smashgg"],
+            "reg": metaprofile["reg"]})
 
     await utils.Alert(ctx, utils.Alert.Style.SUCCESS, title="Mutate complete.", description="Remove this command as soon as possible")
