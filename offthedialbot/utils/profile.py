@@ -36,8 +36,10 @@ class ProfileMeta:
         pass
 
     # Setters
-    def set_ss(self, ss: int):
-        self.meta["signal"] = ss
+    def inc_ss(self, ss: int):
+        """Increases Signal Strength and writes it to the database immediately."""
+        dbh.metaprofiles.update_one({"_id": self.id}, {"$inc": {"signal": ss}})
+        self.meta["signal"] += ss
 
     def set_banned(self, banned: Optional[datetime]):
         self.meta["banned"] = banned
