@@ -42,7 +42,7 @@ async def get_role_profiles(ui, meta=False):
 
     roles_profiles = {}
     for role in reply.role_mentions:
-        profiles = await create_profiles_list(ui.ctx, reply.mentions, meta)
+        profiles = await create_profiles_list(ui.ctx, role.members, meta)
         roles_profiles[role] = profiles
     return roles_profiles
 
