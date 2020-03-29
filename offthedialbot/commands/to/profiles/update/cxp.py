@@ -20,7 +20,7 @@ async def main(ctx):
 async def update_cxp(ctx, profile, username):
     """Modified $profile update cxp command."""
     ui: utils.CommandUI = await utils.CommandUI(ctx, create.create_cxp_embed(ctx))
-    ui.embed.title = f"{username}'s Competitive Experience"
+    ui.embed.description = f"{username}'s Competitive Experience"
 
     profile.set_cxp(await create.get_user_cxp(ui))
     profile.write()
