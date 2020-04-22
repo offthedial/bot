@@ -40,7 +40,7 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
     @utils.deco.tourney()
     async def signedup(self, ctx):
         """Get number of people currently signed up for the tournament."""
-        num = utils.dbh.profiles.count({"meta.competing": True})
+        num = utils.dbh.metaprofiles.count({"reg.reg": True})
         await ctx.send(embed=discord.Embed(
             title="Currently Signed-up:",
             description=f"`{num}`",
