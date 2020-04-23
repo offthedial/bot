@@ -24,7 +24,7 @@ async def check_valid_attendee(ctx, attendee, competing=True):
     except utils.Profile.NotFound:
         profile = utils.ProfileMeta(attendee.id)
     check = {
-        (lambda: not profile): f"`{attendee.display_name}` does not own a profile.",
+        (lambda: isinstance(profile, utils.ProfileMeta)): f"`{attendee.display_name}` does not own a profile.",
         (lambda: not profile.get_reg()): f"`{attendee.display_name}` is not competing."
     }
     if not competing:
