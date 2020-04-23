@@ -13,8 +13,8 @@ async def main(ctx):
 
 def attendee_and_profile(ctx):
     """Create a list of tuples containing an attendee's member object, and profile."""
-    profiles: list = [profile["_id"] for profile in utils.dbh.profiles.find({"meta.competing": True}, {"_id": True})]
-    return [(ctx.guild.get_member(attendee_id), utils.Profile(attendee_id)) for attendee_id in profiles]
+    profile_ids: list = [profile["_id"] for profile in utils.dbh.metaprofiles.find({"reg.reg": True}, {"_id": True})]
+    return [(ctx.guild.get_member(attendee_id), utils.Profile(attendee_id)) for attendee_id in profile_ids]
 
 
 async def check_valid_attendee(ctx, attendee, competing=True):
@@ -24,7 +24,7 @@ async def check_valid_attendee(ctx, attendee, competing=True):
     except utils.Profile.NotFound:
         profile = utils.ProfileMeta(attendee.id)
     check = {
-        (lambda: not profile): f"`{attendee.display_name}` does not own a profile.",
+        (lambda: isinstance(profile, utils.ProfileMeta)): f"`{attendee.display_name}` does not own a profile.",
         (lambda: not profile.get_reg()): f"`{attendee.display_name}` is not competing."
     }
     if not competing:
