@@ -6,7 +6,7 @@ from offthedialbot import utils
 async def main(ctx):
     """Create a mock profile for the user."""
     profile: dict = {
-        "_id": 237321109022703616,
+        "_id": ctx.author.id,
         "IGN": "Dave",
         "SW": '048922225689',
         "Ranks": {
@@ -19,7 +19,7 @@ async def main(ctx):
         "cxp": 22,
     }
     profilemeta: dict = {
-        "_id": 237321109022703616,
+        "_id": ctx.author.id,
         "signal": 150,
         "banned": None,
         "smashgg": None,
@@ -28,8 +28,8 @@ async def main(ctx):
             "code": None
         }
     }
-    utils.dbh.profiles.replace_one({"_id": 237321109022703616}, profile, upsert=True)
-    utils.dbh.metaprofiles.replace_one({"_id": 237321109022703616}, profilemeta, upsert=True)
+    utils.dbh.profiles.replace_one({"_id": ctx.author.id}, profile, upsert=True)
+    utils.dbh.metaprofiles.replace_one({"_id": ctx.author.id}, profilemeta, upsert=True)
 
     await utils.Alert(
         ctx, utils.Alert.Style.SUCCESS,
