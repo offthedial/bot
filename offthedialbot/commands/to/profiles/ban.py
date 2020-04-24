@@ -13,7 +13,7 @@ async def main(ctx):
             title="Ban attendees.",
             description="Mention each attendee you want to ban.",
             color=utils.Alert.Style.DANGER))
-    reply = await ui.get_valid_message(lambda m: len(m.mentions) == 1,
+    reply = await ui.get_valid_message(lambda m: len(m.mentions) >= 1,
         {"title": "Invalid Mention", "description": "Make sure to send a **mention** of the attendee."})
 
     for attendee in reply.mentions:
