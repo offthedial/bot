@@ -12,13 +12,22 @@ async def main(ctx):
     ui: utils.CommandUI = await utils.CommandUI(ctx,
         discord.Embed(
             title="Remove attendees.",
-            description="Mention each attendee you want to remove.",
+            description="Mention or send an ID of each attendee you want to remove.",
             color=utils.colors.COMPETING)
     )
-    reply = await ui.get_valid_message(lambda m: len(m.mentions) >= 1,
-        {"title": "Invalid Mention", "description": "Make sure to send a **mention** of the attendees."})
+    reply = await ui.get_reply()
+    attendees = reply.mentions
+    for id in reply.content.split():
+        try:
+            attendees.append(await ctx.bot.fetch_user(int(id)))
+        except ValueError:
+            continue
 
-    for attendee in reply.mentions:
+    if not attendees:
+        await utils.Alert(ctx, utils.Alert.Style.DANGER, title="No valid attendees found.", description="There were no valid attendees in your message.")
+        raise utils.exc.CommandCancel
+
+    for attendee in attendees:
 
         # Check to make sure the attendee is valid
         if not (profile := await check_valid_attendee(ctx, attendee)):
