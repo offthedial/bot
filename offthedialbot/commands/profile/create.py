@@ -93,9 +93,10 @@ def clean_status_key(profile: utils.Profile, key: str) -> tuple:
     return key, profile.profile[key]
 
 
-async def get_user_stylepoints(ui: utils.CommandUI) -> list:
+async def get_user_stylepoints(ui: utils.CommandUI, user_playstyles=None) -> list:
     """Get the user's playstyle and calculate their, style points."""
-    user_playstyles: list = []
+    if user_playstyles is None:
+        user_playstyles: list = []
     create_tasks = (
         lambda: asyncio.create_task(ui.get_valid_message(
             lambda m: m.content.lower() in utils.Profile.playstyles.keys(),
