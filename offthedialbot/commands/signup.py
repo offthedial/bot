@@ -113,6 +113,8 @@ async def smashgg(ui, profile, link):
     code = await ui.get_valid_message(r"^#?([A-Za-z0-9]){6}$",
         {"title": "Invalid Confirmation Code", "description": "The code you entered was not valid, please try again."},
         timeout=600)
+    if not code.content.startswith("#"):
+        code.content = f"#{code.content}"
     profile.set_reg('code', code.content)
 
 
