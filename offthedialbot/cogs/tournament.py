@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 
 from offthedialbot import utils
-from offthedialbot.commands.signup import profile_updated
+from offthedialbot.commands import signup
 
 
 class Tournament(commands.Cog, command_attrs={'hidden': True}):
@@ -29,7 +29,7 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
         ui: utils.CommandUI = await utils.CommandUI(ctx,
             discord.Embed(title="Check-in Form", color=utils.colors.COMPETING)
         )
-        await profile_updated(ui, utils.Profile(ctx.author.id))
+        await signup.profile_updated(ui, utils.Profile(ctx.author.id))
         if not (role := utils.roles.get(ctx, "Checked In")):
             role = await ui.ctx.guild.create_role(name="Checked In")
 
