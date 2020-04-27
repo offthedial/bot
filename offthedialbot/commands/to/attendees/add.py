@@ -49,6 +49,6 @@ async def on_competing(ctx, attendee, profile: utils.ProfileMeta, *, reason="att
 
 async def on_smashgg(ui, attendee):
     """Add attendee on smash.gg."""
-    link = utils.dbh.get_tourney()["link"].split("/")[-1]
+    link = utils.tourney.get_tourney()["link"].split("/")[-1]
     ui.embed.description = f"If applicable, add `{attendee.display_name}` to smash.gg at **<https://smash.gg/admin/tournament/{link}/attendees>**, then hit the \u2705."
     await ui.get_valid_reaction(["\u2705"])

@@ -77,6 +77,6 @@ async def from_competing(ctx, attendee, profile: utils.ProfileMeta, *, reason="a
 
 async def from_smashgg(ui, attendee):
     """Remove attendee from smash.gg."""
-    link = utils.dbh.get_tourney()["link"].split("/")[-1]
+    link = utils.tourney.get_tourney()["link"].split("/")[-1]
     ui.embed.description = f"Remove `{attendee.display_name}` from smash.gg at **<https://smash.gg/admin/tournament/{link}/attendees>**, then hit the \u2705."
     await ui.get_valid_reaction(["\u2705"])

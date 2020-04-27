@@ -110,7 +110,7 @@ def tourney(open=(True, False)):
         def deco(command):
             @wraps(command)
             async def _(*args):
-                if utils.dbh.get_tourney():
+                if utils.tourney.get_tourney():
                     await command(*args)
                 else:
                     await error_msg(args[-1])
@@ -121,7 +121,7 @@ def tourney(open=(True, False)):
         def deco(command):
             @wraps(command)
             async def _(*args):
-                if not utils.dbh.get_tourney():
+                if not utils.tourney.get_tourney():
                     await command(*args)
                 else:
                     await error_msg(args[-1], "Tournament already exists.")
@@ -132,7 +132,7 @@ def tourney(open=(True, False)):
         def deco(command):
             @wraps(command)
             async def _(*args):
-                if t := utils.dbh.get_tourney():
+                if t := utils.tourney.get_tourney():
                     if t["reg"]:
                         await command(*args)
                     else:
@@ -146,7 +146,7 @@ def tourney(open=(True, False)):
         def deco(command):
             @wraps(command)
             async def _(*args):
-                if t := utils.dbh.get_tourney():
+                if t := utils.tourney.get_tourney():
                     if not t["reg"]:
                         await command(*args)
                     else:

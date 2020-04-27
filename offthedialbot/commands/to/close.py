@@ -25,7 +25,7 @@ async def close_signup(ui):
     """Set tournament reg to false."""
     ui.embed.description = "Closing registration..."
     await ui.update()
-    utils.dbh.set_tourney_reg(False)
+    utils.tourney.set_tourney(reg=False)
 
 
 async def enable_checkin(ui):

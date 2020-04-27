@@ -16,7 +16,7 @@ async def main(ctx):
 
     # Steps
     await remove_all_attendees(ctx)
-    utils.dbh.end_tourney()
+    utils.tourney.delete_tourney()
 
     await ui.end(True)
 
