@@ -23,11 +23,11 @@ async def main(ctx):
 
     # Check requirements
     with checklist.checking("accepted rules"):
-        await accepted_rules(ui, tourney["rules"])
+        await accepted_rules(ui, tourney['type'])
     with checklist.checking("profile is up-to-date"):
         profile = await profile_uptodate(ui, profile)
     with checklist.checking("smash.gg integration"):
-        await smashgg(ui, profile, tourney["link"])
+        await smashgg(ui, profile, tourney['type'])
     with checklist.checking("final confirmation"):
         await confirm_signup(ui)
 
@@ -37,7 +37,7 @@ async def main(ctx):
 
 async def check_prerequisites(ctx):
     """Check to make sure the user fits all the prerequisites."""
-    tourney = utils.dbh.get_tourney()
+    tourney = utils.tourney.get_tourney()
     try:
         profile = utils.Profile(ctx.author.id)
     except utils.Profile.NotFound:
@@ -56,9 +56,9 @@ async def check_prerequisites(ctx):
     return tourney, profile
 
 
-async def accepted_rules(ui, rules):
+async def accepted_rules(ui, tourney_type):
     """Make sure the user has accepted the tournament rules."""
-    ui.embed.title = f"Read over the rules at **<{rules}>**."
+    ui.embed.title = f"Read over the rules at **<{utils.tourney.rules[tourney_type]}>**."
     ui.embed.description = "Once finished, select \u2705. By proceeding, you accept and agree to the rules."
     await ui.get_valid_reaction(["\u2705"])
 
@@ -104,11 +104,11 @@ async def show_preview(ctx, profile):
             await preview.delete()
 
 
-async def smashgg(ui, profile, link):
+async def smashgg(ui, profile, tourney_type):
     """Make sure the user has signed up on smash.gg."""
     # Uses OAuth2 to link user's smash.gg account
     # Give signup code to sign up on smash.gg
-    ui.embed.title = f"Sign up on smash.gg at **<{link}/register>**."
+    ui.embed.title = f"Sign up on smash.gg at **<{utils.tourney.links[tourney_type]}/register>**."
     ui.embed.description = "Once finished, enter the confirmation code you recieved in the email.\nFor example: `#F1PN28`."
     code = await ui.get_valid_message(r"^#?([A-Za-z0-9]){6}$",
         {"title": "Invalid Confirmation Code", "description": "The code you entered was not valid, please try again."},

@@ -9,17 +9,20 @@ from offthedialbot.commands.signup import profile_updated
 class Tournament(commands.Cog, command_attrs={'hidden': True}):
     """Cog holding tournament-related misc commands."""
 
-    @commands.command(enabled=False)
+    @commands.command()
     @utils.deco.otd_only
     @utils.deco.tourney(open=False)
     @utils.deco.profile_required(competing=True)
     async def checkin(self, ctx: commands.Context):
         """Check in for the tournament."""
+        # Check if check-in is not enabled
+        if utils.tourney.get_tourney()['checkin'] is False:
+            raise commands.errors.DisabledCommand
         # Check if the attendee has already checked in
         if utils.roles.has(ctx.author, "Checked In"):
             await utils.Alert(ctx, utils.Alert.Style.DANGER,
-                title="Already Checked-in",
-                description="You have already checked-in!")
+                              title="Already Checked-in",
+                              description="You have already checked-in!")
             raise utils.exc.CommandCancel
 
         # Get Checked In role, or create it.

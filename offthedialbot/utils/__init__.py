@@ -7,6 +7,7 @@ from . import colors
 from . import emojis
 from . import roles
 from . import time
+from . import tourney
 from . import exceptions as exc
 from . import decorators as deco
 from .alert import Alert

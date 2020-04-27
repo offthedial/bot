@@ -12,22 +12,17 @@ async def main(ctx):
         discord.Embed(title="Opening registration for a new tournament...", color=utils.colors.COMPETING))
 
     # Steps
-    link = await get_tourney_link(ui)
-    rules = await get_rules_link(ui)
-    utils.dbh.new_tourney(link, rules)
+    tourney_type = await get_tourney_type(ui)
+    utils.tourney.new_tourney(tourney_type)
 
     await ui.end(True)
 
 
-async def get_tourney_link(ui):
-    """Set the smash.gg link for the next tournament."""
-    ui.embed.description = "Enter the new link to the tournament. (https://smash.gg/slug)"
-    reply = await ui.get_reply()
-    return reply.content
-
-
-async def get_rules_link(ui):
-    """Set the rules for the next tournament."""
-    ui.embed.description = "Enter the link of the rules to the tournament. (https://docs.google.com/document/d/rules/edit?usp=sharing)"
-    reply = await ui.get_reply()
-    return reply.content
+async def get_tourney_type(ui):
+    """Create a new tournament."""
+    directions = f"Enter the tournament type ({', '.join([tourney.name for tourney in utils.tourney.Type])})"
+    ui.embed.title = directions
+    reply = await ui.get_valid_message(
+        lambda r: getattr(utils.tourney.Type, r.content.upper(), False) is not False,
+        {'title': 'Invalid Tournament Type', 'description': directions})
+    return getattr(utils.tourney.Type, reply.content.upper())
