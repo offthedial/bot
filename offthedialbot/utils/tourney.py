@@ -53,3 +53,17 @@ def update(reg: bool = None, checkin: bool = None):
     if checkin is None:
         checkin = tourney['checkin']
     return utils.dbh.to.update_one({"_id": 0}, {"$set": {"reg": reg, "checkin": checkin}})
+
+
+def current_step():
+    """Return an integer representing the current step the tournament is on."""
+    if tourney := get():
+        checklist = [
+            (True, False),
+            (True, True),
+            (False, False),
+            (None, None)
+        ]
+        return checklist.index((tourney['reg'], tourney['checkin'])) + 1
+    else:
+        return 0
