@@ -24,13 +24,12 @@ async def end_checkin(ui):
     """Disable the checkin command."""
     ui.embed.description = "Disabling `$checkin`..."
     await ui.update()
-    checkin_cmd = ui.ctx.bot.get_command("checkin")
-    checkin_cmd.enabled = False
+    utils.tourney.set_tourney(checkin=False)
 
 
 async def check_tourney_checkin(ctx):
     """Make sure the tournament checkin is enabled so it is able to be started."""
-    if not ctx.bot.get_command("checkin").enabled:
+    if not utils.tourney.get_tourney()['checkin']:
         await utils.Alert(ctx, utils.Alert.Style.DANGER,
                           title="Command Failed",
                           description="Tournament has already started.")

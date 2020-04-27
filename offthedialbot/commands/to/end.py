@@ -29,7 +29,7 @@ async def remove_all_attendees(ctx):
 
 async def check_tourney_started(ctx):
     """Make sure the tournament has started so it is able to be ended."""
-    if ctx.bot.get_command("checkin").enabled:
+    if utils.tourney.get_tourney()['checkin']:
         await utils.Alert(ctx, utils.Alert.Style.DANGER,
             title="Command Failed",
             description="Tournament has not started yet.")

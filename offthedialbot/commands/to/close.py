@@ -32,8 +32,7 @@ async def enable_checkin(ui):
     """Enable the checkin command."""
     ui.embed.description = "Enabling `$checkin`..."
     await ui.update()
-    checkin_cmd = ui.ctx.bot.get_command("checkin")
-    checkin_cmd.enabled = True
+    utils.tourney.set_tourney(checkin=True)
 
 
 async def warn_attendees(ctx):
