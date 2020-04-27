@@ -13,7 +13,7 @@ async def main(ctx):
 
     # Steps
     tourney_type = await get_tourney_type(ui)
-    utils.tourney.new_tourney(tourney_type)
+    utils.tourney.new(tourney_type)
 
     await ui.end(True)
 

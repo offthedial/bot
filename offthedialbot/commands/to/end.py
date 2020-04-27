@@ -16,7 +16,7 @@ async def main(ctx):
 
     # Steps
     await remove_all_attendees(ctx)
-    utils.tourney.delete_tourney()
+    utils.tourney.delete()
 
     await ui.end(True)
 
@@ -29,7 +29,7 @@ async def remove_all_attendees(ctx):
 
 async def check_tourney_started(ctx):
     """Make sure the tournament has started so it is able to be ended."""
-    if utils.tourney.get_tourney()['checkin']:
+    if utils.tourney.get()['checkin']:
         await utils.Alert(ctx, utils.Alert.Style.DANGER,
             title="Command Failed",
             description="Tournament has not started yet.")

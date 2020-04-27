@@ -16,7 +16,7 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
     async def checkin(self, ctx: commands.Context):
         """Check in for the tournament."""
         # Check if check-in is not enabled
-        if utils.tourney.get_tourney()['checkin'] is False:
+        if utils.tourney.get()['checkin'] is False:
             raise commands.errors.DisabledCommand
         # Check if the attendee has already checked in
         if utils.roles.has(ctx.author, "Checked In"):

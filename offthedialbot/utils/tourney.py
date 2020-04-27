@@ -25,7 +25,7 @@ rules = [
 ]
 
 
-def new_tourney(tourney_type: Type):
+def new(tourney_type: Type):
     """Start a new tournament."""
     return utils.dbh.to.insert_one({
         "_id": 0,
@@ -35,19 +35,19 @@ def new_tourney(tourney_type: Type):
     })
 
 
-def get_tourney():
+def get():
     """Get the tournament database entry."""
     return utils.dbh.to.find_one({"_id": 0})
 
 
-def delete_tourney():
+def delete():
     """Delete the tournament from the database."""
     return utils.dbh.to.find_one_and_delete({"_id": 0})
 
 
-def set_tourney(reg: bool = None, checkin: bool = None):
+def update(reg: bool = None, checkin: bool = None):
     """Set tournament registration and check-in."""
-    tourney = get_tourney()
+    tourney = get()
     if reg is None:
         reg = tourney['reg']
     if checkin is None:
