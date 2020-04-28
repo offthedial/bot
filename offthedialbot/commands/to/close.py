@@ -14,9 +14,9 @@ async def main(ctx):
 
     await close_signup(ui)
     await end_checkin(ui)
-    await attendees.remove.disqualified(ctx, checkin=True)
-    file = attendees.export.create_file(ctx, attendees.attendee_and_profile(ctx))
-    await ctx.send(file=file)
+    await remove_disqualified(ui)
+    await export_attendees(ui)
+
     await ui.end(True,
         title=":incoming_envelope: *Exporting attendees complete!*",
         description="Download the spreadsheet below. \U0001f4e5")
@@ -36,3 +36,16 @@ async def end_checkin(ui):
     utils.tourney.update(checkin=False)
 
 
+async def remove_disqualified(ui):
+    """Remove disqualified members."""
+    ui.embed.description = "Removing disqualified members..."
+    await ui.update()
+    await attendees.remove.disqualified(ui.ctx, left=True, checkin=True)
+
+
+async def export_attendees(ui):
+    """Automatically export attendees."""
+    ui.embed.description = "Exporting attendees..."
+    await ui.update()
+    file = attendees.export.create_file(ui.ctx, attendees.attendee_and_profile(ui.ctx))
+    await ui.ctx.send(file=file)
