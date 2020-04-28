@@ -94,65 +94,35 @@ def require_role(role: str):
     return deco
 
 
-def tourney(open=(True, False)):
+def tourney(step: int = None):
     """ Require tournament to call command.
 
-    open: Union[tribool, Tuple(True, False)]
-        (default): Tournament exists
-        None: Tournament does not exist
-        True: Tournament registration is open
-        False: Tournament registration is closed
+    :param int step: The step the tournament should be at when the command is run. If None, the tournament simply must exist.
     """
-    error_msg = lambda ctx, d="Tournament does not exist.": \
-        utils.Alert(ctx, utils.Alert.Style.DANGER, title="Command Failed", description=d)
+    error_msg = lambda ctx, d: utils.Alert(ctx, utils.Alert.Style.DANGER, title="Command Failed", description=d)
 
-    if open == (True, False):
+    if step is None:
         def deco(command):
             @wraps(command)
             async def _(*args):
-                if utils.tourney.get_tourney():
+                if utils.tourney.get():
                     await command(*args)
                 else:
-                    await error_msg(args[-1])
+                    await error_msg(args[-1], "Tournament does not exist.")
 
             return _
 
-    elif open is None:
+    else:
         def deco(command):
             @wraps(command)
             async def _(*args):
-                if not utils.tourney.get_tourney():
+                current_step = utils.tourney.current_step()
+                if step > current_step:
+                    await error_msg(args[-1], "You cannot complete this step yet.")
+                elif step < current_step:
+                    await error_msg(args[-1], "You already completed this step.")
+                else:
                     await command(*args)
-                else:
-                    await error_msg(args[-1], "Tournament already exists.")
-
-            return _
-
-    elif open is True:
-        def deco(command):
-            @wraps(command)
-            async def _(*args):
-                if t := utils.tourney.get_tourney():
-                    if t["reg"]:
-                        await command(*args)
-                    else:
-                        await error_msg(args[-1], "Tournament registration is not open.")
-                else:
-                    await error_msg(args[-1])
-
-            return _
-
-    elif open is False:
-        def deco(command):
-            @wraps(command)
-            async def _(*args):
-                if t := utils.tourney.get_tourney():
-                    if not t["reg"]:
-                        await command(*args)
-                    else:
-                        await error_msg(args[-1], "Tournament registration is currently open.")
-                else:
-                    await error_msg(args[-1])
 
             return _
 

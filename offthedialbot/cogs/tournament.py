@@ -11,7 +11,7 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
 
     @commands.command()
     @utils.deco.otd_only
-    @utils.deco.tourney(open=False)
+    @utils.deco.tourney()
     @utils.deco.profile_required(competing=True)
     async def checkin(self, ctx: commands.Context):
         """Check in for the tournament."""

@@ -5,7 +5,7 @@ from offthedialbot import utils
 
 
 @utils.deco.require_role("Organiser")
-@utils.deco.tourney(None)
+@utils.deco.tourney(0)
 async def main(ctx):
     """Open registration for a new tournament!"""
     ui: utils.CommandUI = await utils.CommandUI(ctx,

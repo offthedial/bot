@@ -6,15 +6,9 @@ from . import attendees
 
 
 @utils.deco.require_role("Organiser")
-@utils.deco.tourney(False)
+@utils.deco.tourney(2)
 async def main(ctx):
-    """Start the tournament!"""
-    if not utils.tourney.get()['checkin']:
-        await utils.Alert(ctx, utils.Alert.Style.DANGER,
-            title="Command Failed",
-            description="Tournament has already started.")
-        raise utils.exc.CommandCancel
-
+    """Close registration and end checkin for the tournament."""
     ui: utils.CommandUI = await utils.CommandUI(ctx,
         discord.Embed(title="Commencing tournament...", color=utils.colors.COMPETING))
 
