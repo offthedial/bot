@@ -97,15 +97,14 @@ async def get_user_stylepoints(ui: utils.CommandUI, user_playstyles=None) -> lis
     """Get the user's playstyle and calculate their, style points."""
     if user_playstyles is None:
         user_playstyles: list = []
-    create_tasks = (
-        lambda: asyncio.create_task(ui.get_valid_message(
-            lambda m: m.content.lower() in utils.Profile.playstyles.keys(),
-            {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}, cancel=False)),
-        lambda: asyncio.create_task(ui.get_valid_reaction(['\u23ed\ufe0f'], cancel=False)),
-        lambda: ui.create_cancel_task()
-    )
     while True:
-        tasks = [task() for task in create_tasks]
+        tasks = [
+            asyncio.create_task(ui.get_valid_message(
+                lambda m: m.content.lower() in utils.Profile.playstyles.keys(),
+                {"title": "Invalid Playstyle.", "description": "Please enter a valid playstyle."}, cancel=None)),
+            asyncio.create_task(ui.get_valid_reaction(['\u23ed\ufe0f'], cancel=None)),
+            await ui.create_cancel_task(),
+        ]
         ui.embed.set_field_at(0, name="Playstyles", value=create_playstyle_list(user_playstyles))
         task, reply = await ui.wait_tasks(tasks)
         await ui.delete_alert()

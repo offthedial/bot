@@ -32,7 +32,6 @@ class CommandUI:
     async def create_ui(ctx: Context, embed: discord.Embed) -> discord.Message:
         """Create and return the discord embed UI."""
         ui: discord.Message = await ctx.send(embed=embed)
-        await ui.add_reaction('❌')
         return ui
 
     async def get_valid(self, event, /, *args, **kwargs):
@@ -85,6 +84,8 @@ class CommandUI:
                 **(error_fields if error_fields else {}),
                 "style": utils.Alert.Style.DANGER
             }
+            if get_reply_params.get("cancel", True) is True:
+                await self.ui.add_reaction('❌')
             for react in valid:  # Add reactions
                 await self.ui.add_reaction(react)
         else:
@@ -101,10 +102,9 @@ class CommandUI:
             # Remove reactions
             if len(valid) < 3:
                 for react in valid:
-                    await self.ui.remove_reaction(react, self.ctx.me)
+                    await self.ui.clear_reaction(react)
             else:
                 await self.ui.clear_reactions()
-                await self.ui.add_reaction('❌')
         else:
             reply: discord.Reaction = await self.get_valid_reaction(
                 valid=valid, _alert_params=_alert_params, **get_reply_params
@@ -123,12 +123,12 @@ class CommandUI:
             },
             'reaction_add': {
                 "check": utils.checks.react(self.ctx.author, self.ui),
-                "delete": lambda r: self.ui.remove_reaction(r[0].emoji, r[1])
+                "delete": lambda r: self.ui.clear_reaction(r[0].emoji)
             }
         }
         # Create tasks
         reply_task = asyncio.create_task(self.ctx.bot.wait_for(event, check=key[event]["check"]), name="CommandUI.reply_task")
-        cancel_task = self.create_cancel_task() if kwargs.get("cancel", True) else None
+        cancel_task = await self.create_cancel_task(kwargs.get("cancel", True))
 
         # Await tasks
         tasks = {reply_task, cancel_task} if cancel_task else {reply_task}
@@ -161,18 +161,9 @@ class CommandUI:
 
     async def run_command(self, main, *args):
         """Run an external command, from a command ui."""
-
-        @asynccontextmanager
-        async def hide_x():
-            try:
-                await self.ui.remove_reaction('❌', self.ctx.me)
-                yield
-            finally:
-                await self.ui.add_reaction('❌')
-
+        await self.ui.clear_reaction('❌')
         try:
-            async with hide_x():
-                await main(self.ctx, *args)
+            await main(self.ctx, *args)
         except utils.exc.CommandCancel as e:
             if e.ui and e.status is not None:
                 await e.ui.ui.delete()
@@ -196,12 +187,20 @@ class CommandUI:
         # Raise exception to cancel command
         raise utils.exc.CommandCancel(status, self)
 
-    def create_cancel_task(self) -> asyncio.Task:
+    async def create_cancel_task(self, value=True) -> asyncio.Task:
         """Create a task that checks if the user canceled the command."""
+        if value is True:
+            await self.ui.add_reaction('❌')
+            return self.cancel_task()
+        elif value is False:
+            await self.ui.clear_reaction('❌')
+
+    def cancel_task(self):
+        """Task that checks if the user canceled the command."""
         return asyncio.create_task(
             self.ctx.bot.wait_for('reaction_add',
                 check=utils.checks.react(self.ctx.author, self.ui, valids={'❌'})),
-            name="CommandUI.cancel_task")
+                name="CommandUI.cancel_task")
 
     async def update(self) -> None:
         """Update the ui with new information."""

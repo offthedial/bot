@@ -16,7 +16,8 @@ async def main(ctx):
     await end_checkin(ui)
     await attendees.remove.disqualified(ctx, checkin=True)
     await attendees.export.export_attendees(ctx, attendees.attendee_and_profile(ctx))
-    await ui.end(None)
+    await ui.ui.delete()
+    await ui.end(True)
 
 
 async def close_signup(ui):

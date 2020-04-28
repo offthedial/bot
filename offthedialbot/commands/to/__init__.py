@@ -25,7 +25,7 @@ async def main(ctx):
             options.update({'next': '\u23ed'})
             await show_dashboard(ui, tourney, options)
 
-        reply = await ui.get_valid_reaction(list(options.values()))
+        reply = await ui.get_valid_reaction(list(options.values()), cancel=False)
         await operator(ui, reply.emoji, options)
 
 
@@ -34,14 +34,14 @@ async def operator(ui, option, options):
     if option == options['done']:
         await ui.end(True)
     elif option == options.get('new'):
-        ui.run_command(to_open.main)
+        await ui.run_command(to_open.main)
     elif option == options.get('next'):
-        ui.run_command([
+        await ui.run_command([
             to_open,
             to_start,
             to_close,
             to_end
-        ])
+        ][utils.tourney.current_step()].main)
 
 
 async def show_dashboard(ui, tourney, options):
