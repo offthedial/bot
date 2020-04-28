@@ -6,40 +6,36 @@ from . import attendees
 
 
 @utils.deco.require_role("Organiser")
-@utils.deco.tourney(True)
+@utils.deco.tourney(False)
 async def main(ctx):
-    """Close registration for the tournament."""
+    """Start the tournament!"""
+    if not utils.tourney.get()['checkin']:
+        await utils.Alert(ctx, utils.Alert.Style.DANGER,
+            title="Command Failed",
+            description="Tournament has already started.")
+        raise utils.exc.CommandCancel
+
     ui: utils.CommandUI = await utils.CommandUI(ctx,
-        discord.Embed(title="Closing registration for the tournament...", color=utils.colors.COMPETING))
+        discord.Embed(title="Commencing tournament...", color=utils.colors.COMPETING))
 
-    # Steps
     await close_signup(ui)
-    await attendees.remove.disqualified(ctx, left=True)
-    await enable_checkin(ui)
-    await warn_attendees(ui.ctx)
-
-    await ui.end(True)
+    await end_checkin(ui)
+    await attendees.remove.disqualified(ctx, checkin=True)
+    await attendees.export.export_attendees(ctx, attendees.attendee_and_profile(ctx))
+    await ui.end(None)
 
 
 async def close_signup(ui):
     """Set tournament reg to false."""
     ui.embed.description = "Closing registration..."
     await ui.update()
-    utils.tourney.set_tourney(reg=False)
+    utils.tourney.update(reg=False)
 
 
-async def enable_checkin(ui):
-    """Enable the checkin command."""
-    ui.embed.description = "Enabling `$checkin`..."
+async def end_checkin(ui):
+    """Disable the checkin command."""
+    ui.embed.description = "Disabling `$checkin`..."
     await ui.update()
-    utils.tourney.set_tourney(checkin=True)
+    utils.tourney.update(checkin=False)
 
 
-async def warn_attendees(ctx):
-    """Warn attendees who have not checked in yet."""
-    for attendee, profile in attendees.attendee_and_profile(ctx):
-        utils.time.Timer.schedule(
-            utils.time.relativedelta(hours=18) + utils.time.datetime.utcnow(),
-            attendee.id, ctx.me.id, style=utils.Alert.Style.WARNING,
-            title="You have not checked in yet!",
-            description="There are approximately 6 hours left to check-in, so make sure you check-in soon or you will be automatically disqualified.")
