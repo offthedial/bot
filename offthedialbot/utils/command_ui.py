@@ -136,7 +136,7 @@ class CommandUI:
 
         # Get result
         if task in (None, cancel_task):
-            await self.end(status=False)
+            await self.end(False, None if task == cancel_task else "Command timed out")
         else:
             if kwargs.get("delete") is not False:
                 await key[event]["delete"](reply)
