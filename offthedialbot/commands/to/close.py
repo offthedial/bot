@@ -15,9 +15,11 @@ async def main(ctx):
     await close_signup(ui)
     await end_checkin(ui)
     await attendees.remove.disqualified(ctx, checkin=True)
-    await attendees.export.export_attendees(ctx, attendees.attendee_and_profile(ctx))
-    await ui.ui.delete()
-    await ui.end(True)
+    file = attendees.export.create_file(ctx, attendees.attendee_and_profile(ctx))
+    await ctx.send(file=file)
+    await ui.end(True,
+        title=":incoming_envelope: *Exporting attendees complete!*",
+        description="Download the spreadsheet below. \U0001f4e5")
 
 
 async def close_signup(ui):
