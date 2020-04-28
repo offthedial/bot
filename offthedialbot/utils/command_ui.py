@@ -174,10 +174,10 @@ class CommandUI:
     async def end(self, status: Union[bool, None], title: str = None, description=discord.Embed.Empty) -> None:
         """End UI interaction and display status."""
         status_key: dict = {
-            True: discord.Embed(
-                title=title if title else "Success!", description=description, color=utils.Alert.Style.SUCCESS),
-            False: discord.Embed(
-                title=title if title else "Canceled.", description=description, color=utils.Alert.Style.DANGER),
+            True: utils.Alert.create_embed(utils.Alert.Style.SUCCESS,
+                title=title if title else "Command Complete", description=description),
+            False: utils.Alert.create_embed(utils.Alert.Style.DANGER,
+                title=title if title else "Command Canceled", description=description),
         }
         if status_key.get(status):
             await self.ui.edit(embed=status_key[status])

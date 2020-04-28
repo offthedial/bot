@@ -9,12 +9,12 @@ class Alert:
 
     class Style:
         """Alert styles and their colors."""
+        SUCCESS = 0x63ae33
         DANGER = 0xf50206
         WARNING = 0xffbe00
-        SUCCESS = 0x63ae33
         INFO = 0x0082ef
 
-    def __init__(self, ctx, style: Style, *, title: str, description: str):
+    def __init__(self, ctx, style: Style, *, title: str, description: str = discord.Embed.Empty):
         """Create alert embed."""
         self.ctx = ctx
         self.embed: discord.Embed = self.create_embed(style, title, description)
@@ -29,19 +29,19 @@ class Alert:
         return self
 
     @classmethod
-    def create_embed(cls, style, title: str, description: str = None) -> discord.Embed:
+    def create_embed(cls, style, title: str, description: str = discord.Embed.Empty) -> discord.Embed:
         """Create alert embed."""
         emoji_key = {
+            cls.Style.SUCCESS: ':white_check_mark:',
             cls.Style.DANGER:  ':no_entry_sign:',
             cls.Style.WARNING: ':warning:',
             cls.Style.INFO:    ':information_source:',
-            cls.Style.SUCCESS: ':white_check_mark:',
         }
         title_key = {
+            cls.Style.SUCCESS: lambda t: f' {emoji_key[style]} Success: **{t}**',
             cls.Style.DANGER:  lambda t: f' {emoji_key[style]} Error: **{t}**',
             cls.Style.WARNING: lambda t: f' {emoji_key[style]} Warning: **{t}**',
             cls.Style.INFO:    lambda t: f' {emoji_key[style]} Info: **{t}**',
-            cls.Style.SUCCESS: lambda t: f' {emoji_key[style]} Success: **{t}**',
         }
         return discord.Embed(title=title_key[style](title), description=description, color=style)
 
