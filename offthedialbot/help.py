@@ -23,12 +23,12 @@ class HelpCommand(commands.DefaultHelpCommand):
             fields=[{
                 "name": "Commands:",
                 "value": "\n".join([
-                    f'`{self.clean_prefix}{command}` {command.help}'
+                    f'`{self.clean_prefix}{command}` {command.short_doc}'
                     for command in await self.filter_commands(mapping[None]) if command.help])
             }, {
                 "name": "Misc Commands:",
                 "value": "\n".join([
-                    f'`{self.clean_prefix}{command}` {command.help}'
+                    f'`{self.clean_prefix}{command}` {command.short_doc}'
                     for command in list_commands])
             }]
         )
@@ -42,7 +42,7 @@ class HelpCommand(commands.DefaultHelpCommand):
             fields=[{
                 "name": f"{cog.qualified_name.capitalize()} Commands:",
                 "value": "\n".join([
-                    f'`{self.clean_prefix}{command}` {command.help}'
+                    f'`{self.clean_prefix}{command}` {command.short_doc}'
                     for command in cog.get_commands()
                 ])
             }]
@@ -57,8 +57,8 @@ class HelpCommand(commands.DefaultHelpCommand):
             fields=[{
                 "name": f"Subcommands:",
                 "value": "\n".join([
-                    f'`{self.clean_prefix}{command}` {command.help}'
-                    for command in group.all_commands.values()
+                    f'`{self.clean_prefix}{command}` {command.short_doc}'
+                    for command in await self.filter_commands(group.all_commands.values())
                 ])
             }]
         )

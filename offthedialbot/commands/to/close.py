@@ -5,42 +5,58 @@ from offthedialbot import utils
 from . import attendees
 
 
-@utils.deco.require_role("Organiser")
-@utils.deco.tourney(True)
-async def main(ctx):
-    """Close registration for the tournament."""
-    ui: utils.CommandUI = await utils.CommandUI(ctx,
-        discord.Embed(title="Closing registration for the tournament...", color=utils.colors.COMPETING))
+class ToClose(utils.Command):
+    """ Close registration and end checkin for the tournament.
 
-    # Steps
-    await close_signup(ui)
-    await attendees.remove.disqualified(ctx, left=True)
-    await enable_checkin(ui)
-    await warn_attendees(ui.ctx)
+    Steps:
+    - Close registration
+    - End checkin
+    - Remove disqualified attendees
+    - Export attendees
+    """
 
-    await ui.end(True)
+    @classmethod
+    @utils.deco.require_role("Organiser")
+    @utils.deco.tourney(2)
+    async def main(cls, ctx):
+        """Close registration and end checkin for the tournament."""
+        ui: utils.CommandUI = await utils.CommandUI(ctx,
+            discord.Embed(title="Commencing tournament...", color=utils.colors.COMPETING))
 
+        await cls.close_reg(ui)
+        await cls.end_checkin(ui)
+        await cls.remove_disqualified(ui)
+        await cls.export_attendees(ui)
 
-async def close_signup(ui):
-    """Set tournament reg to false."""
-    ui.embed.description = "Closing registration..."
-    await ui.update()
-    utils.dbh.set_tourney_reg(False)
+        await ui.end(True,
+            title=":incoming_envelope: *Exporting attendees complete!*",
+            description="Download the spreadsheet below. \U0001f4e5")
 
+    @classmethod
+    async def close_reg(cls, ui):
+        """Set tournament reg to false."""
+        ui.embed.description = "Closing registration..."
+        await ui.update()
+        utils.tourney.update(reg=False)
 
-async def enable_checkin(ui):
-    """Enable the checkin command."""
-    ui.embed.description = "Enabling `$checkin`..."
-    await ui.update()
-    checkin_cmd = ui.ctx.bot.get_command("checkin")
-    checkin_cmd.enabled = True
+    @classmethod
+    async def end_checkin(cls, ui):
+        """Disable the checkin command."""
+        ui.embed.description = "Disabling `$checkin`..."
+        await ui.update()
+        utils.tourney.update(checkin=False)
 
+    @classmethod
+    async def remove_disqualified(cls, ui):
+        """Remove disqualified members."""
+        ui.embed.description = "Removing disqualified attendees..."
+        await ui.update()
+        await attendees.remove.disqualified(ui.ctx, left=True, checkin=True)
 
-async def warn_attendees(ctx):
-    """Warn attendees who have not checked in yet."""
-    for attendee, profile in attendees.attendee_and_profile(ctx):
-        utils.time.Timer.schedule(
-            utils.time.relativedelta(hours=18) + utils.time.datetime.utcnow(),
-            attendee.id, ctx.me.id, style=utils.Alert.Style.WARNING,
-            title="You have not checked in yet!",
-            description="There are approximately 6 hours left to check-in, so make sure you check-in soon or you will be automatically disqualified.")
+    @classmethod
+    async def export_attendees(cls, ui):
+        """Automatically export attendees."""
+        ui.embed.description = "Exporting attendees..."
+        await ui.update()
+        file = attendees.export.create_file(ui.ctx, attendees.attendee_and_profile(ui.ctx))
+        await ui.ctx.send(file=file)

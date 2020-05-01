@@ -2,13 +2,16 @@
 from discord.ext import commands
 
 from offthedialbot import utils
-from .. import attendees
 
 
-@utils.deco.require_role("Organiser")
-async def main(ctx):
+class ToProfiles(utils.Command):
     """Command tools for managing profiles."""
-    raise commands.TooManyArguments
+
+    @classmethod
+    @utils.deco.require_role("Organiser")
+    async def main(cls, ctx):
+        """Command tools for managing profiles."""
+        raise commands.TooManyArguments
 
 
 def user_and_profile(ctx):

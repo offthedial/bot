@@ -2,30 +2,34 @@
 import discord
 
 from offthedialbot import utils
-from offthedialbot.commands.profile import create_status_embed
+from offthedialbot.commands.profile import Profile
 
 
-@utils.deco.require_role("Organiser")
-async def main(ctx):
+class ToProfilesGet(utils.Command):
     """Get a specific profile."""
-    ui: utils.CommandUI = await utils.CommandUI(ctx, embed=discord.Embed())
-    for profile, member in await get_profiles(ui):
-        await ctx.send(embed=create_status_embed(member.display_name, profile, True))
 
-    await ui.end(None)
+    @classmethod
+    @utils.deco.require_role("Organiser")
+    async def main(cls, ctx):
+        """Get a specific profile."""
+        ui: utils.CommandUI = await utils.CommandUI(ctx, embed=discord.Embed())
+        for profile, member in await cls.get_profiles(ui):
+            await ctx.send(embed=Profile.create_status_embed(member.display_name, profile, True))
 
+        await ui.end(None)
 
-async def get_profiles(ui, meta=False):
-    """Return a list of profile, member tuples that the user specifies."""
-    ui.embed = discord.Embed(
-        title="Mention each user you want to get.",
-        color=utils.colors.DIALER
-    )
-    reply = await ui.get_valid_message(lambda m: len(m.mentions),
-        {"title": "Invalid Mention", "description": "Make sure to **mention** each user."})
+    @classmethod
+    async def get_profiles(cls, ui, meta=False):
+        """Return a list of profile, member tuples that the user specifies."""
+        ui.embed = discord.Embed(
+            title="Mention each user you want to get.",
+            color=utils.colors.DIALER
+        )
+        reply = await ui.get_valid_message(lambda m: len(m.mentions),
+            {"title": "Invalid Mention", "description": "Make sure to **mention** each user."})
 
-    profiles = await create_profiles_list(ui.ctx, reply.mentions, meta)
-    return profiles
+        profiles = await create_profiles_list(ui.ctx, reply.mentions, meta)
+        return profiles
 
 
 async def get_role_profiles(ui, meta=False):

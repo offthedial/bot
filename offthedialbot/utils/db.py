@@ -21,22 +21,5 @@ class DatabaseHandler:
         self.to = self.db["to"]
         self.timers = self.db["timers"]
 
-    def new_tourney(self, link: str, rules: str, reg: bool = True):
-        return self.to.insert_one({
-            "_id": 0,
-            "link": link,
-            "rules": rules,
-            "reg": reg
-        })
-
-    def get_tourney(self):
-        return self.to.find_one({"_id": 0})
-
-    def end_tourney(self):
-        return self.to.find_one_and_delete({"_id": 0})
-
-    def set_tourney_reg(self, reg):
-        return self.to.update_one({"_id": 0}, {"$set": {"reg": reg}})
-
 
 dbh = DatabaseHandler()

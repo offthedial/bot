@@ -17,7 +17,7 @@ async def warn_if_competing(member):
 
     if not (profile.get_reg() and not profile.get_banned()):
         return
-    if not ((tourney := utils.dbh.get_tourney()) and tourney["reg"]):
+    if not ((tourney := utils.tourney.get()) and tourney["reg"]):
         return
 
     # Member should be warned

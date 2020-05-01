@@ -2,7 +2,7 @@
 from discord.ext import commands
 
 from offthedialbot import utils
-from offthedialbot.commands.profile import display_field
+from offthedialbot.commands.profile import Profile
 
 
 class GetStatusField(commands.Cog, command_attrs={'hidden': True}):
@@ -18,7 +18,7 @@ class GetStatusField(commands.Cog, command_attrs={'hidden': True}):
             return
         await utils.Alert(ctx, utils.Alert.Style.INFO,
             title=f"`{profile.get_ign()}`'s Friend Code:",
-            description=f"{display_field('SW', profile.get_sw())}")
+            description=f"{Profile.display_field('SW', profile.get_sw())}")
 
     @commands.command()
     @utils.deco.profile_required()
@@ -30,7 +30,7 @@ class GetStatusField(commands.Cog, command_attrs={'hidden': True}):
             return
         await utils.Alert(ctx, utils.Alert.Style.INFO,
             title=f"{ctx.author.display_name}'s IGN:",
-            description=f"{display_field('IGN', profile.get_ign())}")
+            description=f"{Profile.display_field('IGN', profile.get_ign())}")
 
     @commands.command()
     @utils.deco.profile_required()
@@ -42,4 +42,4 @@ class GetStatusField(commands.Cog, command_attrs={'hidden': True}):
             return
         await utils.Alert(ctx, utils.Alert.Style.INFO,
             title=f"`{profile.get_ign()}`'s Ranks:",
-            description=f"{display_field('Ranks', profile.get_ranks())}")
+            description=f"{Profile.display_field('Ranks', profile.get_ranks())}")

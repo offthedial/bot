@@ -7,8 +7,10 @@ from . import colors
 from . import emojis
 from . import roles
 from . import time
+from . import tourney
 from . import exceptions as exc
 from . import decorators as deco
+from .command import Command
 from .alert import Alert
 from .command_ui import CommandUI
 from .profile import Profile, ProfileMeta

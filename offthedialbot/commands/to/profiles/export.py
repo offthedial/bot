@@ -1,11 +1,16 @@
 """$to profiles export"""
 from offthedialbot import utils
 
-from . import user_and_profile, attendees
+from ..attendees.export import ToAttendeesExport
+from . import user_and_profile
 
 
-@utils.deco.require_role("Organiser")
-async def main(ctx):
+class ToProfilesExport(utils.Command):
     """Export profiles to a csv."""
-    await ctx.trigger_typing()
-    await attendees.export.export_attendees(ctx, user_and_profile(ctx))
+
+    @classmethod
+    @utils.deco.require_role("Organiser")
+    async def main(cls, ctx):
+        """Export profiles to a csv."""
+        await ctx.trigger_typing()
+        await ToAttendeesExport.export_attendees(ctx, user_and_profile(ctx))

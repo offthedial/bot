@@ -50,8 +50,16 @@ class Timer:
     timers = utils.dbh.timers
 
     @classmethod
-    def schedule(cls, when: int, /, destination: int, author: int, *, style, title: str, description: str):
-        """Schedule a [coro]utine at [when], and return timer id."""
+    def schedule(cls, when: datetime, /, destination: int, author: int, *, style, title: str, description: str):
+        """ Schedule a [coro]utine at [when], and return timer id.
+
+        :param datetime when: Datetime object for when to send the alert
+        :param int destination: Discord channel/user id. Channel ID to send to a channel and user ID to send a DM.
+        :param int author: User ID of the timer author.
+        :param style: Alert style.
+        :param title: Alert title.
+        :param description: Alert description.
+        """
         timer = cls.timers.insert_one({
             "when": when,
             "destination": destination,
