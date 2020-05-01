@@ -35,11 +35,7 @@ def get_class(module):
     """Get the first class present in a given module."""
     module_name = ".".join(module.__name__.split(".")[-1:])
     for name, obj in inspect.getmembers(module):
-        if inspect.isclass(obj) and obj.__name__ == snake_to_pascal(module_name):
+        if inspect.isclass(obj) and obj.__name__ == ''.join([w.title() for w in module_name.split('_')]):
             return obj
     else:
-        logger.warn(f"Cannot register cog in '{module_name}.py': Missing `{snake_to_pascal(module_name)}`")
-
-
-def snake_to_pascal(name):
-    return ''.join([w.title() for w in name.split('_')])
+        logger.warn(f"Cannot register cog in '{module_name}.py': Missing `{''.join([w.title() for w in module_name.split('_')])}`")

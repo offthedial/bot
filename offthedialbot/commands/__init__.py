@@ -47,7 +47,7 @@ def find_commands(module=sys.modules[__name__]):
         # Iterate over its contents
         for cmd_name in dir(sub_module):
             attr = getattr(sub_module, cmd_name)
-            if inspect.isclass(attr):
+            if inspect.isclass(attr) and attr.__name__ == ''.join([w.title() for w in module_name.split('.')]):
                 sub_dict['class'] = attr
                 break
 
@@ -79,12 +79,12 @@ def derive_command(command, name):
     """Wrap command in another function to parse arguments and exceptions."""
     warn = None
     if not command:
-        warn = 'class'
+        warn = "class"
     elif not getattr(command, 'main', False):
-        warn = 'main'
+        warn = f"'main' inside {command.__name__}"
 
     if warn:
-        logger.warn(f"Cannot register command '{name}': Missing `{warn}`")
+        logger.warn(f"Cannot register command in '{name}.py': Missing {warn}")
 
         async def _(ctx):
             pass
