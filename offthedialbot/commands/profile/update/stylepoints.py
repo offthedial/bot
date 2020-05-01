@@ -3,12 +3,16 @@ from offthedialbot import utils
 from .. import create
 
 
-@utils.deco.profile_required()
-async def main(ctx):
+class ProfileUpdateStylepoints(utils.Command):
     """Update your stylepoints."""
-    profile: utils.Profile = utils.Profile(ctx.author.id)
-    ui: utils.CommandUI = await utils.CommandUI(ctx, create.create_stylepoints_embed(ctx))
 
-    profile.set_stylepoints(await create.get_user_stylepoints(ui, profile.get_stylepoints()))
-    profile.write()
-    await ui.end(True)
+    @classmethod
+    @utils.deco.profile_required()
+    async def main(cls, ctx):
+        """Update your stylepoints."""
+        profile: utils.Profile = utils.Profile(ctx.author.id)
+        ui: utils.CommandUI = await utils.CommandUI(ctx, create.create_stylepoints_embed(ctx))
+
+        profile.set_stylepoints(await create.get_user_stylepoints(ui, profile.get_stylepoints()))
+        profile.write()
+        await ui.end(True)
