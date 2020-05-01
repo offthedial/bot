@@ -5,7 +5,7 @@ import re
 import discord
 
 from offthedialbot import utils
-from . import create_status_embed, display_field
+from . import Profile
 
 
 @utils.deco.profile_required(reverse=True)
@@ -13,7 +13,7 @@ async def main(ctx):
     """Create your profile."""
     profile: utils.Profile = utils.Profile(ctx.author.id, new=True)
 
-    embed: discord.Embed = create_status_embed(ctx.author.display_name, profile)
+    embed: discord.Embed = Profile.create_status_embed(ctx.author.display_name, profile)
     ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
 
     profile = await set_user_status(ui, profile)
@@ -37,7 +37,7 @@ async def set_user_status(ui: utils.CommandUI, profile: utils.Profile) -> utils.
 
     if not await confirm_profile(ui):
         profile: utils.Profile = utils.Profile(ui.ctx.author.id, new=True)
-        ui.embed = create_status_embed(ui.ctx.author.display_name, profile)
+        ui.embed = Profile.create_status_embed(ui.ctx.author.display_name, profile)
         profile: utils.Profile = await set_user_status(ui, profile)
 
     return profile
@@ -57,7 +57,7 @@ async def set_status_field(ui, profile, key, field_index) -> None:
         profile.set_ign(field_value)
     elif key == "SW":
         profile.set_sw(field_value)
-    ui.embed.set_field_at(field_index, name=key, value=display_field(key, field_value))
+    ui.embed.set_field_at(field_index, name=key, value=Profile.display_field(key, field_value))
 
 
 async def set_rank_field(ui: utils.CommandUI, profile: utils.Profile, field_index: int) -> None:
@@ -74,7 +74,7 @@ async def set_rank_field(ui: utils.CommandUI, profile: utils.Profile, field_inde
         profile.set_rank(key, parse_reply("Ranks", reply.content))
         ui.embed.set_field_at(field_index,
             name="Ranks",
-            value=display_field("Ranks", profile.get_ranks()), inline=False)
+            value=Profile.display_field("Ranks", profile.get_ranks()), inline=False)
 
 
 def clean_status_key(profile: utils.Profile, key: str) -> tuple:

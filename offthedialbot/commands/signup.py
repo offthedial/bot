@@ -4,7 +4,7 @@ from contextlib import contextmanager, asynccontextmanager
 import discord
 
 from offthedialbot import utils
-from offthedialbot.commands.profile import create, update, create_status_embed
+from offthedialbot.commands.profile import create, update, Profile
 
 
 @utils.deco.otd_only
@@ -95,7 +95,7 @@ async def show_preview(ctx, profile):
     """Show a preview for profile update."""
     preview = None
     try:
-        embed = create_status_embed(ctx.author.display_name, profile, True)
+        embed = Profile.create_status_embed(ctx.author.display_name, profile, True)
         embed.title, embed.description = "Preview:", f"**{embed.title}**"
         preview = await ctx.send(embed=embed)
         yield

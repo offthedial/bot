@@ -1,6 +1,6 @@
 """$profile update"""
 from offthedialbot import utils
-from .. import create, display_field, create_status_embed
+from .. import Profile, create
 
 
 @utils.deco.profile_required()
@@ -26,7 +26,7 @@ async def update_profile(ctx, profile, title=None):
 async def wait_profile_field(ui: utils.CommandUI, profile: utils.Profile, index, field) -> None:
     """wait for reply and write updated field."""
     ui.embed.clear_fields()
-    ui.embed.add_field(name=field[0], value=display_field(*field))
+    ui.embed.add_field(name=field[0], value=Profile.display_field(*field))
 
     await set_field(ui, profile, index)
 
@@ -50,7 +50,7 @@ async def set_field(ui: utils.CommandUI, profile: utils.Profile, index: int) -> 
 
 def create_update_embed(ctx, profile: utils.Profile):
     """Create status embed, with some adjustments."""
-    embed = create_status_embed(ctx.author.display_name, profile)
+    embed = Profile.create_status_embed(ctx.author.display_name, profile)
     emojis: list = []
     for (index, field), emoji in zip(enumerate(embed.fields), utils.emojis.digits):
         embed.set_field_at(index, name=(f"{emoji} " + field.name), value=field.value,
