@@ -35,7 +35,7 @@ def find_commands(module=sys.modules[__name__]):
 
         # Load the module
         sub_module = loader.find_module(module_name).load_module(module_name)
-        sub_dict = {'func': None, 'subcommands': {}}
+        sub_dict = {'class': None, 'subcommands': {}}
 
         # Get the current node in the tree
         if len(hierarchy) == 1:
@@ -46,10 +46,11 @@ def find_commands(module=sys.modules[__name__]):
             parent['subcommands'][hierarchy[-1]] = sub_dict
 
         # Iterate over its contents
-        for item_name in dir(sub_module):
-            obj = getattr(sub_module, item_name)
-            if inspect.iscoroutinefunction(obj) and item_name == 'main':
-                sub_dict['func'] = obj
+        for cmd_name in dir(sub_module):
+            attr = getattr(sub_module, cmd_name)
+            if inspect.isclass(attr):
+                sub_dict['class'] = attr
+                break
 
     return data
 
@@ -58,33 +59,38 @@ def process_commands(data, parent):
     """Extract main function and convert into an ext command."""
     for name, cmd_dict in data.items():
 
-        func = derive_command(cmd_dict['func'], name)
-        func.hidden = getattr(func, 'hidden', False)
+        command = derive_command(cmd_dict['class'], name)
+        command_attrs = getattr(cmd_dict['class'], 'command_attrs', {})
         subcommands = cmd_dict['subcommands']
 
         # If subcommands were found, create a command group
         if subcommands:
-            cmd = commands.Group(func, name=name, invoke_without_command=True, ignore_extra=False, hidden=func.hidden)
+            cmd = commands.Group(command, name=name, invoke_without_command=True, ignore_extra=False, **command_attrs)
             # Re-run this function for all of the subcommands
             process_commands(subcommands, cmd)
 
         # Otherwise, create a normal command
         else:
-            cmd = commands.Command(func, name=name, ignore_extra=False, hidden=func.hidden)
+            cmd = commands.Command(command, name=name, ignore_extra=False, **command_attrs)
 
         parent.add_command(cmd)
 
 
-def derive_command(func, name):
+def derive_command(command, name):
     """Wrap command in another function to parse arguments and exceptions."""
-    if not func:
-        logger.warn(f"Cannot register command '{name}': Missing `main`")
+    warn = None
+    if not command:
+        warn = 'class'
+    elif not getattr(command, 'main', False):
+        warn = 'main'
 
-        async def func(ctx):
+    if warn:
+        logger.warn(f"Cannot register command '{name}': Missing `{warn}`")
+
+        async def _(ctx):
             pass
-
-    @wraps(func)
-    async def _(ctx):
-        await func(ctx)
-
+    else:
+        async def _(ctx):
+            await command.main(ctx)
+    _.__doc__ = command.__doc__
     return _

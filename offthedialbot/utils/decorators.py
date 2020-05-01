@@ -88,7 +88,6 @@ def require_role(role: str):
                     title="Permission Denied",
                     description=f"This command is only avaliable to {role}s.")
 
-        _.hidden = True
         return _
 
     return deco
