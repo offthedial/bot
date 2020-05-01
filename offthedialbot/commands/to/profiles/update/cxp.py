@@ -1,27 +1,24 @@
 """$to profiles update cxp"""
-import discord
+from offthedialbot import utils
+from offthedialbot.commands.profile.create import ProfileCreate
+from . import update_profile_key
 
-from offthedialbot.commands.profile.update import *
-from ..get import get_profiles
 
-
-@utils.deco.require_role("Organiser")
-async def main(ctx):
+class ToProfilesUpdateCxp(utils.Command):
     """Update user's competitive experience."""
-    ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed())
-    profiles = await get_profiles(ui)
-    ui.embed = discord.Embed(title="Updating profiles...", color=utils.colors.DIALER)
-    for profile, member in profiles:
-        await ui.run_command(update_cxp, profile, member.display_name)
 
-    await ui.end(True)
+    @classmethod
+    @utils.deco.require_role("Organiser")
+    async def main(cls, ctx):
+        """Update user's competitive experience."""
+        await update_profile_key(ctx, cls.update_cxp)
 
+    @classmethod
+    async def update_cxp(cls, ctx, profile, username):
+        """Modified $profile update cxp command."""
+        ui: utils.CommandUI = await utils.CommandUI(ctx, ProfileCreate.create_cxp_embed(ctx))
+        ui.embed.description = f"{username}'s Competitive Experience"
 
-async def update_cxp(ctx, profile, username):
-    """Modified $profile update cxp command."""
-    ui: utils.CommandUI = await utils.CommandUI(ctx, create.create_cxp_embed(ctx))
-    ui.embed.description = f"{username}'s Competitive Experience"
-
-    profile.set_cxp(await create.get_user_cxp(ui))
-    profile.write()
-    await ui.end(True)
+        profile.set_cxp(await ProfileCreate.get_user_cxp(ui))
+        profile.write()
+        await ui.end(True)

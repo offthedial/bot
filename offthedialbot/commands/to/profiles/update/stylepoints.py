@@ -1,27 +1,24 @@
 """$to profiles update stylepoints"""
-import discord
+from offthedialbot import utils
+from offthedialbot.commands.profile.create import ProfileCreate
+from . import update_profile_key
 
-from offthedialbot.commands.profile.update import *
-from ..get import get_profiles
 
-
-@utils.deco.require_role("Organiser")
-async def main(ctx):
+class ToProfilesUpdateStylepoints(utils.Command):
     """Update user's stylepoints."""
-    ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed())
-    profiles = await get_profiles(ui)
-    ui.embed = discord.Embed(title="Updating profiles...", color=utils.colors.DIALER)
-    for profile, member in profiles:
-        await ui.run_command(update_stylepoints, profile, member.display_name)
 
-    await ui.end(True)
+    @classmethod
+    @utils.deco.require_role("Organiser")
+    async def main(cls, ctx):
+        """Update user's stylepoints."""
+        await update_profile_key(ctx, cls.update_stylepoints)
 
+    @classmethod
+    async def update_stylepoints(cls, ctx, profile, username):
+        """Modified $profile update stylepoints command."""
+        ui: utils.CommandUI = await utils.CommandUI(ctx, ProfileCreate.create_stylepoints_embed(ctx))
+        ui.embed.description = f"{username}'s Stylepoints"
 
-async def update_stylepoints(ctx, profile, username):
-    """Modified $profile update stylepoints command."""
-    ui: utils.CommandUI = await utils.CommandUI(ctx, create.create_stylepoints_embed(ctx))
-    ui.embed.description = f"{username}'s Stylepoints"
-
-    profile.set_stylepoints(await create.get_user_stylepoints(ui))
-    profile.write()
-    await ui.end(True)
+        profile.set_stylepoints(await ProfileCreate.get_user_stylepoints(ui))
+        profile.write()
+        await ui.end(True)
