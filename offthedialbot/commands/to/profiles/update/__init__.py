@@ -3,7 +3,7 @@ import discord
 
 from offthedialbot import utils
 from offthedialbot.commands.profile.update import ProfileUpdate
-from ..get import get_profiles
+from ..get import ToProfilesGet
 
 
 class ToProfilesUpdate(utils.Command):
@@ -26,7 +26,7 @@ async def update_profile_key(ctx, command):
     """Update other profile keys."""
     ui: utils.CommandUI = await utils.CommandUI(ctx,
         discord.Embed(title="Updating profiles...", color=utils.colors.DIALER))
-    profiles = await get_profiles(ui)
+    profiles = await ToProfilesGet.get_profiles(ui)
     for profile, member in profiles:
         await ui.run_command(command, profile, member.display_name)
 
