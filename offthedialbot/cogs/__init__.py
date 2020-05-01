@@ -33,8 +33,8 @@ def get_cogs(modules) -> list:
 
 def get_class(module):
     """Get the first class present in a given module."""
+    module_name = ".".join(module.__name__.split(".")[-1:])
     for name, obj in inspect.getmembers(module):
-        module_name = ".".join(module.__name__.split(".")[-1:])
         if inspect.isclass(obj) and obj.__name__ == snake_to_pascal(module_name):
             return obj
     else:

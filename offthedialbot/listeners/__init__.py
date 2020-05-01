@@ -34,8 +34,8 @@ def get_listeners(modules: list) -> list:
 
 def get_function(module):
     """Get the first function present in a given module."""
+    module_name = ".".join(module.__name__.split(".")[-1:])
     for name, obj in inspect.getmembers(module):
-        module_name = ".".join(module.__name__.split(".")[-1:])
         if inspect.isfunction(obj) and obj.__name__ == module_name:
             return obj
     else:
