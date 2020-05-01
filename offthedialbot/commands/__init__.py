@@ -2,7 +2,6 @@
 import inspect
 import pkgutil
 import sys
-from functools import wraps
 
 from discord.ext import commands
 
