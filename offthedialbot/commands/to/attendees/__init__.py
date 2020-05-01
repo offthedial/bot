@@ -4,11 +4,15 @@ from discord.ext import commands
 from offthedialbot import utils
 
 
-@utils.deco.require_role("Organiser")
-@utils.deco.tourney()
-async def main(ctx):
+class ToAttendees(utils.Command):
     """Command tools for managing attendees."""
-    raise commands.TooManyArguments
+
+    @classmethod
+    @utils.deco.require_role("Organiser")
+    @utils.deco.tourney()
+    async def main(cls, ctx):
+        """Command tools for managing attendees."""
+        raise commands.TooManyArguments
 
 
 def attendee_and_profile(ctx):
