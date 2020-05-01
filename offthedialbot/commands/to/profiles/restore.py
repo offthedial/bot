@@ -11,11 +11,11 @@ from offthedialbot.commands.profile.create import ProfileCreate
 
 
 class ToProfilesRestore(utils.Command):
-    """Temporary command to import from backup."""
+    """Restore profiles from backup."""
 
     @classmethod
     async def main(cls, ctx):
-        """Temporary command to import from backup."""
+        """Restore profiles from backup."""
         ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(
             title="Please upload a valid profiles export."
         ))
