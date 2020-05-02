@@ -1,6 +1,6 @@
 """$profile update stylepoints"""
 from offthedialbot import utils
-from .. import create
+from ..create import ProfileCreate
 
 
 class ProfileUpdateStylepoints(utils.Command):
@@ -11,8 +11,8 @@ class ProfileUpdateStylepoints(utils.Command):
     async def main(cls, ctx):
         """Update your stylepoints."""
         profile: utils.Profile = utils.Profile(ctx.author.id)
-        ui: utils.CommandUI = await utils.CommandUI(ctx, create.create_stylepoints_embed(ctx))
+        ui: utils.CommandUI = await utils.CommandUI(ctx, ProfileCreate.create_stylepoints_embed(ctx))
 
-        profile.set_stylepoints(await create.get_user_stylepoints(ui, profile.get_stylepoints()))
+        profile.set_stylepoints(await ProfileCreate.get_user_stylepoints(ui, profile.get_stylepoints()))
         profile.write()
         await ui.end(True)

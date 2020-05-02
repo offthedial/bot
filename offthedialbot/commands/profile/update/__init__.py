@@ -1,6 +1,7 @@
 """$profile update"""
 from offthedialbot import utils
-from .. import Profile, create
+from .. import Profile
+from ..create import ProfileCreate
 
 
 class ProfileUpdate(utils.Command):
@@ -23,7 +24,7 @@ class ProfileUpdate(utils.Command):
 
         reply = await ui.get_valid_reaction(emojis)
         index: int = emojis.index(reply.emoji)
-        field = create.clean_status_key(profile, ['IGN', 'SW', 'Ranks'][index])
+        field = ProfileCreate.clean_status_key(profile, ['IGN', 'SW', 'Ranks'][index])
         await cls.wait_profile_field(ui, profile, index, field)
 
     @classmethod
@@ -35,7 +36,7 @@ class ProfileUpdate(utils.Command):
         await cls.set_field(ui, profile, index)
 
         # Confirm profile and save it
-        if await create.confirm_profile(ui):
+        if await ProfileCreate.confirm_profile(ui):
             profile.write()
             await ui.end(True)
         else:
@@ -46,9 +47,9 @@ class ProfileUpdate(utils.Command):
     async def set_field(cls, ui: utils.CommandUI, profile: utils.Profile, index: int) -> None:
         """Wait for user to type whichever field they want to update."""
         await [
-            lambda: create.set_status_field(ui, profile, "IGN", 0),
-            lambda: create.set_status_field(ui, profile, "SW", 0),
-            lambda: create.set_rank_field(ui, profile, 0),
+            lambda: ProfileCreate.set_status_field(ui, profile, "IGN", 0),
+            lambda: ProfileCreate.set_status_field(ui, profile, "SW", 0),
+            lambda: ProfileCreate.set_rank_field(ui, profile, 0),
         ][index]()
 
     @classmethod

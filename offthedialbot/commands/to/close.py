@@ -2,7 +2,9 @@
 import discord
 
 from offthedialbot import utils
-from . import attendees
+from .attendees import attendee_and_profile
+from .attendees.export import ToAttendeesExport
+from .attendees.remove import ToAttendeesRemove
 
 
 class ToClose(utils.Command):
@@ -51,12 +53,12 @@ class ToClose(utils.Command):
         """Remove disqualified members."""
         ui.embed.description = "Removing disqualified attendees..."
         await ui.update()
-        await attendees.remove.disqualified(ui.ctx, left=True, checkin=True)
+        await ToAttendeesRemove.disqualified(ui.ctx, left=True, checkin=True)
 
     @classmethod
     async def export_attendees(cls, ui):
         """Automatically export attendees."""
         ui.embed.description = "Exporting attendees..."
         await ui.update()
-        file = attendees.export.create_file(ui.ctx, attendees.attendee_and_profile(ui.ctx))
+        file = ToAttendeesExport.create_file(attendee_and_profile(ui.ctx))
         await ui.ctx.send(file=file)
