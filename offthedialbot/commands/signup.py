@@ -4,7 +4,9 @@ from contextlib import contextmanager, asynccontextmanager
 import discord
 
 from offthedialbot import utils
-from offthedialbot.commands.profile import create, update, Profile
+from offthedialbot.commands.profile import Profile
+from offthedialbot.commands.profile.create import ProfileCreate
+from offthedialbot.commands.profile.update import ProfileUpdate
 
 
 class Signup(utils.Command):

@@ -2,10 +2,10 @@
 import discord
 
 from offthedialbot import utils
-from . import open as to_open
-from . import start as to_start
-from . import close as to_close
-from . import end as to_end
+from .open import ToOpen
+from .start import ToStart
+from .close import ToClose
+from .end import ToEnd
 
 
 class To(utils.Command):
@@ -41,13 +41,13 @@ class To(utils.Command):
         if option == options['done']:
             await ui.end(True)
         elif option == options.get('new'):
-            await ui.run_command(to_open.main)
+            await ui.run_command(ToOpen.main)
         elif option == options.get('next'):
             await ui.run_command([
-                to_open,
-                to_start,
-                to_close,
-                to_end
+                ToOpen,
+                ToStart,
+                ToClose,
+                ToEnd
             ][utils.tourney.current_step()].main)
 
     @classmethod
