@@ -193,3 +193,12 @@ class Profile(ProfileMeta):
 
     def get_cxp(self) -> int:
         return self.profile["cxp"]
+
+
+def find(id, meta=False) -> Union[Profile, Optional[ProfileMeta]]:
+    """Find and return Profile given id."""
+    try:
+        profile = Profile(id)
+    except Profile.NotFound:
+        profile = ProfileMeta(id) if meta else None
+    return profile

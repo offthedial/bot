@@ -23,10 +23,7 @@ def attendee_and_profile(ctx):
 
 async def check_valid_attendee(ctx, attendee, competing=True):
     """Check if the attendee is valid or not."""
-    try:
-        profile = utils.Profile(attendee.id)
-    except utils.Profile.NotFound:
-        profile = utils.ProfileMeta(attendee.id)
+    profile = utils.profile.find(attendee.id, meta=True)
     check = {
         (lambda: not isinstance(profile, utils.Profile)): f"`{attendee.display_name}` does not own a profile.",
         (lambda: not profile.get_reg()): f"`{attendee.display_name}` is not competing."
@@ -39,6 +36,3 @@ async def check_valid_attendee(ctx, attendee, competing=True):
         return False
 
     return profile
-
-
-from . import export, remove
