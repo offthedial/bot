@@ -25,14 +25,16 @@ class CommandUI:
         self = super().__new__(cls)
         self.__init__(ctx, embed)
 
-        self.ui = await self.create_ui(ctx, embed)
+        self.message = await self.create_ui(ctx, embed)
         return self
 
     @staticmethod
     async def create_ui(ctx: Context, embed: discord.Embed) -> discord.Message:
         """Create and return the discord embed UI."""
-        ui: discord.Message = await ctx.send(embed=embed)
-        return ui
+        if embed.colour == discord.Color.default():
+            embed.colour = utils.colors.DIALER
+        message: discord.Message = await ctx.send(embed=embed)
+        return message
 
     async def get_valid(self, event, /, *args, **kwargs):
         """Get a reply with validity checks."""
@@ -85,9 +87,9 @@ class CommandUI:
                 "style": utils.Alert.Style.DANGER
             }
             if get_reply_params.get("cancel", True) is True:
-                await self.ui.add_reaction('❌')
+                await self.message.add_reaction('❌')
             for react in valid:  # Add reactions
-                await self.ui.add_reaction(react)
+                await self.message.add_reaction(react)
         else:
             first = False
             await self.delete_alert()
@@ -102,9 +104,9 @@ class CommandUI:
             # Remove reactions
             if len(valid) < 3:
                 for react in valid:
-                    await self.ui.clear_reaction(react)
+                    await self.message.clear_reaction(react)
             else:
-                await self.ui.clear_reactions()
+                await self.message.clear_reactions()
         else:
             reply: discord.Reaction = await self.get_valid_reaction(
                 valid=valid, _alert_params=_alert_params, **get_reply_params
@@ -122,8 +124,8 @@ class CommandUI:
                 "delete": lambda m: m.delete()
             },
             'reaction_add': {
-                "check": utils.checks.react(self.ctx.author, self.ui),
-                "delete": lambda r: self.ui.clear_reaction(r[0].emoji)
+                "check": utils.checks.react(self.ctx.author, self.message),
+                "delete": lambda r: self.message.clear_reaction(r[0].emoji)
             }
         }
         # Create tasks
@@ -161,12 +163,12 @@ class CommandUI:
 
     async def run_command(self, main, *args):
         """Run an external command, from a command ui."""
-        await self.ui.clear_reaction('❌')
+        await self.message.clear_reaction('❌')
         try:
             await main(self.ctx, *args)
         except utils.exc.CommandCancel as e:
             if e.ui and e.status is not None:
-                await e.ui.ui.delete()
+                await e.ui.message.delete()
             if not e.status:
                 await self.end(e.status)
             return e
@@ -180,10 +182,10 @@ class CommandUI:
                 title=title if title else "Command Canceled", description=description),
         }
         if status_key.get(status):
-            await self.ui.edit(embed=status_key[status])
-            await self.ui.clear_reactions()
+            await self.message.edit(embed=status_key[status])
+            await self.message.clear_reactions()
         else:
-            await self.ui.delete()
+            await self.message.delete()
         await self.delete_alerts()
 
         # Raise exception to cancel command
@@ -192,21 +194,21 @@ class CommandUI:
     async def create_cancel_task(self, value=True) -> asyncio.Task:
         """Create a task that checks if the user canceled the command."""
         if value is True:
-            await self.ui.add_reaction('❌')
+            await self.message.add_reaction('❌')
             return self.cancel_task()
         elif value is False:
-            await self.ui.clear_reaction('❌')
+            await self.message.clear_reaction('❌')
 
     def cancel_task(self):
         """Task that checks if the user canceled the command."""
         return asyncio.create_task(
             self.ctx.bot.wait_for('reaction_add',
-                check=utils.checks.react(self.ctx.author, self.ui, valids={'❌'})),
+                                  check=utils.checks.react(self.ctx.author, self.message, valids={'❌'})),
                 name="CommandUI.cancel_task")
 
     async def update(self) -> None:
         """Update the ui with new information."""
-        await self.ui.edit(embed=self.embed)
+        await self.message.edit(embed=self.embed)
 
     @staticmethod
     def check_valid(valid, reply: Union[discord.Message, discord.Reaction]) -> bool:
