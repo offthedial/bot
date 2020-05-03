@@ -1,6 +1,8 @@
 """Contains on_ready listener."""
 from collections import defaultdict
 
+from offthedialbot import env
+
 
 async def on_ready(client):
     """When the bot is ready."""
@@ -8,6 +10,8 @@ async def on_ready(client):
 
     # Ready!
     client.logger.info(f'Logged in as: {client.user}')
+    if env.get('debug'):
+        client.logger.info(f'Running in debug mode. Do not use for production.')
 
 
 def set_vars(client):

@@ -23,5 +23,8 @@ class Client(Bot):
 client = Client(command_prefix='$')
 
 cogs.register_cogs(client)
+logger.debug("Cogs registered.")
 commands.register_commands(client)
+logger.debug("Commands registered.")
 listeners.register_listeners(client)
+logger.debug("Listeners registered.")

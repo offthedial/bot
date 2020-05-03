@@ -13,3 +13,8 @@ logging.getLogger("websockets").setLevel(logging.WARNING)
 logging.getLogger("asyncio").setLevel(logging.WARNING)
 
 logger = logging.getLogger("__name__")
+
+if not env.get('token'):
+    logger.warning("Cannot find 'token' key in config.yml")
+if not env.get('smashgg'):
+    logger.warning("Cannot find 'smashgg' key in config.yml")
