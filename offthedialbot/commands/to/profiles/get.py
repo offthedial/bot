@@ -63,9 +63,9 @@ async def create_profiles_list(ctx, members, meta=False):
 async def get_profile_member(ctx, member, meta=False):
     """Return a tuple containing a utils.Profile object and a discord.Member object."""
     if not meta:
-        try:
-            return utils.Profile(member.id), member
-        except utils.Profile.NotFound:
+        if profile := utils.profile.find(member.id):
+            return profile, member
+        else:
             await utils.Alert(ctx, utils.Alert.Style.DANGER,
                 title="Invalid User", description=f"{member.display_name} doesn't have a profile.")
             return False

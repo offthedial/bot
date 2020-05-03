@@ -4,7 +4,9 @@ from contextlib import contextmanager, asynccontextmanager
 import discord
 
 from offthedialbot import utils
-from offthedialbot.commands.profile import create, update, Profile
+from offthedialbot.commands.profile import Profile
+from offthedialbot.commands.profile.create import ProfileCreate
+from offthedialbot.commands.profile.update import ProfileUpdate
 
 
 class Signup(utils.Command):
@@ -42,16 +44,12 @@ class Signup(utils.Command):
     async def check_prerequisites(cls, ctx):
         """Check to make sure the user fits all the prerequisites."""
         tourney = utils.tourney.get()
-        try:
-            profile = utils.Profile(ctx.author.id)
-        except utils.Profile.NotFound:
-            profile = utils.ProfileMeta(ctx.author.id)
+        profile = utils.profile.find(ctx.author.id, meta=True)
 
         check = {
             (lambda: not tourney or tourney["reg"] is False): "Registration is not open.",
             (lambda: profile and profile.get_banned()):
                 "You are currently banned from competing in Off the Dial tournaments.",
-            (lambda: profile and profile.get_reg()): "You are already signed up!"
         }
         if any(values := [value for key, value in check.items() if key()]):
             await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Registration Failed.", description=values[0])
@@ -73,7 +71,7 @@ class Signup(utils.Command):
             ui.embed.title = "A profile is required to compete. To create one and proceed, select \u2705."
             ui.embed.description = "Your profile will be saved for future use."
             await ui.get_valid_reaction(["\u2705"])
-            await ui.run_command(create.main)
+            await ui.run_command(ProfileCreate.main)
         else:
             await cls.profile_updated(ui, profile)
 
@@ -91,7 +89,7 @@ class Signup(utils.Command):
         async with cls.show_preview(ui.ctx, profile):
             reply = await ui.get_valid_reaction(list(emojis.values()))
         if reply.emoji == emojis["pencil"]:
-            await ui.run_command(update.ProfileUpdate.main)
+            await ui.run_command(ProfileUpdate.main)
 
     @classmethod
     @asynccontextmanager
