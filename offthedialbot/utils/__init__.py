@@ -1,6 +1,6 @@
 """Import common utilites used by all commands of the bot."""
-
 from .db import dbh
+from .session import session
 from . import channels
 from . import checks
 from . import colors
