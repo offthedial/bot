@@ -7,7 +7,7 @@ async def on_ready(client):
     set_vars(client)
 
     # Ready!
-    client.logger.info(f'Logged in as: {client.user.name}')
+    client.logger.info(f'Logged in as: {client.user}')
 
 
 def set_vars(client):
