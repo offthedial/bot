@@ -11,9 +11,10 @@ This bot was created to help organize Off The Dial's tournaments easier and fast
 - Realtime data using smash.gg's GraphQL API!
 - Unique, polished UI for discord commands!
 
-<!--
 ## Usage
-![Example Output][example-output] <!-- Picture of someone using the help command -->
+
+<!-- Picture of someone using the help command -->
+![Example Output][example-output]
 
 ## Development Enviroment
 1. Clone the repo with `git clone https://github.com/LeptoFlare/offthedialbot.git`
