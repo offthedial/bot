@@ -1,6 +1,6 @@
 """Contains the DatabaseHandler class."""
 
-from offthedialbot import env
+from offthedialbot import logger, env
 
 if env.get("debug"):
     from mongomock import MongoClient
@@ -13,6 +13,7 @@ class DatabaseHandler:
 
     def __init__(self):
         self.client = MongoClient("mongodb://mongo:27017/")
+        logger.debug("New MongoClient has been created (port:27017).")
         self.db = self.client["offthedialbot"]
 
         # Collections

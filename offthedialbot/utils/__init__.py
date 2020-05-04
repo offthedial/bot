@@ -1,6 +1,6 @@
 """Import common utilites used by all commands of the bot."""
-
 from .db import dbh
+from .session import session
 from . import channels
 from . import checks
 from . import colors
@@ -8,6 +8,7 @@ from . import emojis
 from . import roles
 from . import time
 from . import tourney
+from . import smashgg
 from . import exceptions as exc
 from . import decorators as deco
 from .command import Command
