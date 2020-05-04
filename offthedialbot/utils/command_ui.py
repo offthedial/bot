@@ -45,41 +45,37 @@ class CommandUI:
         return await coro()
 
     async def get_valid_message(self, valid: Union[str, Callable], error_fields: dict = None, *,
-                                _alert_params=None, **get_reply_params) -> discord.Message:
+                                _alert_params=None, _alert_index=None, **get_reply_params) -> discord.Message:
         """Get message reply with validity checks."""
         await self.update()
         # Check if it's the function's first run
         if _alert_params is None:  # Initialize error params
-            first = True
             _alert_params: dict = {
                 "title": "Invalid Message",
                 **(error_fields if error_fields else {}),
                 "style": utils.Alert.Style.DANGER
             }
         else:
-            first = False
-            await self.delete_alert()
-            await self.create_alert(**_alert_params)
+            _alert_index = await self.create_alert(**_alert_params)
 
         # Get message
         reply: discord.Message = await self.get_reply(**get_reply_params)
+        if isinstance(_alert_index, int):
+            await self.delete_alert(_alert_index)
 
         # Make sure it's valid
-        if self.check_valid(valid, reply):
-            if not first:  await self.delete_alert()
-        else:
+        if not self.check_valid(valid, reply):
             reply: discord.Message = await self.get_valid_message(
-                valid=valid, _alert_params=_alert_params, **get_reply_params
+                valid=valid, _alert_params=_alert_params, _alert_index=_alert_index, **get_reply_params
             )
         return reply
 
     async def get_valid_reaction(self, valid: list, error_fields: dict = None, *,
-                                 _alert_params=None, **get_reply_params) -> discord.Reaction:
+                                 _alert_params=None, _alert_index=None, **get_reply_params) -> discord.Reaction:
         """Get reaction reply with validity checks."""
         await self.update()
         # Check if it's the function's first run
         if _alert_params is None:  # Initialize error params
-            first = True
             _alert_params: dict = {
                 "title": "Invalid Option",
                 "description": "Please choose one of the supported options",
@@ -91,26 +87,19 @@ class CommandUI:
             for react in valid:  # Add reactions
                 await self.message.add_reaction(react)
         else:
-            first = False
-            await self.delete_alert()
-            await self.create_alert(**_alert_params)
+            _alert_index = await self.create_alert(**_alert_params)
 
         # Get reaction
         reply: discord.Reaction = await self.get_reply("reaction_add", **get_reply_params)
+        if isinstance(_alert_index, int):
+            await self.delete_alert(_alert_index)
 
         # Make sure it's valid
-        if self.check_valid(valid, reply):
-            if not first:  await self.delete_alert()
-            # Remove reactions
-            if len(valid) < 3:
-                for react in valid:
-                    await self.message.clear_reaction(react)
-            else:
-                await self.message.clear_reactions()
-        else:
+        if not self.check_valid(valid, reply):
             reply: discord.Reaction = await self.get_valid_reaction(
-                valid=valid, _alert_params=_alert_params, **get_reply_params
+                valid=valid, _alert_params=_alert_params, _alert_index=_alert_index, **get_reply_params
             )
+        await self.remove_reactions(valid, self.message)
         return reply
 
     async def get_reply(self, event: str = 'message', /, **kwargs) -> Union[discord.Message, discord.Reaction]:
@@ -147,9 +136,23 @@ class CommandUI:
 
         return reply
 
-    async def create_alert(self, *args, **kwargs) -> None:
+    async def create_alert(self, *args, **kwargs) -> int:
         """Create an alert associated with the command ui."""
-        self.alerts.append(await utils.Alert(self.ctx, *args, **kwargs))
+        self.alerts.append(alert := await utils.Alert(self.ctx, *args, **kwargs))
+        return self.alerts.index(alert)
+
+
+    @asynccontextmanager
+    async def create_temp_alert(self, *args, **kwargs) -> int:
+        """Create an alert associated with the command ui."""
+        alert = None
+        try:
+            alert = await self.create_alert(*args, **kwargs)
+            yield alert
+        finally:
+            if alert is not None:
+                await self.delete_alert(alert)
+
 
     async def delete_alert(self, index=-1) -> None:
         """Delete an alert associated with the command ui if it exists, defaults the the latest alert."""
@@ -203,26 +206,12 @@ class CommandUI:
         """Task that checks if the user canceled the command."""
         return asyncio.create_task(
             self.ctx.bot.wait_for('reaction_add',
-                                  check=utils.checks.react(self.ctx.author, self.message, valids={'❌'})),
+                check=utils.checks.react(self.ctx.author, self.message, valids={'❌'})),
                 name="CommandUI.cancel_task")
 
     async def update(self) -> None:
         """Update the ui with new information."""
         await self.message.edit(embed=self.embed)
-
-    @staticmethod
-    def check_valid(valid, reply: Union[discord.Message, discord.Reaction]) -> bool:
-        """Check if a user's reply is valid."""
-        if isinstance(valid, str):
-            return bool(re.search(valid, reply.content))
-        if getattr(valid, "__contains__", False):
-            return reply.emoji in valid
-
-        else:
-            try:
-                return valid(reply)
-            except ValueError:
-                return False
 
     @classmethod
     async def wait_tasks(cls, tasks: Set[asyncio.Task], timeout=None) -> Tuple[Optional[asyncio.Future], Optional[Any]]:
@@ -240,3 +229,26 @@ class CommandUI:
             return task, task.result()
 
         return None, None
+
+    @staticmethod
+    def check_valid(valid, reply: Union[discord.Message, discord.Reaction]) -> bool:
+        """Check if a user's reply is valid."""
+        if isinstance(valid, str):
+            return bool(re.search(valid, reply.content))
+        if getattr(valid, "__contains__", False):
+            return reply.emoji in valid
+
+        else:
+            try:
+                return valid(reply)
+            except ValueError:
+                return False
+
+    @staticmethod
+    async def remove_reactions(reactions, message):
+        """Efficiently remove reactions."""
+        if len(reactions) < 3:
+            for react in reactions:
+                await message.clear_reaction(react)
+        else:
+            await message.clear_reactions()
