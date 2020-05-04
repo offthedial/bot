@@ -20,6 +20,7 @@ This bot was created to help organize Off The Dial's tournaments easier and fast
 2. Create a `config.yml` in the repository root:
    ```
    token: XlcL5cwQ...haJQLQ5G
+   smashgg: 7e5073d2c...f61fbea
    debug (optional): true
    ```
 3. Run `docker-compose up --build` in the repository root.
