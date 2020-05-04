@@ -126,13 +126,14 @@ class CommandUI:
         task, reply = await self.wait_tasks(tasks, kwargs.get("timeout", 180))
 
         # Get result
-        if task in (None, cancel_task):
-            await self.end(False, None if task == cancel_task else "Command timed out")
-        else:
+        if task is reply_task:
             if kwargs.get("delete") is not False:
                 await key[event]["delete"](reply)
             if event.startswith('reaction'):
                 reply = reply[0]
+        else:
+            print(task)
+            await self.end(False, None if task else "Command Timeout")
 
         return reply
 
