@@ -54,17 +54,13 @@ class To(utils.Command):
     async def show_dashboard(cls, ui, tourney, options):
         """Show TO dashboard when there is an ongoing tournament."""
         ui.embed.description = f"To proceed to the next step, select {options['next']}."
-        emoji = {
-            "lock": {True: '\U0001f513', False: '\U0001f512'},
-            "check": {True: '\u2705', False: '\u23f9'}
-        }
         ui.embed.add_field(name="Current Tournament Status:", value="\n".join([
             f"**Type:** `{utils.tourney.Type(tourney['type']).name}`", ""
-            f"**Registration:** {emoji['lock'][tourney['reg']]}",
-            f"**Check-in:** {emoji['lock'][tourney['checkin']]}"
+            f"**Registration:** {utils.emojis.lock[tourney['reg']]}",
+            f"**Check-in:** {utils.emojis.lock[tourney['checkin']]}"
         ]))
         ui.embed.add_field(name="Checklist:", value="\n".join([
-            f"{emoji['check'][i < utils.tourney.current_step()]} {value}" for i, value in enumerate([
+            f"{utils.emojis.checklist[i < utils.tourney.current_step()]} {value}" for i, value in enumerate([
                 "`$to open ` Open registration.",
                 "`$to start` Start check-in.",
                 "`$to close` Close registration and end check-in.",
