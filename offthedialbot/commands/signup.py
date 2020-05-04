@@ -1,4 +1,5 @@
 """$signup"""
+import asyncio
 from contextlib import contextmanager, asynccontextmanager
 
 import discord
@@ -10,13 +11,24 @@ from offthedialbot.commands.profile.update import ProfileUpdate
 
 
 class Signup(utils.Command):
-    """Sign up for the upcoming tournament!"""
+    """ Sign up for the upcoming tournament!
+
+    Or check your dashboard if you already signed up.
+    """
 
     @classmethod
     @utils.deco.otd_only
     async def main(cls, ctx):
         """Sign up for the upcoming tournament!"""
-        tourney, profile = await cls.check_prerequisites(ctx)
+        if (profile := utils.profile.find(ctx.author.id, meta=True)).get_reg() is False:
+            await cls.sign_up(ctx, profile)
+        else:
+            await cls.dashboard(ctx)
+
+    @classmethod
+    async def sign_up(cls, ctx, profile):
+        """Sign up for the upcoming tournament!"""
+        tourney = await cls.check_prerequisites(ctx, profile)
 
         ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(color=utils.colors.COMPETING))
         checklist = cls.Checklist(ui, {
@@ -41,10 +53,61 @@ class Signup(utils.Command):
         await ui.end(True)
 
     @classmethod
-    async def check_prerequisites(cls, ctx):
+    async def dashboard(cls, ctx):
+        """Show an attendee dashboard to the user."""
+        tourney = utils.tourney.get()
+        status, tourneygg = await utils.smashgg.post(utils.smashgg.tournament_query)
+        if status != 200:
+            await utils.Alert(ctx, utils.Alert.Style.DANGER, title=f"Status Code - `{status}`", description="An error occurred while trying to retrieve tournament data from smash.gg, try again later.")
+            raise utils.exc.CommandCancel
+
+        start_at = utils.time.datetime.utcfromtimestamp(tourneygg['data']['tournament']['startAt'])
+        tourney_data = {
+            "name": tourneygg['data']['tournament']['name'],
+            "date": start_at.strftime('%A, %B %d | `%I:%M%p` `UTC`'),
+            "countdown": start_at - utils.time.datetime.now(),
+            "checkin": ('\u2705' if utils.roles.has(ctx.author, "Checked In") else '\u26a0') if tourney['checkin'] else utils.emojis.lock[tourney['checkin']],
+            "reg": tourney['reg']
+        }
+        embed = await cls.create_dashboard_embed(ctx, tourney_data)
+        ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
+        await ui.get_valid_reaction(['\u2611'], cancel=False)
+        await ui.end(True)
+
+    @classmethod
+    async def create_dashboard_embed(cls, ctx, tourney):
+        """Create dashboard embed from tournament data."""
+        embed = discord.Embed(color=utils.colors.COMPETING, title=f"Welcome, {ctx.author.display_name} to your signup dashboard!")
+        if tourney['countdown'].total_seconds() <= 0:
+            embed.description = "\U0001f3c6 __**The tournament has commenced!**__"
+        embed.add_field(name="\U0001f4dd Currently signed up for:", value=f"{tourney['name']}", inline=False)
+        embed.add_field(name="\u23f0 Tournament Date:", value=f"{tourney['date']}")
+        if tourney['countdown'].total_seconds() > 0:
+            embed.add_field(name="Countdown:", value=", ".join([
+                f"Days: `{tourney['countdown'].days}`",
+                f"Hours: `{int(tourney['countdown'].seconds / 60**2)}:{int(tourney['countdown'].seconds / 60 % 60)}`",
+            ]))
+        embed.add_field(name="\U0001f4ca Tournament Stats:", value="\n".join([
+            f"Registration: {utils.emojis.lock[tourney['reg']]}",
+            f"Check-in: {tourney['checkin']}"
+        ]), inline=False)
+        return embed
+
+    @classmethod
+    async def dropout(cls, ui: utils.CommandUI):
+        """User requests to dropout."""
+        async with ui.create_temp_alert(utils.Alert.Style.WARNING, title="Are you sure you want to dropout?", description="If you are sure, type `dropout` to confirm.") as alert:
+            reply = await ui.get_valid_message(lambda m: m.content == 'dropout', {"title": "Unable to confirm.", "description": "Please type `dropout` to confirm."}, cancel=False)
+        await ui.end(True, title="Dropout request submitted", description="Your request has been sent to a TO and will be dealt with soon.")
+
+    @classmethod
+    async def share(cls, ui):
+        """User requests to dropout."""
+
+    @classmethod
+    async def check_prerequisites(cls, ctx, profile):
         """Check to make sure the user fits all the prerequisites."""
         tourney = utils.tourney.get()
-        profile = utils.profile.find(ctx.author.id, meta=True)
 
         check = {
             (lambda: not tourney or tourney["reg"] is False): "Registration is not open.",
@@ -55,7 +118,7 @@ class Signup(utils.Command):
             await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Registration Failed.", description=values[0])
             raise utils.exc.CommandCancel
 
-        return tourney, profile
+        return tourney
 
     @classmethod
     async def accepted_rules(cls, ui, tourney_type):
