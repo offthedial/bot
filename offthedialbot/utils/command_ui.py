@@ -141,7 +141,6 @@ class CommandUI:
         self.alerts.append(alert := await utils.Alert(self.ctx, *args, **kwargs))
         return self.alerts.index(alert)
 
-
     @asynccontextmanager
     async def create_temp_alert(self, *args, **kwargs) -> int:
         """Create an alert associated with the command ui."""
@@ -152,7 +151,6 @@ class CommandUI:
         finally:
             if alert is not None:
                 await self.delete_alert(alert)
-
 
     async def delete_alert(self, index=-1) -> None:
         """Delete an alert associated with the command ui if it exists, defaults the the latest alert."""
