@@ -102,9 +102,6 @@ venv.bak/
 # Pycharm project settings
 .idea
 
-# VSCode project settings
-.vscode
-
 # mkdocs documentation
 /site
 
