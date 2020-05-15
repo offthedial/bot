@@ -19,6 +19,7 @@ lib64/
 parts/
 sdist/
 var/
+data/
 wheels/
 *.egg-info/
 .installed.cfg
@@ -100,9 +101,6 @@ venv.bak/
 
 # Pycharm project settings
 .idea
-
-# VSCode project settings
-.vscode
 
 # mkdocs documentation
 /site
