@@ -21,15 +21,14 @@ class ToAttendeesRemove(utils.Command):
         )
         reply = await ui.get_reply()
         attendees = reply.mentions
-        for id in reply.content.split():
+        for user_id in reply.content.split():
             try:
-                attendees.append(await ctx.bot.fetch_user(int(id)))
+                attendees.append(await ctx.bot.fetch_user(int(user_id)))
             except ValueError:
                 continue
 
         if not attendees:
-            await utils.Alert(ctx, utils.Alert.Style.DANGER, title="No valid attendees found.", description="There were no valid attendees in your message.")
-            raise utils.exc.CommandCancel
+            await ui.end(False, "No valid attendees found.", "There were no valid attendees in your message.")
 
         for attendee in attendees:
 
