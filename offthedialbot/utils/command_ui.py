@@ -33,6 +33,8 @@ class CommandUI:
         """Create and return the discord embed UI."""
         if embed.colour == discord.Color.default():
             embed.colour = utils.colors.DIALER
+        if embed.footer.text == discord.Embed.Empty:
+            embed.set_footer(text=f"Invoked: {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
         message: discord.Message = await ctx.send(embed=embed)
         return message
 
