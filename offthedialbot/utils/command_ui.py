@@ -172,7 +172,7 @@ class CommandUI:
             if e.ui and e.status is not None:
                 await e.ui.message.delete()
             if not e.status:
-                await self.end(e.status)
+                await self.end(e.status, e.title, e.description)
             return e
 
     async def end(self, status: Union[bool, None], title: str = None, description=discord.Embed.Empty) -> None:
@@ -191,7 +191,7 @@ class CommandUI:
         await self.delete_alerts()
 
         # Raise exception to cancel command
-        raise utils.exc.CommandCancel(status, self)
+        raise utils.exc.CommandCancel(status, ui=self, title=title, description=description)
 
     async def create_cancel_task(self, value=True) -> asyncio.Task:
         """Create a task that checks if the user canceled the command."""
