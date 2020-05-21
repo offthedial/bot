@@ -22,7 +22,7 @@ def import_modules():
         if module.name == '__init__.py' or not module.name.endswith('.py'):
             continue
         modules.append(importlib.import_module(f"offthedialbot.listeners.{module.name[:-3]}"))
-    del module
+        del module
 
     return modules
 
@@ -35,11 +35,11 @@ def get_listeners(modules: list) -> list:
 def get_function(module):
     """Get the first function present in a given module."""
     module_name = ".".join(module.__name__.split(".")[-1:])
-    for name, obj in inspect.getmembers(module):
+    for _, obj in inspect.getmembers(module):
         if inspect.isfunction(obj) and obj.__name__ == module_name:
             return obj
-    else:
-        logger.warn(f"Cannot register listener in '{module_name}.py': Missing `{module_name}`")
+    logger.warning("Cannot register listener in '%s.py': Missing `%s`", module_name, module_name)
+    return None
 
 
 def derive_listener(func, bot):

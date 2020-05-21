@@ -65,5 +65,4 @@ def current_step():
             (None, None)
         ]
         return checklist.index((tourney['reg'], tourney['checkin'])) + 1
-    else:
-        return 0
+    return 0

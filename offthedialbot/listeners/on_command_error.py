@@ -36,5 +36,5 @@ async def command_cancel(ctx, error):
     """CommandCancel is raised."""
     if getattr(error, 'original', False) is False:
         return False
-    elif isinstance(error.original, utils.exc.CommandCancel):
+    if isinstance(error.original, utils.exc.CommandCancel):
         return True

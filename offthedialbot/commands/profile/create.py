@@ -21,9 +21,9 @@ class ProfileCreate(utils.Command):
         ui: utils.CommandUI = await utils.CommandUI(ctx, embed)
 
         profile = await cls.set_user_status(ui, profile)
-        ui.embed = cls.create_stylepoints_embed(ui.ctx)
+        ui.embed = cls.create_stylepoints_embed()
         profile.set_stylepoints(await cls.get_user_stylepoints(ui))
-        ui.embed = cls.create_cxp_embed(ui.ctx)
+        ui.embed = cls.create_cxp_embed()
         profile.set_cxp(await cls.get_user_cxp(ui))
         profile.write()
         await ui.end(True)
@@ -115,7 +115,10 @@ class ProfileCreate(utils.Command):
 
             if task == tasks[0]:
                 content: str = reply.content.lower()
-                user_playstyles.remove(content) if content in user_playstyles else user_playstyles.append(content)
+                if content in user_playstyles:
+                    user_playstyles.remove(content)
+                else:
+                    user_playstyles.append(content)
             elif task == tasks[1]:
                 if not user_playstyles:
                     await ui.create_alert(utils.Alert.Style.DANGER,
@@ -136,7 +139,7 @@ class ProfileCreate(utils.Command):
         return int(reply.content)
 
     @classmethod
-    def create_stylepoints_embed(cls, ctx) -> discord.Embed:
+    def create_stylepoints_embed(cls) -> discord.Embed:
         """Create embed for asking stylepoints."""
         embed: discord.Embed = discord.Embed(color=utils.colors.DIALER,
             title="Enter all of the playstyles below that apply to you",
@@ -145,7 +148,7 @@ class ProfileCreate(utils.Command):
         return embed
 
     @classmethod
-    def create_cxp_embed(cls, ctx) -> discord.Embed:
+    def create_cxp_embed(cls) -> discord.Embed:
         """Create embed for asking competitive experience."""
         return discord.Embed(color=utils.colors.DIALER,
             title=f"How many tournaments, with at-least 16 teams, have your competed in?")
@@ -165,14 +168,14 @@ class ProfileCreate(utils.Command):
         """Check if reply is valid for the key, return cleaned reply, or false in invalid."""
         if key == "IGN":
             return value if 1 <= len(value) <= 10 else False
-        elif key == "SW":
+        if key == "SW":
             value: str = re.sub(r"[\D]", "", value)
             return value if len(value) == 12 else False
-        elif key == "Ranks":
+        if key == "Ranks":
             value = value.upper()
             if value in {"C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+", "S"}:  # Standard rank, or default X
                 return utils.Profile.convert_rank_power(value)
-            elif re.search(r"(^S\+\d$)|(^X[1-9]\d{3}(\.\d)?$)", value.upper()):  # S+ or X(power)
+            if re.search(r"(^S\+\d$)|(^X[1-9]\d{3}(\.\d)?$)", value.upper()):  # S+ or X(power)
                 return utils.Profile.convert_rank_power(value)
 
         return False

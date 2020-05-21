@@ -33,7 +33,6 @@ class ProfileMeta:
 
     class NotFound(Exception):
         """Database doesn't return a profile."""
-        pass
 
     # Setters
     def inc_ss(self, ss: int):
@@ -58,8 +57,9 @@ class ProfileMeta:
         banned = self.meta["banned"]
         if isinstance(banned, datetime) and datetime.utcnow() < banned:
             return banned
-        elif banned is True:
+        if banned is True:
             return banned
+        return None
 
     def get_smashgg(self):
         return self.meta["smashgg"]
@@ -96,7 +96,7 @@ class Profile(ProfileMeta):
     # Profile Methods
     def calculate_elo(self) -> float:
         """Calculate the user's ELO."""
-        rank_powers = [rank for rank in self.profile["Ranks"].values()]
+        rank_powers = list(self.profile["Ranks"].values())
         return round(sum(rank_powers) / len(rank_powers), 1)
 
     def calculate_stylepoints(self, user_playstyles: list) -> list:
@@ -143,10 +143,11 @@ class Profile(ProfileMeta):
 
         if isinstance(value, float):
             return "X" + str(value)
-        elif rank := ranks.get(value, None):
+        if rank := ranks.get(value, None):
             return rank
-        elif isinstance(value, str):
+        if isinstance(value, str):
             return float(value[1:])
+        return None
 
     playstyles = {
         "frontline": (0, 0, 0),
@@ -195,10 +196,10 @@ class Profile(ProfileMeta):
         return self.profile["cxp"]
 
 
-def find(id, meta=False) -> Union[Profile, Optional[ProfileMeta]]:
+def find(profile_id, meta=False) -> Union[Profile, Optional[ProfileMeta]]:
     """Find and return Profile given id."""
     try:
-        profile = Profile(id)
+        profile = Profile(profile_id)
     except Profile.NotFound:
-        profile = ProfileMeta(id) if meta else None
+        profile = ProfileMeta(profile_id) if meta else None
     return profile

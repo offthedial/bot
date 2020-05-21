@@ -53,6 +53,6 @@ class ToAttendeesAdd(utils.Command):
     @classmethod
     async def on_smashgg(cls, ui, attendee):
         """Add attendee on smash.gg."""
-        link = utils.tourney.get()["link"].split("/")[-1]
-        ui.embed.description = f"If applicable, add `{attendee.display_name}` to smash.gg at **<https://smash.gg/admin/tournament/{link}/attendees>**, then hit the \u2705."
+        slug = utils.tourney.links[utils.tourney.get()['type']].split('/')[-1]
+        ui.embed.description = f"If applicable, add `{attendee.display_name}` to smash.gg at **<https://smash.gg/admin/tournament/{slug}/attendees>**, then hit the \u2705."
         await ui.get_valid_reaction(["\u2705"])

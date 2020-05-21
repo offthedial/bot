@@ -16,7 +16,7 @@ class ToProfilesUpdateStylepoints(utils.Command):
     @classmethod
     async def update_stylepoints(cls, ctx, profile, username):
         """Modified $profile update stylepoints command."""
-        ui: utils.CommandUI = await utils.CommandUI(ctx, ProfileCreate.create_stylepoints_embed(ctx))
+        ui: utils.CommandUI = await utils.CommandUI(ctx, ProfileCreate.create_stylepoints_embed())
         ui.embed.description = f"{username}'s Stylepoints"
 
         profile.set_stylepoints(await ProfileCreate.get_user_stylepoints(ui))
