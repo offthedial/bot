@@ -71,7 +71,7 @@ class ToAttendeesRemove(utils.Command):
         profile.set_reg(value=False)
         profile.set_reg("code", None)
         profile.write()
-        if attendee:  # Roles
+        if attendee and isinstance(attendee, discord.Member):  # Roles
             await attendee.remove_roles(
                 *[utils.roles.get(ctx, name) for name in ["Competing", "Checked In"] if utils.roles.get(ctx, name)],
                 reason=reason
