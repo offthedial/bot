@@ -72,13 +72,15 @@ class Timer:
         return timer.inserted_id
 
     @classmethod
-    def delete(cls, id=None, /, **kwargs):
+    def delete(cls, timer_id=None, /, **kwargs):
         """Delete a timer given their id."""
-        if id:  kwargs["_id"] = id
+        if timer_id:  kwargs["_id"] = timer_id
         return cls.timers.delete_one(kwargs)
 
     @classmethod
-    def get(cls, query={}):
+    def get(cls, query=None):
+        if query is None:
+            query = {}
         if "timers" not in utils.dbh.db.list_collection_names():
             return []
         return utils.dbh.timers.find(query)

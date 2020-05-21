@@ -122,10 +122,10 @@ class Timers(commands.Cog):
                 description=f"You can't have more than `{self.MAX_TIMERS}` timers running at a time.")
             await ui.end(None)
 
-    async def get_destination(self, id):
+    async def get_destination(self, destination_id):
         """Get the destination of the timer."""
         if any(dest := [
-            self.bot.get_channel(id),
-            self.bot.get_user(id),
+            self.bot.get_channel(destination_id),
+            self.bot.get_user(destination_id),
         ]):
             return [d for d in dest if d is not None][0]

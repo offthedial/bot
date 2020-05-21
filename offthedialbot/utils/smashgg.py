@@ -1,7 +1,4 @@
 """test smashgg"""
-import json
-from datetime import datetime
-
 from offthedialbot import env, utils
 
 

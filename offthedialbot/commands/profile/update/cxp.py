@@ -11,7 +11,7 @@ class ProfileUpdateCxp(utils.Command):
     async def main(cls, ctx):
         """Update your competitive experience."""
         profile: utils.Profile = utils.Profile(ctx.author.id)
-        ui: utils.CommandUI = await utils.CommandUI(ctx, ProfileCreate.create_cxp_embed(ctx))
+        ui: utils.CommandUI = await utils.CommandUI(ctx, ProfileCreate.create_cxp_embed())
 
         profile.set_cxp(await ProfileCreate.get_user_cxp(ui))
         profile.write()

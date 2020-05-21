@@ -58,8 +58,10 @@ class ProfileUpdate(utils.Command):
         embed = Profile.create_status_embed(ctx.author.display_name, profile)
         emojis: list = []
         for (index, field), emoji in zip(enumerate(embed.fields), utils.emojis.digits):
-            embed.set_field_at(index, name=(f"{emoji} " + field.name), value=field.value,
-                               inline=True if field.name != "Ranks" else False)
+            embed.set_field_at(index,
+                name=(f"{emoji} " + field.name),
+                value=field.value,
+                inline=field.name != "Ranks")
             emojis.append(emoji)
         embed.title = "React with the field you would like to change."
         return embed, emojis

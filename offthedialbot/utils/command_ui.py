@@ -200,7 +200,7 @@ class CommandUI:
         if value is True:
             await self.message.add_reaction('❌')
             return self.cancel_task()
-        elif value is False:
+        if value is False:
             await self.message.clear_reaction('❌')
 
     def cancel_task(self):
@@ -208,7 +208,7 @@ class CommandUI:
         return asyncio.create_task(
             self.ctx.bot.wait_for('reaction_add',
                 check=utils.checks.react(self.ctx.author, self.message, valids={'❌'})),
-                name="CommandUI.cancel_task")
+            name="CommandUI.cancel_task")
 
     async def update(self) -> None:
         """Update the ui with new information."""

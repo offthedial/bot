@@ -16,7 +16,7 @@ class ToProfilesUpdateCxp(utils.Command):
     @classmethod
     async def update_cxp(cls, ctx, profile, username):
         """Modified $profile update cxp command."""
-        ui: utils.CommandUI = await utils.CommandUI(ctx, ProfileCreate.create_cxp_embed(ctx))
+        ui: utils.CommandUI = await utils.CommandUI(ctx, ProfileCreate.create_cxp_embed())
         ui.embed.description = f"{username}'s Competitive Experience"
 
         profile.set_cxp(await ProfileCreate.get_user_cxp(ui))

@@ -46,7 +46,8 @@ class Minesweeper(commands.Cog):
 
         # Send minesweeper
         async with ctx.typing():
-            [await ctx.send(message) for message in map_list]
+            for message in map_list:
+                await ctx.send(message)
 
         # Remove embed
         await ui.end(status=None)

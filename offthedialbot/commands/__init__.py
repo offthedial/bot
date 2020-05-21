@@ -84,7 +84,7 @@ def derive_command(command, name):
         warn = f"'main' inside {command.__name__}"
 
     if warn:
-        logger.warn(f"Cannot register command in '{name}.py': Missing {warn}")
+        logger.warning("Cannot register command in '%s.py': Missing %s", name, warn)
 
         async def _(ctx):
             pass
