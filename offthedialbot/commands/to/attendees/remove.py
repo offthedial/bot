@@ -58,7 +58,7 @@ class ToAttendeesRemove(utils.Command):
                     lambda a, p: not utils.roles.has(a, "Checked In"),
                     "attendee failed to check-in"),
 
-            }[key] for key in kwargs.keys()]
+            }[key] for key in kwargs]
             disq = [(check, reason) for check, reason in checks if check(attendee, profile)]
 
             if any(disq):
