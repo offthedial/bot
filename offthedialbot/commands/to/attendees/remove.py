@@ -80,6 +80,6 @@ class ToAttendeesRemove(utils.Command):
     @classmethod
     async def from_smashgg(cls, ui, attendee):
         """Remove attendee from smash.gg."""
-        link = utils.tourney.get()["link"].split("/")[-1]
-        ui.embed.description = f"Remove `{attendee.display_name}` from smash.gg at **<https://smash.gg/admin/tournament/{link}/attendees>**, then hit the \u2705."
+        slug = utils.tourney.links[utils.tourney.get()['type']].split('/')[-1]
+        ui.embed.description = f"Remove `{attendee.display_name}` from smash.gg at **<https://smash.gg/admin/tournament/{slug}/attendees>**, then hit the \u2705."
         await ui.get_valid_reaction(["\u2705"])
