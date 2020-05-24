@@ -19,9 +19,9 @@ links = [
 
 
 rules = [
-    'https://docs.google.com/document/d/1f8j-DwNGEkgwpoyroJQ1jAg0v-sGWgWJfeSYf8jFV78',
-    'https://docs.google.com/document/d/1yOE-BHw4rxX9SJCUNO8NnCn70KBrQ4gomEPcqWOckGU',
-    'https://docs.google.com/document/d/1f8j-DwNGEkgwpoyroJQ1jAg0v-sGWgWJfeSYf8jFV78',
+    'https://otd.ink/idtga/rules',
+    'https://otd.ink/wl/rules',
+    'https://otd.ink/idtga/rules',
 ]
 
 
