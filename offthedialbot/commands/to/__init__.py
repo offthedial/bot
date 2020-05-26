@@ -8,7 +8,7 @@ from .close import ToClose
 from .end import ToEnd
 
 
-class To(utils.Command):
+class To(utils.Command, hidden=True):
     """ Special commands for tournament organisers!
 
     Shows a dashboard when run on it's own.
