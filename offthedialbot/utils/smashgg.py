@@ -1,13 +1,29 @@
-"""test smashgg"""
+"""Contains requests."""
 from offthedialbot import env, utils
 
 
 ver = 'alpha'
 
-tournament_query = """query TournamentQuery($slug: String) {
+startat = """query TournamentQuery($slug: String) {
   tournament(slug: $slug){
     name
     startAt
+  }
+}"""
+
+
+totalgames = """query {
+  tournament(slug: "wl") {
+    events {
+      phases {
+        name
+        sets {
+          nodes {
+           	totalGames
+          }
+        }
+      }
+    }
   }
 }"""
 
