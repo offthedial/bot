@@ -21,22 +21,20 @@ bucket = {
 
 import json
 from random import randint, shuffle
-from pprint import pprint
+
+from offthedialbot import utils
 
 
 class Maplist:
     """Represent Splatoon 2 Maplist object."""
 
-    def __init__(self, brackets: dict):
+    def __init__(self, pool, brackets: dict):
         """ Create a list of sets given the list of brackets
 
         :param list brackets: {"Preliminaries": [3, 3, 3], "Finals": [5, 5]}
         """
-        with open("pool.json") as file:
-            self.pool = json.load(file)
-        with open("popularity.json") as file:
-            self.popularity = json.load(file)
-
+        self.pool = pool
+        self.popularity = None
         self.BACKLOG = min([len(subpool) for subpool in self.pool])
         self.sets = [s for g in brackets.values() for s in g]
 
@@ -52,7 +50,7 @@ class Maplist:
 
         for maplist_round in range(len(self.sets)):
             round_maplist = []
-            for game in range(self.sets[maplist_round]):
+            for _ in range(self.sets[maplist_round]):
                 new_map = self.get_map(mode_list[mode_index], buckets, map_history)
 
                 map_history.append(new_map)
