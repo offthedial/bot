@@ -25,14 +25,19 @@ class ToMaplist(utils.Command):
             "rm": "Rainmaker",
             "cb": "Clam Blitz"
         }
-        round_names = cls.get_round_names(brackets)
-        message = []
-        for (i, game), round_name in zip(enumerate(maplist.generate()), round_names):
-            message.append(f"\n__{round_name} Round {i+1}__")
+        phases = cls.get_phases(brackets)
+        previous_phase = None
+        for (i, game), current_phase in zip(enumerate(maplist.generate()), phases):
+            phase_name = list(brackets.keys())[current_phase]
+            if previous_phase != current_phase:
+                phase_i = i
+                await ctx.send(f"__**{phase_name}:**__")
+            previous_phase = current_phase
+            message = []
+            message.append(f"> __{phase_name} Round {i-phase_i+1}:__")
             for mode, stage in game:
-                message.append(f"`{mode_names[mode]}:` {stage}")
-
-        await ctx.send("\n".join(message))
+                message.append(f"> `{mode_names[mode]}:` {stage}")
+            await ctx.send("\n".join(message))
 
     @classmethod
     async def get_maplist(cls, ctx, index=0):
@@ -48,14 +53,14 @@ class ToMaplist(utils.Command):
     def get_brackets(cls, result):
         return {
             phase["name"]: [
-                node["totalGames"] for node in phase["sets"]["nodes"]
+                node["bestOf"] for node in phase["phaseGroups"]["nodes"][0]["rounds"]
             ] for phase in result["data"]["tournament"]["events"][0]["phases"]
         }
 
     @classmethod
-    def get_round_names(cls, brackets):
-        names = []
-        for name, games in brackets.items():
+    def get_phases(cls, brackets):
+        phases = []
+        for i, games in enumerate(brackets.values()):
             for _ in range(len(games)):
-                names.append(name)
-        return names
+                phases.append(i)
+        return phases
