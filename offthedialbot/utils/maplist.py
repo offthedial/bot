@@ -1,23 +1,4 @@
-# Originally from: https://github.com/Leanny/SplatoonAlgorithm/blob/master/map_generator
-
-"""
-VOD: https://www.twitch.tv/videos/422999828
-Notes:
-Map Generator
-- Gathering input data (map pool, how many matches/sets/games, self.popularity?)
-- map generation
-  - for each game [choose x maps]
-- print maps
-
-bucket = {
-    0: { # 0 times used
-        "sz": [Moray, Shellendorf]
-    },
-    1: { # 1 times used
-        "sz": [MakoMart, Goby]
-    }
-}
-"""
+"""Contains Maplist class that can generate splatoon 2 maplists given brackets."""
 
 import json
 from random import randint, shuffle
@@ -31,7 +12,13 @@ class Maplist:
     def __init__(self, pool, brackets: dict):
         """ Create a list of sets given the list of brackets
 
-        :param list brackets: {"Preliminaries": [3, 3, 3], "Finals": [5, 5]}
+        :param dict pool: The pool where all the maps are drawn from.
+            e.g: {"sz": ["Map 1", "Map 2"]}
+        :param dict brackets:
+            keys: The name of the phase.
+            values: A list, where the len is the number of sets.
+                int values: The number of games in the set.
+            e.g: {"Preliminaries": [3, 3, 3], "Finals": [5, 5]}
         """
         self.pool = pool
         self.popularity = None
@@ -44,9 +31,9 @@ class Maplist:
         shuffle(mode_list)
         mode_index = 0
 
-        maplist = []  # will be returned
-        buckets = {}  # see example above
-        map_history = []  # used maps
+        maplist = []
+        buckets = {}
+        map_history = []
 
         for maplist_round in range(len(self.sets)):
             round_maplist = []
