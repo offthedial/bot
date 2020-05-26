@@ -11,6 +11,7 @@ class Website(commands.Cog):
         """Send an embedded section of a website document."""
 
     @commands.command(hidden=True)
+    @utils.deco.require_role("Organiser")
     async def moved(self, ctx, page: str):
         """This channel has been moved!"""
         await utils.Alert(ctx, utils.Alert.Style.WARNING,
