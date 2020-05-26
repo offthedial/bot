@@ -6,9 +6,9 @@ from offthedialbot import utils
 
 class Website(commands.Cog):
 
-    @commands.group(invoke_without_command=True)
-    async def website(self, ctx):
-        pass
+    @commands.group(invoke_without_command=True, aliases=["web", "site", "docs", "d"])
+    async def website(self, ctx, *args):
+        """Send an embedded section of a website document."""
 
     @commands.command()
     async def moved(self, ctx, page: str):
