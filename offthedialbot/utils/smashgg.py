@@ -12,6 +12,22 @@ startat = """query TournamentQuery($slug: String) {
 }"""
 
 
+totalgames = """query {
+  tournament(slug: "wl") {
+    events {
+      phases {
+        name
+        sets {
+          nodes {
+           	totalGames
+          }
+        }
+      }
+    }
+  }
+}"""
+
+
 async def post(query):
     """Send a post request to the smash.gg gql api."""
     slug = utils.tourney.links[utils.tourney.get()['type']].split('/')[-1]
