@@ -15,8 +15,9 @@ class ToMaplist(utils.Command):
         if status != 200:
             await utils.Alert(ctx, utils.Alert.Style.DANGER, title=f"Status Code - `{status}`", description="An error occurred while trying to retrieve tournament data from smash.gg, try again later.")
             raise utils.exc.CommandCancel
+        else:
+            brackets = cls.get_brackets(result)
 
-        brackets = {phase["name"]: [node["totalGames"] for node in phase["sets"]["nodes"]] for phase in result["data"]["tournament"]["events"][0]["phases"]}
         maplist = utils.Maplist(brackets)
         mode_names = {
             "sz": "Splat Zones",
@@ -24,11 +25,7 @@ class ToMaplist(utils.Command):
             "rm": "Rainmaker",
             "cb": "Clam Blitz"
         }
-        round_names = []
-        for name, games in brackets.items():
-            for i in range(len(games)):
-                round_names.append(name)
-
+        round_names = get_round_names(brackets)
         message = []
         for (i, game), round_name in zip(enumerate(maplist.generate()), round_names):
             message.append(f"\n__{round_name} Round {i+1}__")
@@ -36,3 +33,19 @@ class ToMaplist(utils.Command):
                 message.append(f"`{mode_names[mode]}:` {stage}")
 
         await ctx.send("\n".join(message))
+
+    @classmethod
+    def get_brackets(cls, result):
+        return {
+            phase["name"]: [
+                node["totalGames"] for node in phase["sets"]["nodes"]
+            ] for phase in result["data"]["tournament"]["events"][0]["phases"]
+        }
+
+    @classmethod
+    def get_round_names(cls, brackets):
+        names = []
+        for name, games in brackets.items():
+            for i in range(len(games)):
+                names.append(name)
+        return names
