@@ -10,7 +10,7 @@ class Website(commands.Cog):
     async def website(self, ctx, *args):
         """Send an embedded section of a website document."""
 
-    @commands.command()
+    @commands.command(hidden=True)
     async def moved(self, ctx, page: str):
         """This channel has been moved!"""
         await utils.Alert(ctx, utils.Alert.Style.WARNING,
