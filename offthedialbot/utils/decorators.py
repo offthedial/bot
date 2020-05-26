@@ -1,5 +1,6 @@
 """Contains custom decorators."""
 from functools import wraps
+import inspect
 
 from offthedialbot import env, utils
 
@@ -12,11 +13,11 @@ def profile_required(reverse=False, competing=False):
             @wraps(command)
             async def _(*args):
                 try:
-                    utils.Profile(args[-1].author.id)
+                    utils.Profile(get_ctx(_, args).author.id)
                 except utils.Profile.NotFound:
                     await command(*args)
                 else:
-                    await utils.Alert(args[-1], utils.Alert.Style.DANGER,
+                    await utils.Alert(get_ctx(_, args), utils.Alert.Style.DANGER,
                         title="Command Failed",
                         description="Existing profile found. You can edit it using `$profile update`.")
 
@@ -26,11 +27,11 @@ def profile_required(reverse=False, competing=False):
         def deco(command):
             @wraps(command)
             async def _(*args):
-                profile = utils.ProfileMeta(args[-1].author.id)
+                profile = utils.ProfileMeta(get_ctx(_, args).author.id)
                 if profile.get_reg():
                     await command(*args)
                 else:
-                    await utils.Alert(args[-1], utils.Alert.Style.DANGER,
+                    await utils.Alert(get_ctx(_, args), utils.Alert.Style.DANGER,
                         title="Command Failed",
                         description="You are not currently competing.")
 
@@ -41,9 +42,9 @@ def profile_required(reverse=False, competing=False):
             @wraps(command)
             async def _(*args):
                 try:
-                    utils.Profile(args[-1].author.id)
+                    utils.Profile(get_ctx(_, args).author.id)
                 except utils.Profile.NotFound:
-                    await utils.Alert(args[-1], utils.Alert.Style.DANGER,
+                    await utils.Alert(get_ctx(_, args), utils.Alert.Style.DANGER,
                         title="Command Failed",
                         description="No profile found. You can create one using `$profile create`.")
                 else:
@@ -59,7 +60,7 @@ def otd_only(command):
 
     @wraps(command)
     async def _(*args):
-        ctx = args[-1]
+        ctx = get_ctx(_, args)
         if ctx.guild and ctx.bot.OTD and ctx.guild.id == ctx.bot.OTD.id:
             await command(*args)
         elif env.get('debug'):
@@ -80,7 +81,7 @@ def require_role(role: str):
 
         @wraps(command)
         async def _(*args):
-            ctx = args[-1]
+            ctx = get_ctx(_, args)
             if ctx.guild and utils.roles.has(ctx.author, role):
                 await command(*args)
             else:
@@ -107,7 +108,7 @@ def tourney(step: int = None):
                 if utils.tourney.get():
                     await command(*args)
                 else:
-                    await error_msg(args[-1], "Tournament does not exist.")
+                    await error_msg(get_ctx(_, args), "Tournament does not exist.")
 
             return _
 
@@ -117,12 +118,16 @@ def tourney(step: int = None):
             async def _(*args):
                 current_step = utils.tourney.current_step()
                 if step > current_step:
-                    await error_msg(args[-1], "You cannot complete this step yet.")
+                    await error_msg(get_ctx(_, args), "The tournament isn't at the required step yet.")
                 elif step < current_step:
-                    await error_msg(args[-1], "You already completed this step.")
+                    await error_msg(get_ctx(_, args), "The tournament is already past the required step.")
                 else:
                     await command(*args)
 
             return _
 
     return deco
+
+
+def get_ctx(func, args):
+    return args[list(inspect.signature(func).parameters).index('ctx')]
