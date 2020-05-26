@@ -55,7 +55,7 @@ class Signup(utils.Command):
     async def dashboard(cls, ctx):
         """Show an attendee dashboard to the user."""
         tourney = utils.tourney.get()
-        status, tourneygg = await utils.smashgg.post(utils.smashgg.tournament_query)
+        status, tourneygg = await utils.smashgg.post(utils.smashgg.startat)
         if status != 200:
             await utils.Alert(ctx, utils.Alert.Style.DANGER, title=f"Status Code - `{status}`", description="An error occurred while trying to retrieve tournament data from smash.gg, try again later.")
             raise utils.exc.CommandCancel
