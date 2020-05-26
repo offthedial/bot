@@ -1,4 +1,4 @@
-"""test smashgg"""
+"""Contains requests."""
 from offthedialbot import env, utils
 
 
