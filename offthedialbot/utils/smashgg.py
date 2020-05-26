@@ -12,14 +12,16 @@ startat = """query TournamentQuery($slug: String) {
 }"""
 
 
-totalgames = """query {
-  tournament(slug: "wl") {
+totalgames = """query TournamentQuery($slug: String) {
+  tournament(slug: $slug) {
     events {
       phases {
         name
-        sets {
+        phaseGroups {
           nodes {
-           	totalGames
+            rounds {
+            	bestOf
+            }
           }
         }
       }
