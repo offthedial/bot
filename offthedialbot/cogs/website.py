@@ -26,6 +26,9 @@ class Website(commands.Cog):
     async def send_embedded_section(self, ctx, page, section, startwith=None):
         lines = (await self.get_page(ctx, page)).splitlines()
         name, content = self.get_section(self.create_sections(lines, startwith), section)
+        if name is None:
+            await utils.Alert(ctx, utils.Alert.Style.DANGER, title="No section found.", description="Could not find a section that resembled what you entered, try rewording what you said.")
+            raise utils.exc.CommandCancel
         await self.display_section(ctx, f"https://otd.ink/{page}", name, content)
 
     @staticmethod
@@ -62,7 +65,7 @@ class Website(commands.Cog):
     @staticmethod
     def get_section(sections, choice):
         if not (result := process.extractOne(choice, list(sections), scorer=fuzz.partial_ratio, score_cutoff=51)):
-            return "", 100
+            return None, None
 
         section = sections[result[0]]
         return " ".join(result[0].split()[1:]), "\n".join(section)
