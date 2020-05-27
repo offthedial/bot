@@ -5,3 +5,5 @@ numpy
 mongomock
 pymongo
 python-dateutil
+python-Levenshtein
+fuzzywuzzy
