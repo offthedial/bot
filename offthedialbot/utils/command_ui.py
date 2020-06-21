@@ -185,8 +185,17 @@ class CommandUI:
             False: utils.Alert.create_embed(utils.Alert.Style.DANGER,
                 title=title if title else "Command Canceled", description=description),
         }
-        if status_key.get(status):
-            await self.message.edit(embed=status_key[status])
+        # Get embed
+        if isinstance(status, discord.Embed):
+            embed = status
+        elif status_key.get(status):
+            embed = status_key[status]
+        else:
+            embed = None
+
+        # Update message
+        if embed:
+            await self.message.edit(embed=embed)
             await self.message.clear_reactions()
         else:
             await self.message.delete()

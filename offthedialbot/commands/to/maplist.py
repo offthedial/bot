@@ -11,11 +11,7 @@ class ToMaplist(utils.Command):
     @utils.deco.require_role("Organiser")
     @utils.deco.tourney()
     async def main(cls, ctx):
-        status, result = await utils.smashgg.post(utils.smashgg.totalgames)
-        if status != 200:
-            await utils.Alert(ctx, utils.Alert.Style.DANGER, title=f"Status Code - `{status}`", description="An error occurred while trying to retrieve tournament data from smash.gg, try again later.")
-            raise utils.exc.CommandCancel
-
+        status, result = await utils.smashgg.post(utils.smashgg.totalgames, ctx=ctx)
         brackets = cls.get_brackets(result)
 
         maplist = utils.Maplist(await cls.get_maplist(ctx), brackets)

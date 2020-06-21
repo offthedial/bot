@@ -11,6 +11,12 @@ startat = """query TournamentQuery($slug: String) {
   }
 }"""
 
+registrationclosesat = """query TournamentQuery($slug: String) {
+  tournament(slug: $slug){
+    name
+    registrationClosesAt
+  }
+}"""
 
 totalgames = """query TournamentQuery($slug: String) {
   tournament(slug: $slug) {
@@ -30,7 +36,7 @@ totalgames = """query TournamentQuery($slug: String) {
 }"""
 
 
-async def post(query):
+async def post(query, ctx=None):
     """Send a post request to the smash.gg gql api."""
     slug = utils.tourney.links[utils.tourney.get()['type']].split('/')[-1]
     url = 'https://api.smash.gg/gql/' + ver
@@ -40,4 +46,10 @@ async def post(query):
         "variables": {"slug": slug}
     }
     async with utils.session.post(url, json=request, headers=headers) as resp:
+        if resp.status != 200 and ctx:
+            await utils.Alert(ctx, utils.Alert.Style.DANGER,
+                title=f"Status Code - `{resp.status}`",
+                description="An error occurred while trying to retrieve tournament data from smash.gg, try again later.")
+            raise utils.exc.CommandCancel
+
         return resp.status, await resp.json()

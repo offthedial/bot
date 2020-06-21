@@ -33,7 +33,7 @@ class ToEnd(utils.Command):
         ui.embed.description = "Removing attendees from competing role..."
         await ui.update()
         for attendee, profile in attendees.attendee_and_profile(ui.ctx):
-            await attendees.remove.from_competing(ui.ctx, attendee, profile, reason="tournament has ended.")
+            await attendees.remove.ToAttendeesRemove.from_competing(ui.ctx, attendee, profile, reason="tournament has ended.")
 
     @classmethod
     async def delete_tourney(cls, ui):

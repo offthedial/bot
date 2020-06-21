@@ -32,9 +32,9 @@ Contact me · [**@LeptoFlare**](https://github.com/LeptoFlare) · [lepto.tech](h
 
 As always, distributed under the MIT license. See `LICENSE` for more information.
 
-_[https://github.com/LeptoFlare/offthedialbot](https://github.com/LeptoFlare/offthedialbot)_
+_[https://github.com/offthedial/bot](https://github.com/offthedial/bot)_
 
 <!-- markdown links & imgs -->
-[stars-shield]: https://img.shields.io/github/stars/LeptoFlare/offthedialbot.svg?style=social
-[license-shield]: https://img.shields.io/github/license/LeptoFlare/offthedialbot.svg?style=flat
-[ci-shield]: https://github.com/LeptoFlare/offthedialbot/workflows/Continuous%20Integration/badge.svg
+[stars-shield]: https://img.shields.io/github/stars/offthedial/bot.svg?style=social
+[license-shield]: https://img.shields.io/github/license/offthedial/bot.svg?style=flat
+[ci-shield]: https://github.com/offthedial/bot/workflows/Continuous%20Integration/badge.svg

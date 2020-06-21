@@ -1,5 +1,5 @@
 """cogs.Website"""
-from fuzzywuzzy import fuzz, process
+from rapidfuzz import fuzz, process
 
 import discord
 from discord.ext import commands
@@ -9,33 +9,44 @@ from offthedialbot import utils
 
 class Website(commands.Cog):
 
-    @commands.group(invoke_without_command=True, aliases=["web", "site", "docs", "d"])
-    async def website(self, ctx, *args):
+    @commands.command(invoke_without_command=True, aliases=["site"])
+    async def website(self, ctx, page=None, *, section=""):
         """Send an embedded section of an otd.ink page."""
+        if not page:
+            await ctx.send_help(ctx.cog)
+        else:
+            await self.send_embedded_section(ctx, page, section)
 
-    @website.command()
+    @commands.command(hidden=True)
     async def faq(self, ctx, *, section):
         """Send an embedded section of the faq."""
-        await self.send_embedded_section(ctx, "faq", section, "### ")
+        await self.send_embedded_section(ctx, "faq", section, 3)
 
-    @website.group(aliases=["tourney", "t"])
-    async def tournament(self, ctx, page, sub, *, section):
-        """Send an embedded section of a tournament page."""
-        await self.send_embedded_section(ctx, f"{page}/{sub}", section, "## ")
+    @commands.command(hidden=True, aliases=["d", "docs"])
+    async def rules(self, ctx, page, *, section):
+        """Send an embedded section of the faq."""
+        await self.send_embedded_section(ctx, f"{page}/rules", section)
 
-    async def send_embedded_section(self, ctx, page, section, startwith=None):
+
+    async def send_embedded_section(self, ctx, page, section, minimal=2):
         lines = (await self.get_page(ctx, page)).splitlines()
-        name, content = self.get_section(self.create_sections(lines, startwith), section)
-        if name is None:
+        header = self.get_header(self.list_headers(lines, minimal), section)
+
+        if header is None:
             await utils.Alert(ctx, utils.Alert.Style.DANGER, title="No section found.", description="Could not find a section that resembled what you entered, try rewording what you said.")
             raise utils.exc.CommandCancel
+
+        name, content = self.get_section(lines, header[0])
         await self.display_section(ctx, f"https://otd.ink/{page}", name, content)
 
     @staticmethod
     async def display_section(ctx, url, name, content):
         embed = discord.Embed(title=name, description=content, color=utils.colors.DIALER)
         embed.url = url
-        await ctx.send(embed=embed)
+        try:
+            await ctx.send(embed=embed)
+        except discord.HTTPException:
+            await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Section too long!", description="Try narrowing down your search to a more specific sub-section.")
 
     @staticmethod
     async def get_page(ctx, slug: str):
@@ -43,32 +54,33 @@ class Website(commands.Cog):
             if resp.status != 200:
                 await utils.Alert(ctx, utils.Alert.Style.DANGER,
                     title=f"Status Code - `{resp.status}`",
-                    description="An error occurred while trying to retrieve website data from otd.ink, try again later.")
+                    description="An error occurred while trying to retrieve website data from otd.ink, check the status code or try again later.")
                 raise utils.exc.CommandCancel
             return await resp.text()
+
+    @staticmethod
+    def get_section(lines, header):
+        name = header.split()
+        header_hashes = len(name[0])
+        section = []
+        for line in lines[lines.index(header)+1:]:
+            if line.startswith("#"):
+                line_hashes = len(line.split()[0])
+                if line_hashes > header_hashes:
+                    line = f"__**{' '.join(line.split()[1:])}**__"
+                else:
+                    break
+            section.append(line)
+        return " ".join(name[1:]), "\n".join(section)
+
+    @staticmethod
+    def list_headers(lines, minimal):
+        return [line for line in lines if line.startswith("#"*minimal)]
     
     @staticmethod
-    def create_sections(lines, startwith="## "):
-        sections = {
-            "": []
-        }
-        for line in lines:
-            if line.startswith(startwith):
-                sections[line] = []
-            else:
-                if not line.startswith("".join(startwith[1:])):
-                    if line.startswith("#"):
-                        line = f"__**{' '.join(line.split()[1:])}**__"
-                    sections[list(sections)[-1]].append(line)
-        return sections
-
-    @staticmethod
-    def get_section(sections, choice):
-        if not (result := process.extractOne(choice, list(sections), scorer=fuzz.partial_ratio, score_cutoff=51)):
-            return None, None
-
-        section = sections[result[0]]
-        return " ".join(result[0].split()[1:]), "\n".join(section)
+    def get_header(headers, choice):
+        """Fuzzy search header."""
+        return process.extractOne(choice, headers, scorer=fuzz.partial_ratio, score_cutoff=75)
 
     @commands.command(hidden=True)
     @utils.deco.require_role("Organiser")

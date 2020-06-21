@@ -49,3 +49,44 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
             description=f"`{num}`",
             color=utils.colors.COMPETING
         ))
+
+    @commands.group(invoke_without_command=True)
+    @utils.deco.tourney()
+    async def when(self, ctx):
+        """Check when the tournament starts / ends registration relative to your timezone."""
+
+    @when.command(aliases=["starts"])
+    @utils.deco.tourney()
+    async def start(self, ctx):
+        ui, timezone = await self.ask_timezone(ctx)
+        status, resp = await utils.smashgg.post(utils.smashgg.startat, ctx=ctx)
+        timestamp = utils.time.Zone.add_offset(resp["data"]["tournament"]["startAt"], timezone)
+
+        await ui.end(utils.Alert.create_embed(utils.Alert.Style.INFO,
+            title="Tournament starts at:",
+            description=self.display_time(timestamp, timezone)))
+
+    @when.command(aliases=["closes", "reg", "registration"])
+    @utils.deco.tourney()
+    async def close(self, ctx):
+        ui, timezone = await self.ask_timezone(ctx)
+        status, resp = await utils.smashgg.post(utils.smashgg.registrationclosesat, ctx=ctx)
+        timestamp = utils.time.Zone.add_offset(resp["data"]["tournament"]["registrationClosesAt"], timezone)
+
+        await ui.end(utils.Alert.create_embed(utils.Alert.Style.INFO,
+            title="Tournament registration closes at:",
+            description=self.display_time(timestamp, timezone)))
+
+    async def ask_timezone(self, ctx):
+        ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(
+            title="What timezone are you in?",
+            description="ex: `UTC`, `AEST`, `EDT`"
+        ))
+        reply = await ui.get_valid_message(
+            lambda m: utils.time.Zone.tz_offsets.get(m.content.upper(), False) is not False,
+            {"title": "Invalid Timezone", "description": "Please enter a valid timezone."})
+        return ui, reply.content.upper()
+
+    @staticmethod
+    def display_time(timestamp, timezone):
+        return utils.time.User.display(timestamp, "%A, %b %d at %I:%M%p ") + timezone
