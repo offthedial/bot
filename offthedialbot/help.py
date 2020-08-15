@@ -43,7 +43,7 @@ class HelpCommand(commands.DefaultHelpCommand):
                 "name": f"{cog.qualified_name.capitalize()} Commands:",
                 "value": "\n".join([
                     f'`{self.clean_prefix}{command}` {command.short_doc}'
-                    for command in await self.filter_commands(cog.get_commands())
+                    for command in cog.get_commands()
                 ])
             }]
         )
