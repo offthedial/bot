@@ -21,10 +21,10 @@ class ToMaplist(utils.Command):
     @classmethod
     async def display_maplist(cls, ctx, brackets, maplist):
         mode_names = {
-            "sz": "Splat Zones",
-            "tc": "Tower Control",
-            "rm": "Rainmaker",
-            "cb": "Clam Blitz"
+            "sz": ":sz: `Splat Zones`",
+            "tc": ":tc: `Tower Control`",
+            "rm": ":rm: `Rainmaker`",
+            "cb": ":cb: `Clam Blitz`"
         }
         phases = cls.get_phases(brackets)
         previous_phase = None
@@ -37,7 +37,7 @@ class ToMaplist(utils.Command):
             message = []
             message.append(f"> __{phase_name} Round {i-phase_i+1}:__")
             for mode, stage in game:
-                message.append(f"> `{mode_names[mode]}:` {stage}")
+                message.append(f"> {mode_names[mode]}: {stage}")
             await ctx.send("\n".join(message))
 
     @classmethod
