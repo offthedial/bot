@@ -21,10 +21,10 @@ class ToMaplist(utils.Command):
     @classmethod
     async def display_maplist(cls, ctx, brackets, maplist):
         mode_names = {
-            "sz": ":sz: `Splat Zones`",
-            "tc": ":tc: `Tower Control`",
-            "rm": ":rm: `Rainmaker`",
-            "cb": ":cb: `Clam Blitz`"
+            "sz": "<:sz:747322891606950011> `Splat Zones`",
+            "tc": "<:tc:747322891749556264> `Tower Control`",
+            "rm": "<:rm:747322891703550042> `Rainmaker`",
+            "cb": "<:cb:747322891338776588> `Clam Blitz`"
         }
         phases = cls.get_phases(brackets)
         previous_phase = None
