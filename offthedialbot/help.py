@@ -78,7 +78,7 @@ class HelpCommand(commands.DefaultHelpCommand):
 
     async def subcommand_not_found(self, command, string):
         """Returns message when subcommand is not found."""
-        if isinstance(command, Group) and len(command.all_commands) > 0:
+        if isinstance(command, commands.Group) and len(command.all_commands) > 0:
             return f"Command {self.short(command, False)} has no subcommand named `{string}`."
         else:
             return f"Command {self.short(command, False)} has no subcommands."
