@@ -45,7 +45,7 @@ class Minesweeper(commands.Cog):
         map_list = mines.create_mines()
 
         # Send minesweeper
-        async with ctx.typing():
+        with ctx.typing():
             for message in map_list[:-1]:
                 await ctx.send(message)
         await ctx.send(map_list[-1])
