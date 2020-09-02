@@ -20,7 +20,7 @@ class To(utils.Command, hidden=True):
         """Special commands for tournament organisers, shows dashboard."""
         ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(
             title=f"Welcome {ctx.author.display_name}, to your TO dashboard!",
-            color=0xdc6e00))
+            color=utils.colors.ORGANISER))
         while True:
 
             ui.embed.clear_fields()
