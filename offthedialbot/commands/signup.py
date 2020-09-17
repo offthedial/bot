@@ -174,12 +174,12 @@ class Signup(utils.Command):
         # Give signup code to sign up on smash.gg
         ui.embed.title = f"Sign up on smash.gg at **<{utils.tourney.links[tourney_type]}/register>**."
         ui.embed.description = "Once finished, enter the confirmation code you recieved in the email.\nFor example: `#F1PN28`."
-        code = await ui.get_valid_message(r"^#?([A-Za-z0-9]){6}$",
+        code = await ui.get_valid_message(r"^#?([A-Fa-f0-9]){6}$",
             {"title": "Invalid Confirmation Code", "description": "The code you entered was not valid, please try again."},
             timeout=600)
         if not code.content.startswith("#"):
             code.content = f"#{code.content}"
-        profile.set_reg('code', code.content)
+        profile.set_reg('code', code.content.upper())
 
     @classmethod
     async def confirm_signup(cls, ui):
