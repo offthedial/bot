@@ -1,13 +1,13 @@
-version: "3.7"
+version: "3.8"
 
 services:
 
   otdb:
     build: .
-    restart: always
+    restart: unless-stopped
 
   mongo:
     image: mongo
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./var/mongo/data/db:/data/db
