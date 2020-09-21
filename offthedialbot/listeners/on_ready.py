@@ -1,4 +1,5 @@
 """Contains on_ready listener."""
+
 from collections import defaultdict
 
 from offthedialbot import env

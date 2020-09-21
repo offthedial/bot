@@ -1,4 +1,5 @@
 """Dynamically import and generate discord.ext listeners."""
+
 import importlib
 import inspect
 import os

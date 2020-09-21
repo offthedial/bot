@@ -1,4 +1,5 @@
 """Contains on_message listener."""
+
 from contextlib import contextmanager
 
 

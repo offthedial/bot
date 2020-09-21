@@ -1,4 +1,5 @@
 """Contains on_member_remove listener."""
+
 from offthedialbot import utils
 
 

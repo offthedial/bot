@@ -1,4 +1,5 @@
 """$to profiles update"""
+
 import discord
 
 from offthedialbot import utils

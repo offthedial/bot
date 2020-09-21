@@ -1,4 +1,5 @@
 """$to open"""
+
 import discord
 
 from offthedialbot import utils

@@ -1,4 +1,5 @@
 """Contains function to create ClientSession."""
+
 from offthedialbot import logger
 import aiohttp
 

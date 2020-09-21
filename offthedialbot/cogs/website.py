@@ -1,4 +1,5 @@
 """cogs.Website"""
+
 from rapidfuzz import fuzz, process
 
 import discord

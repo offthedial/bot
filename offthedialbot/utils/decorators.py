@@ -1,4 +1,5 @@
 """Contains custom decorators."""
+
 from functools import wraps
 import inspect
 

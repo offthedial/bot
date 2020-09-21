@@ -1,4 +1,5 @@
 """$profile"""
+
 import discord
 
 from offthedialbot import utils

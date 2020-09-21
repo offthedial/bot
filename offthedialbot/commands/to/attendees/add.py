@@ -1,4 +1,5 @@
 """$to attendees add"""
+
 import discord
 
 from offthedialbot import utils
