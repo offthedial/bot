@@ -1,3 +1,5 @@
+"""Contains on_command_error listener."""
+
 from discord.ext import commands
 
 from offthedialbot import utils

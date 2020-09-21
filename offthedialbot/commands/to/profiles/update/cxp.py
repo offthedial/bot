@@ -1,4 +1,5 @@
 """$to profiles update cxp"""
+
 from offthedialbot import utils
 from offthedialbot.commands.profile.create import ProfileCreate
 from . import update_profile_key

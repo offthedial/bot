@@ -1,4 +1,5 @@
 """$test alerts"""
+
 import discord
 
 from offthedialbot import utils

@@ -1,4 +1,5 @@
 """cogs.Minesweeper"""
+
 import random
 
 import discord

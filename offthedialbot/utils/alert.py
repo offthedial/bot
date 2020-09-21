@@ -1,4 +1,5 @@
 """Contains the Alert class."""
+
 from typing import Optional
 
 import discord

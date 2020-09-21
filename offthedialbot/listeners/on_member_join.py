@@ -1,4 +1,5 @@
 """Contains on_member_join listener."""
+
 import asyncio
 
 from offthedialbot import utils

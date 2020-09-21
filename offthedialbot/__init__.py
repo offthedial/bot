@@ -1,4 +1,5 @@
 """Contains client subclass of discord.ext.Bot, and registers listeners, commands, and cogs."""
+
 from discord.ext.commands import Bot
 
 from .env import env

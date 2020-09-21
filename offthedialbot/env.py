@@ -1,4 +1,5 @@
 """Get enviroment from the bot."""
+
 import yaml
 
 try:

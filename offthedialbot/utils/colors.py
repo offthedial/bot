@@ -1,5 +1,6 @@
 """Contains commonly used colors."""
 
+
 DIALER = 0x1ABFC7
 ORGANISER = 0x5d9194
 COMPETING = 0xfb788b
