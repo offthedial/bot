@@ -51,7 +51,7 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
             color=utils.colors.COMPETING
         )
         if num_checkedin := len(utils.roles.get(ctx, "Checked In").members):
-            embed.add_field(name="Currently Shecked-in:", value=f"`{num_checkedin}`")
+            embed.add_field(name="Currently Checked-in:", value=f"`{num_checkedin}`")
         await ctx.send(embed=embed)
 
     @commands.group(invoke_without_command=True)
