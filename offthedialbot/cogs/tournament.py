@@ -1,5 +1,6 @@
 """cogs.Checkin"""
 import discord
+from discord.embeds import EmbedProxy
 from discord.ext import commands
 
 from offthedialbot import utils
@@ -44,11 +45,14 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
     async def signedup(self, ctx):
         """Get number of people currently signed up for the tournament."""
         num = utils.dbh.metaprofiles.count({"reg.reg": True})
-        await ctx.send(embed=discord.Embed(
+        embed = discord.Embed(
             title="Currently Signed-up:",
             description=f"`{num}`",
             color=utils.colors.COMPETING
-        ))
+        )
+        if num_checkedin := utils.roles.get(ctx, "Checked In").members:
+            embed.add_field(name="Currently Shecked-in:", value=f"`{num_checkedin}`")
+        await ctx.send(embed=embed)
 
     @commands.group(invoke_without_command=True)
     @utils.deco.tourney()
