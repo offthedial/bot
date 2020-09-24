@@ -1,4 +1,5 @@
 """Contains commonly used roles."""
+
 import discord
 
 from offthedialbot import logger

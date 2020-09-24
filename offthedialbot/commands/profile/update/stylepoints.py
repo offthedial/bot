@@ -1,4 +1,5 @@
 """$profile update stylepoints"""
+
 from offthedialbot import utils
 from ..create import ProfileCreate
 

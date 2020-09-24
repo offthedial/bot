@@ -1,4 +1,5 @@
 """Contains the Command class."""
+
 from discord.ext.commands import Context
 
 

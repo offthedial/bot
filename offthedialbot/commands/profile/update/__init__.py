@@ -1,4 +1,5 @@
 """$profile update"""
+
 from offthedialbot import utils
 from .. import Profile
 from ..create import ProfileCreate

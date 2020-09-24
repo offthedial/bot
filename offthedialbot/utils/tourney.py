@@ -1,4 +1,5 @@
 """Contains tournament."""
+
 from enum import IntEnum
 
 from offthedialbot import utils

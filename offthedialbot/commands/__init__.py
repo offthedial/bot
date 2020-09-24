@@ -1,4 +1,5 @@
 """Dynamically import and generate discord.ext commands."""
+
 import inspect
 import pkgutil
 import sys

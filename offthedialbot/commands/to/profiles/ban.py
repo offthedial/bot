@@ -1,4 +1,5 @@
 """$to attendees ban"""
+
 import discord
 
 from offthedialbot import utils

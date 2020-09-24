@@ -1,4 +1,5 @@
 """cogs.Checkin"""
+
 import discord
 from discord.embeds import EmbedProxy
 from discord.ext import commands

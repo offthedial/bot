@@ -1,4 +1,5 @@
 """$signup"""
+
 from contextlib import contextmanager, asynccontextmanager
 
 import discord
