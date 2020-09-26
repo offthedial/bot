@@ -16,16 +16,26 @@ class ToProfilesBan(utils.Command):
         ui: utils.CommandUI = await utils.CommandUI(ctx,
             discord.Embed(
                 title="Ban attendees.",
-                description="Mention each attendee you want to ban.",
+                description="Mention or send an ID of each attendee you want to ban.",
                 color=utils.Alert.Style.DANGER))
-        reply = await ui.get_valid_message(lambda m: len(m.mentions) >= 1,
-            {"title": "Invalid Mention", "description": "Make sure to send a **mention** of the attendee."})
 
-        for attendee in reply.mentions:
+        reply = await ui.get_reply()
+        attendees = reply.mentions
+        for user_id in reply.content.split():
+            try:
+                attendees.append(await ctx.bot.fetch_user(int(user_id)))
+            except ValueError:
+                continue
+
+        if not attendees:
+            await ui.end(False, "No valid attendees found.", "There were no valid attendees in your message.")
+
+        for attendee in attendees:
 
             profile = utils.ProfileMeta(attendee.id)
-
             until = await cls.set_ban_length(ui, profile)
+
+            # Remove attendee
             await cls.remove_smashgg(ui, attendee)
             await ToAttendeesRemove.from_competing(ctx, attendee, profile,
                 reason=f"attendee manually banned by {ctx.author.display_name}.")
