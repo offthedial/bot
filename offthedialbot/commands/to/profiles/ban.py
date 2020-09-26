@@ -33,7 +33,7 @@ class ToProfilesBan(utils.Command):
         for attendee in attendees:
 
             profile = utils.ProfileMeta(attendee.id)
-            until = await cls.set_ban_length(ui, profile)
+            until = await cls.set_ban_length(ui, profile, attendee)
 
             # Remove attendee
             await cls.remove_smashgg(ui, attendee)
@@ -56,9 +56,9 @@ class ToProfilesBan(utils.Command):
             pass
 
     @classmethod
-    async def set_ban_length(cls, ui: utils.CommandUI, profile):
+    async def set_ban_length(cls, ui: utils.CommandUI, profile, attendee):
         """Get ban length and set it inside of the profile."""
-        ui.embed.description = f"Specify the length of the ban. or enter 'forever' for a permanent ban."
+        ui.embed.description = f"Specify the length of the ban of `{attendee.display_name}`. or enter 'forever' for a permanent ban."
         ui.embed.add_field(name="Supported symbols:", value=utils.time.User.symbols)
 
         parse = lambda m: utils.time.User.parse(m.content) if m.content != "forever" else True
