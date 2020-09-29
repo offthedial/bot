@@ -19,11 +19,6 @@ class Flairme(commands.Cog):
         await self.give_flair(ctx, "Off the Dial Alerts")
 
     @flairme.command()
-    async def detective(self, ctx):
-        """Flair or unflair the Detective role."""
-        await self.give_flair(ctx, "Detective")
-
-    @flairme.command()
     async def pickup(self, ctx):
         """Flair or unflair the LF: Pickup Scrim role."""
         await self.give_flair(ctx, "LF: Pickup Scrim")
