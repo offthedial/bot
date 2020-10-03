@@ -46,7 +46,7 @@ class HelpCommand(commands.DefaultHelpCommand):
                     self.short(command)
                     for command in cog.get_commands()])
             }]} if cog.get_commands() else {}))
-        )
+
         await self.get_destination().send(embed=embed)
 
     async def send_group_help(self, group):
