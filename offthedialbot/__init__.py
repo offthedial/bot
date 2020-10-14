@@ -1,5 +1,6 @@
 """Contains client subclass of discord.ext.Bot, and registers listeners, commands, and cogs."""
 
+from discord import Intents
 from discord.ext.commands import Bot
 
 from .env import env
@@ -20,8 +21,9 @@ class Client(Bot):
         self.logger = logger
         self.help_command = help_command
 
-
-client = Client(command_prefix='$')
+intents = Intents.default()
+intents.members = True
+client = Client(command_prefix='$', intents=intents)
 
 cogs.register_cogs(client)
 logger.debug("Cogs registered.")
