@@ -21,6 +21,7 @@ class Client(Bot):
         self.logger = logger
         self.help_command = help_command
 
+
 intents = Intents.default()
 intents.members = True
 client = Client(command_prefix='$', intents=intents)
