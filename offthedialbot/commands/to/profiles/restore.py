@@ -80,7 +80,7 @@ class ToProfilesRestore(utils.Command):
                 "cxp": int(row[cls.Column.CXP]),
             })
             metaprofiles.append({
-                "_id": _id,
+                "_id": str(_id),
                 "signal": int(row[cls.Column.SS]),
                 "smashgg": None,
                 "banned": None,
