@@ -2,6 +2,7 @@
 
 from enum import IntEnum
 import csv
+import json
 from io import StringIO
 
 import aiohttp
@@ -31,8 +32,19 @@ class ToProfilesRestore(utils.Command):
             await reply.delete()
 
             profiles, metaprofiles = cls.new_profiles(reader)
-            utils.dbh.profiles.insert_many(profiles)
-            utils.dbh.metaprofiles.insert_many(metaprofiles)
+
+            file = StringIO()
+            file.write(json.dumps(profiles))
+            file.seek(0)
+            ctx.send(file=discord.File(file, filename="profiles.json"))
+
+            file = StringIO()
+            file.write(json.dumps(metaprofiles))
+            file.seek(0)
+            ctx.send(file=discord.File(file, filename="metaprofiles.json"))
+
+            # utils.dbh.profiles.insert_many(profiles)
+            # utils.dbh.metaprofiles.insert_many(metaprofiles)
 
         await ui.end(True)
 
