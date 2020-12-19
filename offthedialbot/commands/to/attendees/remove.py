@@ -10,7 +10,7 @@ class ToAttendeesRemove(utils.Command):
     """Remove an attendee from the tournament."""
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     @utils.deco.tourney()
     async def main(cls, ctx):
         """Remove an attendee from the tournament."""

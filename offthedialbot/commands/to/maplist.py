@@ -9,7 +9,7 @@ class ToMaplist(utils.Command):
     """Create and send a maplist."""
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     @utils.deco.tourney()
     async def main(cls, ctx):
         status, result = await utils.smashgg.post(utils.smashgg.totalgames, ctx=ctx)

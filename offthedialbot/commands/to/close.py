@@ -19,7 +19,7 @@ class ToClose(utils.Command):
     """
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     @utils.deco.tourney(2)
     async def main(cls, ctx):
         """Close registration and end checkin for the tournament."""

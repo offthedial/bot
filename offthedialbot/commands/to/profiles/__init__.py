@@ -9,7 +9,7 @@ class ToProfiles(utils.Command):
     """Command tools for managing profiles."""
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     async def main(cls, ctx):
         """Command tools for managing profiles."""
         raise commands.TooManyArguments

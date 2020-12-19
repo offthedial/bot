@@ -10,7 +10,7 @@ class ToProfilesDistribute(utils.Command):
     """Distribute Signal Strength by role!"""
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     async def main(cls, ctx):
         """Distribute Signal Strength by role!"""
         ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed())

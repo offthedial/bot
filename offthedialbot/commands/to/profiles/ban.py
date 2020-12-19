@@ -10,7 +10,7 @@ class ToProfilesBan(utils.Command):
     """Ban an attendee from the tournament."""
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     async def main(cls, ctx):
         """Ban an attendee from the tournament."""
         ui: utils.CommandUI = await utils.CommandUI(ctx,

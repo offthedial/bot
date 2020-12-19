@@ -16,7 +16,7 @@ class To(utils.Command, hidden=True):
     """
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     async def main(cls, ctx):
         """Special commands for tournament organisers, shows dashboard."""
         ui: utils.CommandUI = await utils.CommandUI(ctx, discord.Embed(

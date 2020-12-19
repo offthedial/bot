@@ -10,7 +10,7 @@ class ToProfilesGet(utils.Command):
     """Get a specific profile."""
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     async def main(cls, ctx):
         """Get a specific profile."""
         ui: utils.CommandUI = await utils.CommandUI(ctx, embed=discord.Embed())

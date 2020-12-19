@@ -15,7 +15,7 @@ class ToEnd(utils.Command):
     """
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     @utils.deco.tourney(3)
     async def main(cls, ctx):
         """End the tournament."""

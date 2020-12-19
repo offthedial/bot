@@ -9,7 +9,7 @@ class ToProfilesUpdateStylepoints(utils.Command):
     """Update user's stylepoints."""
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     async def main(cls, ctx):
         """Update user's stylepoints."""
         await update_profile_key(ctx, cls.update_stylepoints)

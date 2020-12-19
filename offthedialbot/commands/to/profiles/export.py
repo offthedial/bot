@@ -10,7 +10,7 @@ class ToProfilesExport(utils.Command):
     """Export profiles to a csv."""
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     async def main(cls, ctx):
         """Export profiles to a csv."""
         await ctx.trigger_typing()

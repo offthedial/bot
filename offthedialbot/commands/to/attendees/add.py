@@ -10,7 +10,7 @@ class ToAttendeesAdd(utils.Command):
     """Add an attendee to the tournament."""
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     @utils.deco.tourney()
     async def main(cls, ctx):
         """Add an attendee to the tournament."""

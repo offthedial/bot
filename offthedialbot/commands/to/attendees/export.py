@@ -13,7 +13,7 @@ class ToAttendeesExport(utils.Command):
     """Export attendee profiles to a csv."""
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     @utils.deco.tourney()
     async def main(cls, ctx):
         """Export attendee profiles to a csv."""

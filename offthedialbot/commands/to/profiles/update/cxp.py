@@ -9,7 +9,7 @@ class ToProfilesUpdateCxp(utils.Command):
     """Update user's competitive experience."""
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     async def main(cls, ctx):
         """Update user's competitive experience."""
         await update_profile_key(ctx, cls.update_cxp)

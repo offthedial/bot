@@ -10,7 +10,7 @@ class ToProfilesUpdateSs(utils.Command):
     """Set a user's signal strength."""
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     async def main(cls, ctx):
         """Set a user's signal strength."""
         await update_profile_key(ctx, cls.update_ss)

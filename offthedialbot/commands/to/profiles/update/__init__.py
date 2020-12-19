@@ -11,7 +11,7 @@ class ToProfilesUpdate(utils.Command):
     """Update user's profile."""
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     async def main(cls, ctx):
         """Update user's profile."""
         await update_profile_key(ctx, cls.profile_update)

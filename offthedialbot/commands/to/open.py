@@ -14,7 +14,7 @@ class ToOpen(utils.Command):
     """
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     @utils.deco.tourney(0)
     async def main(cls, ctx):
         """Open registration for a new tournament!"""

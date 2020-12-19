@@ -15,7 +15,7 @@ class ToStart(utils.Command):
     """
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     @utils.deco.tourney(1)
     async def main(cls, ctx):
         """Start checkin for the tournament."""
