@@ -69,12 +69,12 @@ class ToProfilesRestore(utils.Command):
             profiles.append({
                 "_id": _id,
                 "IGN": row[cls.Column.IGN],
-                "SW": ProfileCreate.parse_reply('SW', row[cls.Column.SW]),
+                "SW": row[cls.Column.SW],
                 "Ranks": {
-                    "Splat Zones": ProfileCreate.parse_reply('Ranks', row[cls.Column.SZ]),
-                    "Tower Control": ProfileCreate.parse_reply('Ranks', row[cls.Column.TC]),
-                    "Rainmaker": ProfileCreate.parse_reply('Ranks', row[cls.Column.RM]),
-                    "Clam Blitz": ProfileCreate.parse_reply('Ranks', row[cls.Column.CB]),
+                    "Splat Zones": row[cls.Column.SZ],
+                    "Tower Control": row[cls.Column.TC],
+                    "Rainmaker": row[cls.Column.RM],
+                    "Clam Blitz": row[cls.Column.CB],
                 },
                 "stylepoints": eval(row[cls.Column.SP]),
                 "cxp": int(row[cls.Column.CXP]),
