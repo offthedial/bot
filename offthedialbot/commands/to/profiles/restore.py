@@ -67,7 +67,7 @@ class ToProfilesRestore(utils.Command):
                 continue
 
             profiles.append({
-                "_id": _id,
+                "_id": str(_id),
                 "IGN": row[cls.Column.IGN],
                 "SW": row[cls.Column.SW],
                 "Ranks": {
