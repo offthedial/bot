@@ -36,12 +36,12 @@ class ToProfilesRestore(utils.Command):
             file = StringIO()
             file.write(json.dumps(profiles))
             file.seek(0)
-            ctx.send(file=discord.File(file, filename="profiles.json"))
+            await ctx.send(file=discord.File(file, filename="profiles.json"))
 
             file = StringIO()
             file.write(json.dumps(metaprofiles))
             file.seek(0)
-            ctx.send(file=discord.File(file, filename="metaprofiles.json"))
+            await ctx.send(file=discord.File(file, filename="metaprofiles.json"))
 
             # utils.dbh.profiles.insert_many(profiles)
             # utils.dbh.metaprofiles.insert_many(metaprofiles)
