@@ -10,9 +10,14 @@ class ToMaplist(utils.Command):
 
     @classmethod
     @utils.deco.require_role("Organiser")
-    @utils.deco.tourney()
     async def main(cls, ctx):
-        status, result = await utils.smashgg.post(utils.smashgg.totalgames, ctx=ctx)
+        status, result = await utils.smashgg.post(utils.smashgg.totalgames, "it-s-dangerous-to-go-alone-december-2020", ctx=ctx)
+
+        if status != 200:
+            await ctx.send("error lol: " + status)
+            await ctx.send(f"```json\n{result}\n```")
+            raise utils.exc.CommandCancel
+
         brackets = cls.get_brackets(result)
 
         maplist = utils.Maplist(await cls.get_maplist(ctx), brackets)

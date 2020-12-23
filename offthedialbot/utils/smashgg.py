@@ -37,9 +37,8 @@ totalgames = """query TournamentQuery($slug: String) {
 }"""
 
 
-async def post(query, ctx=None):
+async def post(query, slug, ctx=None):
     """Send a post request to the smash.gg gql api."""
-    slug = utils.tourney.links[utils.tourney.get()['type']].split('/')[-1]
     url = 'https://api.smash.gg/gql/' + ver
     headers = {"Authorization": f"Bearer {env['smashgg']}"}
     request = {
