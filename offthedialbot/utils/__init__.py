@@ -7,6 +7,7 @@ from . import checks
 from . import colors
 from . import emojis
 from . import roles
+from . import firestore
 from . import time
 from . import tourney
 from . import smashgg

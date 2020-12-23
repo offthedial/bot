@@ -6,3 +6,4 @@ mongomock
 pymongo
 python-dateutil
 rapidfuzz
+firebase_admin
