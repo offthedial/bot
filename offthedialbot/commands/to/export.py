@@ -86,7 +86,13 @@ class ToExport(utils.Command):
             }
 
         full_signups = [await per_doc(doc) for doc in docs]
-        await ctx.send(f"```json\n{json.dumps(full_signups[0], indent=2)}\n```")
+        not_on_otd = "\n".join([f'> `-` {node["gamerTag"]}' for node in nodes if node["user"]["slug"][5:] in smashgg_attendee_slugs])
+
+        await ctx.send(file=cls.create_file(full_signups))
+        await ctx.send(f"Signed up on smash.gg but not otd.ink: \n{not_on_otd}")
+
+    @classmethod
+    def create_file(cls, full_signups):
         file = StringIO()
         writer: csv.writer = csv.writer(file)
         csv_profiles = []
@@ -125,13 +131,11 @@ class ToExport(utils.Command):
             "support", "aggressive", "objective", "slayer", "anchor", "mobile", "flex", "focused",
             "Amount of tourneys", "highest teams placed above", "Signal Strength", "Timezone Offset (minutes)", "Confirmation Code", "Smash.gg user slug", "Discord ID"], []] + csv_profiles)
         file.seek(0)
-        await ctx.send(file=discord.File(file, filename="signups.csv"))
-        not_on_otd = "\n".join([f'> `-` {node["gamerTag"]}' for node in nodes if node["user"]["slug"][5:] in smashgg_attendee_slugs])
-        await ctx.send(f"Signed up on smash.gg but not otd.ink: \n{not_on_otd}")
-        print(json.dumps(full_signups))
+        return discord.File(file, filename="signups.csv")
+
 
     @classmethod
-    async def fix_stylepoints(cls, db):
+    def fix_stylepoints(cls, db):
         batch = db.batch()
         docs = db.collection(u'users').stream()
         for doc in docs:
