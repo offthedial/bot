@@ -16,7 +16,7 @@ class ToExport(utils.Command):
     """
 
     @classmethod
-    @utils.deco.require_role("Organiser")
+    @utils.deco.require_role("Staff")
     async def main(cls, ctx):
         """Temporary export signups command."""
         ui: utils.CommandUI = await utils.CommandUI(ctx,
