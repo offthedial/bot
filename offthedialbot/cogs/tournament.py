@@ -30,7 +30,9 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
             if not sign.id in ids:
                 await sign.remove_roles(role)
 
-
+    @loop.before_loop
+    async def before_loop(self):
+        await self.bot.wait_until_ready()
 
     @commands.command()
     @utils.deco.otd_only
