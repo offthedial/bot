@@ -1,7 +1,7 @@
 """cogs.Checkin"""
 
 import discord
-from discord.ext import commands
+from discord.ext import tasks, commands
 
 from offthedialbot import utils
 from offthedialbot.commands.signup import Signup
@@ -9,6 +9,28 @@ from offthedialbot.commands.signup import Signup
 
 class Tournament(commands.Cog, command_attrs={'hidden': True}):
     """Cog holding tournament-related misc commands."""
+    def __init__(self, bot):
+        self.bot = bot
+        self.loop.start()
+
+    @tasks.loop(hours=1)
+    async def loop(self):
+        """Task loop that assigns roles."""
+        docs = utils.firestore.db.collection(u'tournaments').document(u'2KnLtpnPNjz2AE0OxwX5').collection(u'signups').stream()
+        ids = [doc.id for doc in docs]
+
+        guild = self.bot.get_guild(374715620052172800)
+        role = guild.get_role(415767083691802624)
+
+        for id in ids:
+            user = guild.get_member(int(id))
+            await user.add_roles(role)
+
+        for sign in role.members:
+            if not sign.id in ids:
+                await sign.remove_roles(role)
+
+
 
     @commands.command()
     @utils.deco.otd_only
