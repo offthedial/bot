@@ -124,7 +124,7 @@ class ToExport(utils.Command):
                 full_signup["smashgg"]["slug"] if full_signup["smashgg"] else None,
                 f'<@{full_signup["id"]}>'
             ])
-        csv_profiles.sort(key=lambda row: row[7])
+        csv_profiles.sort(key=lambda row: row[8])
 
         writer.writerows([[
             "Discord Mention","Smash.gg gamerTag", "IGN", "SW", "SZ", "TC", "RM", "CB", "Cumulative ELO",
