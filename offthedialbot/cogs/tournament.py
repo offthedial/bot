@@ -16,7 +16,7 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
     @tasks.loop(hours=1)
     async def loop(self):
         """Task loop that assigns roles."""
-        self.sync_competing()
+        await self.sync_competing()
 
     @loop.before_loop
     async def before_loop(self):
@@ -36,6 +36,13 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
         for id in ids:
             user = guild.get_member(int(id))
             await user.add_roles(role)
+
+    @commands.command()
+    @utils.deco.require_role("Staff")
+    async def sync(self, ctx):
+        """Sync competing role."""
+        await self.sync_competing()
+        await ctx.message.add_reaction('✅')
 
     @commands.command()
     @utils.deco.otd_only
