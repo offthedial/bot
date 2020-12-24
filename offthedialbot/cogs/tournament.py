@@ -30,7 +30,7 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
         role = guild.get_role(415767083691802624)
 
         for sign in role.members:
-            if not sign.id in ids:
+            if not str(sign.id) in ids:
                 await sign.remove_roles(role)
 
         for id in ids:
