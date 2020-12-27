@@ -29,9 +29,9 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
         guild = self.bot.get_guild(374715620052172800)
         role = guild.get_role(415767083691802624)
 
-        for sign in role.members:
-            if not str(sign.id) in ids:
-                await sign.remove_roles(role)
+        # for sign in role.members:
+        #     if not str(sign.id) in ids:
+        #         await sign.remove_roles(role)
 
         for id in ids:
             user = guild.get_member(int(id))
