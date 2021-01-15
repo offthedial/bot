@@ -23,7 +23,7 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
         await self.bot.wait_until_ready()
 
     async def sync_competing(self):
-        docs = utils.firestore.db.collection(u'tournaments').document(u'2KnLtpnPNjz2AE0OxwX5').collection(u'signups').stream()
+        docs = utils.firestore.db.collection(u'tournaments').document(u'DqxQ0ZKW66QKLCFW6IZD').collection(u'signups').stream()
         ids = [doc.id for doc in docs]
 
         guild = self.bot.get_guild(374715620052172800)

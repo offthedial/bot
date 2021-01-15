@@ -35,7 +35,7 @@ class ToExport(utils.Command):
         db = utils.firestore.db
         cls.fix_stylepoints(db)
 
-        docs = db.collection(u'tournaments').document(u'2KnLtpnPNjz2AE0OxwX5').collection(u'signups').stream()
+        docs = db.collection(u'tournaments').document(u'DqxQ0ZKW66QKLCFW6IZD').collection(u'signups').stream()
         query = """
             query getAllParticipants($slug: String) {
                 tournament(slug: $slug) {
@@ -50,7 +50,7 @@ class ToExport(utils.Command):
                 }
             }
         """
-        status, data = await utils.smashgg.post(query, "it-s-dangerous-to-go-alone-december-2020", ctx)
+        status, data = await utils.smashgg.post(query, "it-s-dangerous-to-go-alone-january-2021", ctx)
         if status != 200:
             await ctx.send("error lol: " + status)
             await ctx.send(f"```json\n{data}\n```")
