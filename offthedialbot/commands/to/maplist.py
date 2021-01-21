@@ -1,6 +1,7 @@
 """$to close"""
 
 import discord
+import asyncio
 
 from offthedialbot import utils
 
@@ -45,6 +46,8 @@ class ToMaplist(utils.Command):
             for mode, stage in game:
                 message.append(f"> {mode_names[mode]}: {stage}")
             await ctx.send("\n".join(message))
+            await asyncio.sleep(.2)
+
 
     @classmethod
     async def get_maplist(cls, ctx, index=0):
