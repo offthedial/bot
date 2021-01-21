@@ -39,7 +39,7 @@ class ToExport(utils.Command):
         query = """
             query getAllParticipants($slug: String) {
                 tournament(slug: $slug) {
-                    participants(query:{perPage:999}) {
+                    participants(query:{perPage:500}) {
                         nodes {
                             gamerTag
                             user {
