@@ -21,7 +21,14 @@ async def invalid_command(ctx, error):
         if ctx.command:
             await ctx.send_help(ctx.command)
         else:
-            await ctx.send_help()
+            try:
+                int(ctx.message[1:])
+            except ValueError:
+                pass
+            else:
+                await utils.Alert(ctx, utils.Alert.Style.DANGER,
+                    title="Command Not Found",
+                    description="This command doesn't exist.")
         return True
 
 
