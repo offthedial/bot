@@ -32,7 +32,7 @@ class CommandUI:
     @staticmethod
     async def create_ui(ctx: Context, embed: discord.Embed) -> discord.Message:
         """Create and return the discord embed UI."""
-        if embed.colour == discord.Color.default():
+        if embed.colour == discord.Embed.Empty:
             embed.colour = utils.colors.DIALER
         if embed.footer.text == discord.Embed.Empty:
             embed.set_footer(text=f"Invoked: {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
