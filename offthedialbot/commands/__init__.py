@@ -1,5 +1,6 @@
 """Dynamically import and generate discord.ext commands."""
 
+from functools import wraps
 import inspect
 import pkgutil
 import sys
@@ -90,7 +91,6 @@ def derive_command(command, name):
         async def _(ctx):
             pass
     else:
-        async def _(ctx):
-            await command.main(ctx)
-    _.__doc__ = command.__doc__
+        _ = command.main
+
     return _
