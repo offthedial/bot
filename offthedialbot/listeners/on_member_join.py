@@ -19,19 +19,8 @@ async def on_member_join(client, member):
 
 async def add_roles(client, member):
     """Add roles to the user."""
-    try:
-        profile = utils.Profile(member.id)
-    except utils.Profile.NotFound:
-        profile = utils.ProfileMeta(member.id)
-
-    roles = [
-        utils.roles.dialer(client),
-        utils.roles.alerts(client)
-    ]
-    if profile.get_reg():
-        roles.append(utils.roles.get(member, "Competing"))
-
-    await member.add_roles(*roles)
+    role = member.guild.get_role(427710343616397322)
+    await member.add_roles(role)
 
 
 async def send_welcome(client, member):
