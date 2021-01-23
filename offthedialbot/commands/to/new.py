@@ -32,7 +32,7 @@ class ToNew(utils.Command):
     @classmethod
     async def get_tourney_slug(cls, ui):
         """Create a new tournament."""
-        directions = f"Enter the full tournament slug (`it-s-dangerous-to-go-alone-november-2020`)"
+        directions = f"Enter the full tournament slug (`it-s-dangerous-to-go-alone-month-year`)"
         ui.embed.description = directions
         reply = await ui.get_reply()
         return reply.content
