@@ -13,22 +13,22 @@ class Website(commands.Cog):
 
     @commands.command(invoke_without_command=True, aliases=["site"])
     async def website(self, ctx):
-        """Send an embedded section of a page."""        
+        """Send an embedded section of a page."""
         await ctx.send_help(ctx.cog)
 
     @commands.command(hidden=True)
     async def faq(self, ctx, *, section):
         """Send an embedded section of the faq."""
-        await self.send_embedded_section(ctx, "faq", section, 4)
+        await self.send_embedded_section(ctx, "faq", section, 4, partial=True)
 
     @commands.command(hidden=True, aliases=["d", "docs"])
     async def rules(self, ctx, page, *, section):
         """Send an embedded section of a rules page."""
         await self.send_embedded_section(ctx, f"{page}/rules", section)
 
-    async def send_embedded_section(self, ctx, page, section, minimal=2):
+    async def send_embedded_section(self, ctx, page, section, minimal=2, **kwargs):
         lines = (await self.get_page(ctx, page)).splitlines()
-        header = self.get_header(self.list_headers(lines, minimal), section)
+        header = self.get_header(self.list_headers(lines, minimal), section, **kwargs)
 
         if header is None:
             await utils.Alert(ctx, utils.Alert.Style.DANGER, title="No section found.", description="Could not find a section that resembled what you entered, try rewording what you said.")
@@ -74,8 +74,9 @@ class Website(commands.Cog):
     @staticmethod
     def list_headers(lines, minimal):
         return [line for line in lines if line.startswith("#"*minimal)]
-    
+
     @staticmethod
-    def get_header(headers, choice):
+    def get_header(headers, choice, partial=False):
         """Fuzzy search header."""
-        return process.extractOne(choice, headers, scorer=fuzz.partial_ratio, score_cutoff=75)
+        scorer = fuzz.partial_ratio if partial else fuzz.token_sort_ratio
+        return process.extractOne(choice, headers, scorer, score_cutoff=75)
