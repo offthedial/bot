@@ -3,28 +3,9 @@
 from offthedialbot import env, utils
 
 
-ver = 'alpha'
-
-totalgames = """query($slug: String) {
-  tournament(slug: $slug) {
-    events {
-      phases {
-        name
-        phaseGroups {
-          nodes {
-            rounds {
-            	bestOf
-            }
-          }
-        }
-      }
-    }
-  }
-}"""
-
-
 async def post(query, variables, ctx=None):
     """Send a post request to the smash.gg gql api."""
+    ver = 'alpha'
     url = 'https://api.smash.gg/gql/' + ver
     headers = {"Authorization": f"Bearer {env['smashgg']}"}
     request = {
