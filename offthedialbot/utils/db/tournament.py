@@ -43,7 +43,6 @@ class Tournament:
 
     def has_ended(self):
         """Returns whether the tournament has ended."""
-        return False
         return datetime.utcfromtimestamp(self.dict["smashgg"]["endAt"]) < datetime.utcnow()
 
     def is_reg_open(self):
