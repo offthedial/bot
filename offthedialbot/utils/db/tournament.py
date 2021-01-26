@@ -1,7 +1,7 @@
 from firebase_admin.firestore import Query
 from datetime import datetime
 
-from offthedialbot.utils import smashgg
+from offthedialbot import utils
 from . import db
 
 
@@ -23,6 +23,7 @@ class Tournament:
 
     def __init__(self):
         self.doc = next(iter(self.col.order_by(u"date", direction=Query.DESCENDING).limit(1).stream()))
+        self.ref = self.doc.reference
         self.dict = self.doc.to_dict()
 
     def signups(self, col=False, ignore_ended=False):
@@ -30,7 +31,7 @@ class Tournament:
         if self.has_ended() and not ignore_ended:
             return None
 
-        signups = self.doc.reference.collection(u'signups')
+        signups = self.ref.collection(u'signups')
         return signups if col else signups.stream()
 
     def subs(self, col=False, ignore_ended=False):
@@ -38,20 +39,37 @@ class Tournament:
         if self.has_ended() and not ignore_ended:
             return None
 
-        subs = self.doc.reference.collection(u'subs')
+        subs = self.ref.collection(u'subs')
         return subs if col else subs.stream()
+
+    def status(self):
+        """Return the current status of the tournament."""
+        if self.has_ended():
+            return "> ℹ️ `Tournament has ended.`"
+        if self.has_reg_closed():
+            return "> ⚠️ `Registration has closed.`"
+        return "> ✅ `Registration is open!`"
 
     def has_ended(self):
         """Returns whether the tournament has ended."""
-        return datetime.utcfromtimestamp(self.dict["smashgg"]["endAt"]) < datetime.utcnow()
+        return self.dict["smashgg"]["endAt"] < datetime.utcnow().timestamp()
 
-    def is_reg_open(self):
+    def has_reg_closed(self):
         """Returns whether the tournament registration is open."""
-        return datetime.utcfromtimestamp(self.dict["smashgg"]["registrationClosesAt"]) > datetime.utcnow()
+        return self.dict["smashgg"]["registrationClosesAt"] < datetime.utcnow().timestamp()
+
+    def ends_at(self):
+        return datetime.utcfromtimestamp(self.dict["smashgg"]["endAt"]).strftime('%a, %b %d at %I:%M %p UTC')
+
+    def reg_closes_at(self):
+        return datetime.utcfromtimestamp(self.dict["smashgg"]["registrationClosesAt"]).strftime('%a, %b %d at %I:%M %p UTC')
+
+    def date(self):
+        return self.dict["date"].strftime('%a, %b %d at %I:%M %p UTC')
 
     async def sync_smashgg(self):
         smashgg = await self.query_smashgg(self.dict["slug"])
-        self.doc.update({"smashgg": smashgg})
+        self.ref.update({"smashgg": smashgg})
         self.dict["smashgg"] = smashgg  # Optimistic update
 
     @staticmethod
