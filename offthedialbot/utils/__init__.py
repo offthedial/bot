@@ -1,11 +1,10 @@
 """Import common utilites used by all commands of the bot."""
 
-from .session import session
+from .session import session, graphql
 from . import channels
 from . import checks
 from . import colors
 from . import emojis
-from . import smashgg
 from . import exceptions as exc
 from . import decorators as deco
 from .maplist import Maplist

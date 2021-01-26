@@ -64,5 +64,5 @@ class Tournament:
             endAt
           }
         }"""
-        status, resp = await smashgg.post(query, {"slug": slug})
+        status, resp = await utils.graphql("smashgg", query, {"slug": slug})
         return resp["data"]["tournament"]

@@ -1,4 +1,4 @@
-from offthedialbot.utils import smashgg
+from offthedialbot import utils
 from . import db, Tournament
 
 
@@ -38,7 +38,7 @@ class User:
             }
           }
         }"""
-        status, data = await smashgg.post(query, {"slug": self.dict["profile"]["smashgg"]})
+        status, data = await utils.graphql("smashgg", query, {"slug": self.dict["profile"]["smashgg"]})
         return data["data"]["user"]
 
     async def discord(self, bot):

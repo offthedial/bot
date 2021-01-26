@@ -48,12 +48,7 @@ class ToExport(utils.Command):
                 }
             }
         """
-        status, data = await utils.smashgg.post(query, {"slug": tourney.dict["slug"]}, ctx)
-        if status != 200:
-            await utils.Alert(ctx, utils.Alert.Style.DANGER,
-                title=f"Status Code: `{str(status)}`",
-                description=f"```json\n{data}\n```")
-            raise utils.exc.CommandCancel
+        status, data = await utils.graphql("smashgg", query, {"slug": tourney.dict["slug"]}, ctx)
         return {
             node["user"]["slug"][5:]: node["gamerTag"]
             for node in data["data"]["tournament"]["participants"]["nodes"]

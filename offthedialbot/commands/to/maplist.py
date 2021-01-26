@@ -39,13 +39,7 @@ class ToMaplist(utils.Command):
             }
           }
         }"""
-        status, result = await utils.smashgg.post(query, {"slug": tourney.dict["slug"]}, ctx=ctx)
-        if status != 200:
-            await utils.Alert(ctx, utils.Alert.Style.DANGER,
-                title=f"Status Code: `{str(status)}`",
-                description=f"```json\n{result}\n```")
-            raise utils.exc.CommandCancel
-
+        status, result = await utils.graphql("smashgg", query, {"slug": tourney.dict["slug"]}, ctx=ctx)
         return {
             phase["name"]: [
                 node["bestOf"] for node in phase["phaseGroups"]["nodes"][0]["rounds"]
@@ -56,12 +50,9 @@ class ToMaplist(utils.Command):
     @classmethod
     async def query_pool(cls, ctx, index=0, name=None):
         """Send a post request to get the maplist pool from the sendou.ink gql api."""
-        request = {"query": f'query {{\nmaplists(name: "{name if name else "LUTI Season X"}") {{\nsz\ntc\nrm\ncb\n}}\n}}'}
-        async with utils.session.post("https://sendou.ink/graphql", json=request) as resp:
-            if resp.status != 200:
-                await utils.Alert(ctx, utils.Alert.Style.DANGER, title=f"Status Code - `{resp.status}`", description="An error occurred while trying to retrieve tournament data from smash.gg, try again later.")
-                raise utils.exc.CommandCancel
-            return (await resp.json())["data"]["maplists"][index]
+        query = f'query {{\nmaplists(name: "{name if name else "LUTI Season X"}") {{\nsz\ntc\nrm\ncb\n}}\n}}'
+        status, resp = await utils.graphql("sendou", query, ctx=ctx)
+        return resp["data"]["maplists"][index]
 
     @classmethod
     async def display_maplist(cls, ctx, brackets, maplist):
