@@ -26,6 +26,9 @@ class User:
         if doc.exists:
             return "sub", doc
 
+    def is_banned(self):
+        return None
+
     async def smashgg(self):
         """Get smash.gg data from the api with the user slug."""
         query = """query($slug: String) {
@@ -38,9 +41,6 @@ class User:
         status, data = await smashgg.post(query, {"slug": self.dict["profile"]["smashgg"]})
         return data["data"]["user"]
 
-    def is_banned(self):
-        return None
-
     async def discord(self, bot):
         user = bot.get_user(self.doc.id)
         if not user:
@@ -48,7 +48,7 @@ class User:
         return user
 
     def get_elo(self):
-        return sum([self.rank_to_elo(rank) for rank in self.get_ranks()]) / 4
+        return sum([self.rank_to_power(rank) for rank in self.get_ranks()]) / 4
 
     def get_playstyles(self, type=None):
         try:
@@ -80,7 +80,7 @@ class User:
             return None
 
     @staticmethod
-    def rank_to_elo(rank):
+    def rank_to_power(rank):
         if rank.startswith("X"):
             return float(rank[1:])
         return {
