@@ -2,11 +2,7 @@
 import csv
 from io import StringIO
 
-from offthedialbot.utils import smashgg
 import discord
-import json
-
-from pprint import pprint
 
 from offthedialbot import utils
 
@@ -21,21 +17,23 @@ class ToExport(utils.Command):
         """Temporary export signups command."""
         ui: utils.CommandUI = await utils.CommandUI(ctx,
             discord.Embed(title="Exporting attendees...", color=utils.colors.COMPETING))
-        async with ctx.typing():
-            file = await cls.export_attendees(ctx)
 
+        async with ctx.typing():
+            tourney = utils.Tournament()
+            sgg_attendees = await cls.query_attendees(ctx, tourney)
+            signups = cls.list_signups(ctx, tourney.signups(), sgg_attendees)
+            file = cls.create_file(signups)
+            await ctx.send(file=file)
+            await utils.CommandUI.create_ui(ctx, embed=discord.Embed(
+                title="Signed up on smash.gg, but not otd.ink:",
+                description=cls.display_invalid_attendees(sgg_attendees)))
         await ui.end(True,
             title=":incoming_envelope: *Exporting attendees complete!*",
             description="Download the spreadsheet below. \U0001f4e5")
-        await ctx.send(file=file)
 
     @classmethod
-    async def export_attendees(cls, ctx):
-        """Poop."""
-        db = utils.firestore.db
-        cls.fix_stylepoints(db)
-
-        docs = db.collection(u'tournaments').document(u'DqxQ0ZKW66QKLCFW6IZD').collection(u'signups').stream()
+    async def query_attendees(cls, ctx, tourney):
+        """Query attendees from smash.gg, return an object containing their gamerTag and user slug."""
         query = """
             query getAllParticipants($slug: String) {
                 tournament(slug: $slug) {
@@ -50,106 +48,107 @@ class ToExport(utils.Command):
                 }
             }
         """
-        status, data = await utils.smashgg.post(query, "it-s-dangerous-to-go-alone-january-2021", ctx)
+        status, data = await utils.smashgg.post(query, {"slug": tourney.dict["slug"]}, ctx)
         if status != 200:
-            await ctx.send("error lol: " + status)
-            await ctx.send(f"```json\n{data}\n```")
+            await utils.Alert(ctx, utils.Alert.Style.DANGER,
+                title=f"Status Code: `{str(status)}`",
+                description=f"```json\n{data}\n```")
             raise utils.exc.CommandCancel
-
-        nodes = data["data"]["tournament"]["participants"]["nodes"]
-        smashgg_attendee_slugs = [node["user"]["slug"][5:] for node in nodes]
-
-
-        async def per_doc(doc):
-            signup = doc.to_dict()
-            user = db.collection(u'users').document(doc.id).get().to_dict()
-            powers = [utils.Profile.convert_rank_power(rank) for rank in user["profile"]["ranks"].values()]
-            elo = round(sum(powers) / len(powers), 1)
-            smashgg = False
-            if user["profile"]["smashgg"] in smashgg_attendee_slugs:
-                smashgg = [node for node in nodes if node["user"]["slug"][5:] == user["profile"]["smashgg"]][0]
-                smashgg = {
-                    "gamerTag": smashgg["gamerTag"],
-                    "slug": smashgg["user"]["slug"][5:]
-                }
-                smashgg_attendee_slugs.remove(user["profile"]["smashgg"])
-
-            discorduser = ctx.bot.get_user(int(doc.id))
-
-            return {
-                "id": doc.id,
-                "discord_username": f"{discorduser.name}#{discorduser.discriminator}" if discorduser else "None",
-                **signup,
-                **user,
-                "elo": elo,
-                "smashgg": smashgg
-            }
-
-        full_signups = [await per_doc(doc) for doc in docs]
-        not_on_otd = "\n".join([f'> `-` {node["gamerTag"]}' for node in nodes if node["user"]["slug"][5:] in smashgg_attendee_slugs])
-
-        await ctx.send(file=cls.create_file(full_signups))
-        await ctx.send(f"Signed up on smash.gg but not otd.ink: \n{not_on_otd}")
+        return {
+            node["user"]["slug"][5:]: node["gamerTag"]
+            for node in data["data"]["tournament"]["participants"]["nodes"]
+        }
 
     @classmethod
-    def create_file(cls, full_signups):
+    def list_signups(cls, ctx, signups, sgg_attendees):
+        """Return a list with parsed signups."""
+        def per_doc(doc):
+            signup = doc.to_dict()
+            user = utils.User(doc.id)
+            smashgg_tag = sgg_attendees.pop(user.dict["profile"]["smashgg"], None)
+            discord_user = ctx.bot.get_user(int(doc.id))
+            cxp = int({
+                "This is my first tournament :0": 0,
+                "I've played in one or two tournaments.": 2,
+                "I've played in some tournaments.": 5,
+                "I've played in a lot of tournaments.": 10,
+            }[user.dict["profile"]["cxp"]["amount"]] + (user.dict["profile"]["cxp"]["placement"]**(1/3)))
+
+            return {
+                **user.dict,
+                **signup,
+                "id": doc.id,
+                "discord_username": f"{discord_user.name}#{discord_user.discriminator}" if discord_user else None,
+                "elo": user.get_elo(),
+                "smashgg": {
+                    "gamerTag": smashgg_tag,
+                    "slug": user.dict["profile"]["smashgg"]
+                },
+                "cxp": cxp,
+                "stylepoints": {
+                    "sup-agg": user.dict["profile"]["stylepoints"]["aggressive"],
+                    "obj-sla": user.dict["profile"]["stylepoints"]["slayer"],
+                    "anc-mob": user.dict["profile"]["stylepoints"]["mobile"],
+                    "fle-foc": user.dict["profile"]["stylepoints"]["focused"],
+                }
+            }
+
+        return [per_doc(doc) for doc in signups]
+
+    @classmethod
+    def create_file(cls, signups):
         file = StringIO()
         writer: csv.writer = csv.writer(file)
         csv_profiles = []
 
-        for full_signup in full_signups:
+        for signup in signups:
             csv_profiles.append([
-                full_signup["discord_username"],
-                full_signup["smashgg"]["gamerTag"] if full_signup["smashgg"] else None,
-                full_signup["profile"]["ign"],
-                full_signup["profile"]["sw"],
-                full_signup["profile"]["ranks"]["sz"],
-                full_signup["profile"]["ranks"]["tc"],
-                full_signup["profile"]["ranks"]["rm"],
-                full_signup["profile"]["ranks"]["cb"],
-                full_signup["elo"],
-                full_signup["profile"]["stylepoints"]["support"],
-                full_signup["profile"]["stylepoints"]["aggressive"],
-                full_signup["profile"]["stylepoints"]["objective"],
-                full_signup["profile"]["stylepoints"]["slayer"],
-                full_signup["profile"]["stylepoints"]["anchor"],
-                full_signup["profile"]["stylepoints"]["mobile"],
-                full_signup["profile"]["stylepoints"]["flex"],
-                full_signup["profile"]["stylepoints"]["focused"],
-                full_signup["profile"]["cxp"]["amount"],
-                full_signup["profile"]["cxp"]["placement"],
-                full_signup["meta"]["signal"],
-                full_signup["tzOffset"],
-                full_signup["confirmationCode"],
-                full_signup["smashgg"]["slug"] if full_signup["smashgg"] else None,
-                f'<@{full_signup["id"]}>'
+                signup["discord_username"],
+                signup["smashgg"]["gamerTag"] if signup["smashgg"] else None,
+                signup["profile"]["ign"],
+                signup["profile"]["sw"],
+                signup["elo"],
+                signup["profile"]["ranks"]["sz"],
+                signup["profile"]["ranks"]["tc"],
+                signup["profile"]["ranks"]["rm"],
+                signup["profile"]["ranks"]["cb"],
+                signup["stylepoints"]["sup-agg"],
+                signup["stylepoints"]["obj-sla"],
+                signup["stylepoints"]["anc-mob"],
+                signup["stylepoints"]["fle-foc"],
+                signup["cxp"],
+                signup["meta"]["signal"],
+                signup["tzOffset"],
+                signup["confirmationCode"],
+                signup["smashgg"]["slug"] if signup["smashgg"] else None,
+                f'<@{signup["id"]}>'
             ])
-        csv_profiles.sort(key=lambda row: row[8])
-
+        csv_profiles.sort(key=lambda row: row[4])
         writer.writerows([[
-            "Discord Mention","Smash.gg gamerTag", "IGN", "SW", "SZ", "TC", "RM", "CB", "Cumulative ELO",
-            "support", "aggressive", "objective", "slayer", "anchor", "mobile", "flex", "focused",
-            "Amount of tourneys", "highest teams placed above", "Signal Strength", "Timezone Offset (minutes)", "Confirmation Code", "Smash.gg user slug", "Discord ID"], []] + csv_profiles)
+            "Discord Mention",
+            "Smash.gg gamerTag",
+            "IGN",
+            "SW",
+            "Cumulative ELO",
+            "SZ",
+            "TC",
+            "RM",
+            "CB",
+            "support < aggressive",
+            "objective < slayer",
+            "anchor < mobile",
+            "flex < focused",
+            "Competitive Experience",
+            "Signal Strength",
+            "Timezone Offset (minutes)",
+            "Confirmation Code",
+            "Smash.gg user slug",
+            "Discord ID"
+        ], []] + csv_profiles)
         file.seek(0)
         return discord.File(file, filename="signups.csv")
 
-
     @classmethod
-    def fix_stylepoints(cls, db):
-        batch = db.batch()
-        docs = db.collection(u'users').stream()
-        for doc in docs:
-            if "stylepoints" in doc.to_dict()["profile"].keys():
-                stylepoints = doc.to_dict()["profile"]["stylepoints"]
-                print(stylepoints)
-                ref = db.collection(u'users').document(doc.id)
-                batch.update(ref, {
-                    u"profile.stylepoints.support": abs(stylepoints["aggressive"] - 10),
-                    u"profile.stylepoints.objective": abs(stylepoints["slayer"] - 10),
-                    u"profile.stylepoints.anchor": abs(stylepoints["mobile"] - 10),
-                    u"profile.stylepoints.flex": abs(stylepoints["focused"] - 10),
-                })
-                print(doc.to_dict()["profile"]["stylepoints"])
-            else:
-                print(f"Skipped empty profile: {doc.id}")
-        batch.commit()
+    def display_invalid_attendees(cls, sgg_attendees):
+        """Display invalid smash.gg attendees."""
+        return "\n".join(f"`-` {gamerTag}" for gamerTag in sgg_attendees.values())
