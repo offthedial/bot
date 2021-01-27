@@ -1,5 +1,6 @@
 from offthedialbot import utils
 from . import db, Tournament
+from .signup import Signup
 
 
 class User:
@@ -10,21 +11,16 @@ class User:
     def __init__(self, id):
         self.id = str(id)
         self.doc = self.col.document(self.id).get()
+        self.ref = self.doc.reference
         self.dict = self.doc.to_dict()
+        self.tourney = Tournament()
 
-    def signup(self):
+    def signup(self, ignore_ended=False):
         """Return the possible user's signup (useSignup)."""
-        tourney = Tournament()
-        if tourney.has_ended():
+        if self.tourney.has_ended() and not ignore_ended:
             return None
 
-        doc = tourney.signups(col=True).document(self.id).get()
-        if doc.exists:
-            return "signup", doc
-
-        doc = tourney.subs(col=True).document(self.id).get()
-        if doc.exists:
-            return "sub", doc
+        return Signup(self.id)
 
     def is_banned(self):
         return None
@@ -42,9 +38,9 @@ class User:
         return data["data"]["user"]
 
     async def discord(self, bot):
-        user = bot.get_user(self.doc.id)
+        user = bot.get_user(self.id)
         if not user:
-            user = await bot.fetch_user(self.doc.id)
+            user = await bot.fetch_user(self.id)
         return user
 
     def get_elo(self):

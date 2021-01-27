@@ -8,4 +8,5 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 from .tournament import Tournament
+from .signup import Signup
 from .user import User

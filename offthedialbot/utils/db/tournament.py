@@ -28,7 +28,7 @@ class Tournament:
 
     def signups(self, col=False, ignore_ended=False):
         """Return a stream of tournament signups."""
-        if self.has_ended() and not ignore_ended:
+        if self.has_ended() and not (ignore_ended or col):
             return None
 
         signups = self.ref.collection(u'signups')
@@ -36,7 +36,7 @@ class Tournament:
 
     def subs(self, col=False, ignore_ended=False):
         """Return a stream of tournament subs."""
-        if self.has_ended() and not ignore_ended:
+        if self.has_ended() and not (ignore_ended or col):
             return None
 
         subs = self.ref.collection(u'subs')
