@@ -41,16 +41,15 @@ class ToGet(utils.Command):
 
     @classmethod
     async def send_signup_embed(cls, ctx, user: utils.User):
-        col, signup = user.signup()
+        signup = user.signup(ignore_ended=True)
         if not signup:
             return
-        signup_data = signup.to_dict()
         embed = discord.Embed(
             color=utils.colors.COMPETING,
-            title=col.capitalize(),
+            title=signup.col.capitalize(),
             description="\n".join([
-                f"`Smash.gg reg tag: ` **`{(await user.smashgg())['player']['gamerTag']}`**",
-                f"`Timezone offset:  ` **`{signup_data['tzOffset']}`**",
-                f"`Confirmation code:` **`{signup_data['confirmationCode']}`**",
+                f"`Smash.gg reg tag: ` **`{await signup.smashgg(user)}`**",
+                f"`Timezone offset:  ` **`{signup.dict['tzOffset']}`**",
+                f"`Confirmation code:` **`{signup.dict['confirmationCode']}`**",
             ]))
         await utils.CommandUI.create_ui(ctx, embed)
