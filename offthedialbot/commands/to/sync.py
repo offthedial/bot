@@ -23,10 +23,11 @@ class ToSync(utils.Command):
             await tourney.sync_smashgg()
 
         # Sync competing roles
-        if not (docs := tourney.signups()):
-            return
+        if docs := tourney.signups():
+            ids = [int(doc.id) for doc in docs]
+        else:
+            ids = []
 
-        ids = [int(doc.id) for doc in docs]
         guild = bot.get_guild(374715620052172800)
         role = guild.get_role(415767083691802624)
 
