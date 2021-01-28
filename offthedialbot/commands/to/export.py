@@ -13,20 +13,29 @@ class ToExport(utils.Command):
 
     @classmethod
     @utils.deco.require_role("Staff")
-    async def main(cls, ctx):
+    async def main(cls, ctx, collection: str = "signups"):
         """Temporary export signups command."""
         ui: utils.CommandUI = await utils.CommandUI(ctx,
             discord.Embed(title="Exporting attendees...", color=utils.colors.COMPETING))
 
         async with ctx.typing():
             tourney = utils.Tournament()
+
             sgg_attendees = await cls.query_attendees(ctx, tourney)
-            signups = cls.list_signups(ctx, tourney.signups(), sgg_attendees)
-            file = cls.create_file(signups)
+
+            if collection != "subs":
+                stream = tourney.signups(ignore_ended=True)
+            else:
+                stream = tourney.subs(ignore_ended=True)
+
+            signups = cls.list_signups(ctx, stream, sgg_attendees)
+            file = cls.create_file(signups, collection)
+
             await ctx.send(file=file)
-            await utils.CommandUI.create_ui(ctx, embed=discord.Embed(
-                title="Signed up on smash.gg, but not otd.ink:",
-                description=cls.display_invalid_attendees(sgg_attendees)))
+            if collection != "subs":
+                await utils.CommandUI.create_ui(ctx, embed=discord.Embed(
+                    title="Signed up on smash.gg, but not otd.ink:",
+                    description=cls.display_invalid_attendees(sgg_attendees)))
         await ui.end(True,
             title=":incoming_envelope: *Exporting attendees complete!*",
             description="Download the spreadsheet below. \U0001f4e5")
@@ -91,7 +100,7 @@ class ToExport(utils.Command):
         return [per_doc(doc) for doc in signups]
 
     @classmethod
-    def create_file(cls, signups):
+    def create_file(cls, signups, collection="signups"):
         file = StringIO()
         writer: csv.writer = csv.writer(file)
         csv_profiles = []
@@ -141,7 +150,7 @@ class ToExport(utils.Command):
             "Discord ID"
         ], []] + csv_profiles)
         file.seek(0)
-        return discord.File(file, filename="signups.csv")
+        return discord.File(file, filename=f"{collection}.csv")
 
     @classmethod
     def display_invalid_attendees(cls, sgg_attendees):
