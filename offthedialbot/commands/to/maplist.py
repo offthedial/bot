@@ -1,5 +1,5 @@
 """$to close"""
-import discord
+from urllib.parse import urlparse, parse_qs
 import asyncio
 
 from offthedialbot import utils
@@ -10,11 +10,13 @@ class ToMaplist(utils.Command):
 
     @classmethod
     @utils.deco.require_role("Staff")
-    async def main(cls, ctx, pools: dict = None):
+    async def main(cls, ctx, map_pools: str = ""):
         """Generate tournament maplist."""
         brackets = await cls.query_brackets(ctx)
-        if not pools:
-            pools = await cls.query_pool(ctx)
+        if not map_pools.startswith("https://sendou.ink/maps"):
+            pools = await cls.query_pool(ctx, map_pools)
+        else:
+            pools = cls.parse_sendou_link(map_pools)
         maplist = utils.Maplist(pools, brackets)
         async with ctx.typing():
             await cls.display_maplist(ctx, brackets, maplist)
@@ -31,7 +33,7 @@ class ToMaplist(utils.Command):
                 phaseGroups {
                   nodes {
                     rounds {
-                    	bestOf
+                      bestOf
                     }
                   }
                 }
@@ -48,11 +50,29 @@ class ToMaplist(utils.Command):
 
 
     @classmethod
-    async def query_pool(cls, ctx, index=0, name=None):
+    async def query_pool(cls, ctx, name=None):
         """Send a post request to get the maplist pool from the sendou.ink gql api."""
         query = f'query {{\nmaplists(name: "{name if name else "LUTI Season X"}") {{\nsz\ntc\nrm\ncb\n}}\n}}'
         status, resp = await utils.graphql("sendou", query, ctx=ctx)
-        return resp["data"]["maplists"][index]
+        if not resp["data"]["maplists"]:
+            await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Invalid maplist name", description="Check to make sure you didn't make any typos, or that the maplist doesn't exist.")
+            raise utils.exc.CommandCancel
+        return resp["data"]["maplists"][0]
+
+    @classmethod
+    def parse_sendou_link(cls, sendou_link):
+        """Parse sendou.ink map pool share link."""
+        params = parse_qs(urlparse(sendou_link).query)
+        pools = {
+            "sz": [],
+            "tc": [],
+            "rm": [],
+            "cb": [],
+        }
+        for key, value in params.items():
+            for mode in value.pop().split(","):
+                pools[mode.lower()].append(key)
+        return pools
 
     @classmethod
     async def display_maplist(cls, ctx, brackets, maplist):
