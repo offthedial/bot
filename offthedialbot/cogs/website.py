@@ -56,7 +56,7 @@ class Website(commands.Cog):
     @staticmethod
     async def display_section(ctx, name, section, url=None):
         section = re.sub(r'<\/?[^<\/>]+>', '', "\n".join(section))
-        embed = discord.Embed(description=section, color=utils.colors.DIALER)
+        embed = discord.Embed(description=section, color=utils.colors.BOT)
         if url:
             embed.url = url
             embed.title = name
