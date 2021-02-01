@@ -11,4 +11,4 @@ from .maplist import Maplist
 from .command import Command
 from .alert import Alert
 from .command_ui import CommandUI
-from .db import Tournament, User
+from .db import db, Tournament, Signup, User
