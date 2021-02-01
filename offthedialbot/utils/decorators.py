@@ -5,7 +5,7 @@ import discord
 from functools import wraps
 import inspect
 
-from offthedialbot import env, utils
+from offthedialbot import utils
 
 
 def require_role(role: str):
@@ -22,7 +22,7 @@ def require_role(role: str):
             else:
                 await utils.Alert(ctx, utils.Alert.Style.DANGER,
                     title="Permission Denied",
-                    description=f"This command is only avaliable to {role}s.")
+                    description=f"You do not have have the {role} role.")
 
         return _
 
