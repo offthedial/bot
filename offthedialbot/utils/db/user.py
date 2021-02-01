@@ -20,7 +20,10 @@ class User:
         if self.tourney.has_ended() and not ignore_ended:
             return None
 
-        return Signup(self.id)
+        try:
+            return Signup(self.id)
+        except LookupError:
+            return None
 
     def is_banned(self):
         return None

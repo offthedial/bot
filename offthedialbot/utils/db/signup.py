@@ -23,7 +23,7 @@ class Signup:
             self.set_signup()
             return
 
-        raise LookupError(f"User signup for id: '{self.id}' doesn't exist.")
+        raise LookupError
 
     def set_signup(self):
         """Set signup self variables."""
