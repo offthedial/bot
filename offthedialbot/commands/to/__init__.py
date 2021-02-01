@@ -13,7 +13,7 @@ class To(utils.Command, hidden=True):
     async def main(cls, ctx):
         """ Special commands to help with organizing tournaments.
 
-        Display a dashboard displaying the current tournament status.
+            Displays a dashboard showing the current tournament status, with a built-in sync button.
         """
         options = {
             "sync": '♻️',
