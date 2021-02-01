@@ -5,11 +5,11 @@ from offthedialbot import utils
 
 
 class ToGet(utils.Command):
-    """Command to directly sync."""
 
     @classmethod
     @utils.deco.require_role("Staff")
     async def main(cls, ctx, user: discord.User):
+        """Retrieve the profile and signup of a user."""
         user = utils.User(user.id)
         await cls.send_user_embed(ctx, user)
         await cls.send_signup_embed(ctx, user)

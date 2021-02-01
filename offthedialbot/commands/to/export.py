@@ -8,13 +8,11 @@ from offthedialbot import utils
 
 
 class ToExport(utils.Command):
-    """ Export signups
-    """
 
     @classmethod
     @utils.deco.require_role("Staff")
     async def main(cls, ctx, collection: str = "signups"):
-        """Temporary export signups command."""
+        """Export all of the signups or subs of the most recent tournament."""
         ui: utils.CommandUI = await utils.CommandUI(ctx,
             discord.Embed(title="Exporting attendees...", color=utils.colors.COMPETING))
 

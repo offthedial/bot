@@ -5,18 +5,17 @@ from offthedialbot import utils
 
 
 class ToNew(utils.Command):
-    """ Create a new tournament!
-
-    Steps:
-    - Get smash.gg full slug
-    - Ask for the type of tournament
-    - Add tournament to database
-    """
 
     @classmethod
     @utils.deco.require_role("Staff")
     async def main(cls, ctx):
-        """Open registration for a new tournament!"""
+        """ Open registration for a new tournament!
+
+        Steps:
+        - Get smash.gg full slug.
+        - Get tournament type.
+        - Add tournament data to database.
+        """
         ui: utils.CommandUI = await utils.CommandUI(ctx,
             discord.Embed(title="Opening registration for a new tournament...", color=utils.colors.COMPETING))
 

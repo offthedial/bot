@@ -7,15 +7,11 @@ from offthedialbot.commands.to.sync import ToSync
 
 
 class To(utils.Command, hidden=True):
-    """ Special commands for tournament organisers!
-
-    Shows a dashboard when run on it's own.
-    """
 
     @classmethod
     @utils.deco.require_role("Staff")
     async def main(cls, ctx):
-        """Special commands for tournament organisers.
+        """ Special commands to help with organizing tournaments.
 
         Display a dashboard displaying the current tournament status.
         """

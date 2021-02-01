@@ -6,18 +6,16 @@ from offthedialbot import utils
 
 
 class ToSync(utils.Command):
-    """Command to directly sync tournament data."""
 
     @classmethod
     @utils.deco.require_role("Staff")
     async def main(cls, ctx):
-        """Sync tournament."""
+        """Synchronize smash.gg tournament data and competing roles."""
         await cls.sync(ctx.bot)
         await ctx.message.add_reaction('♻️')
 
     @staticmethod
     async def sync(bot, smashgg=True):
-        """Synchronize smash.gg tournament data and competing roles."""
         tourney = utils.Tournament()
         if smashgg:
             await tourney.sync_smashgg()

@@ -6,7 +6,6 @@ from offthedialbot import utils
 
 
 class ToMaplist(utils.Command):
-    """Create and send a maplist."""
 
     @classmethod
     @utils.deco.require_role("Staff")
