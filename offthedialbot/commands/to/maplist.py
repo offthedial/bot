@@ -54,8 +54,7 @@ class ToMaplist(utils.Command):
         query = f'query {{\nmaplists(name: "{name if name else "LUTI Season X"}") {{\nsz\ntc\nrm\ncb\n}}\n}}'
         status, resp = await utils.graphql("sendou", query, ctx=ctx)
         if not resp["data"]["maplists"]:
-            await utils.Alert(ctx, utils.Alert.Style.DANGER, title="Invalid maplist name", description="Check to make sure you didn't make any typos, or that the maplist doesn't exist.")
-            raise utils.exc.CommandCancel
+            raise utils.exc.CommandCancel(title="Invalid maplist name", description="Check to make sure you didn't make any typos, or that the maplist doesn't exist.")
         return resp["data"]["maplists"][0]
 
     @classmethod

@@ -17,15 +17,13 @@ class ToSub(utils.Command):
         sub_signup = utils.User(sub.id).signup()
 
         if not reported_signup or reported_signup.col != "signups":
-            await utils.Alert(ctx, utils.Alert.Style.DANGER,
+            raise utils.exc.CommandCancel(
                 title="Reported player is invalid",
                 description=f"<@{reported.id}> was not found in `signups`.")
-            raise utils.exc.CommandCancel
         if not sub_signup or sub_signup.col != "subs":
-            await utils.Alert(ctx, utils.Alert.Style.DANGER,
+            raise utils.exc.CommandCancel(
                 title="Sub player is invalid",
                 description=f"<@{sub.id}> was not found in `subs`.")
-            raise utils.exc.CommandCancel
 
         # Start database operation
         batch = utils.db.batch()

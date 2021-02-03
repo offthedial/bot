@@ -46,4 +46,8 @@ async def command_cancel(ctx, error):
     if getattr(error, 'original', False) is False:
         return False
     if isinstance(error.original, utils.exc.CommandCancel):
+        if error.original.title or error.original.description:
+            await utils.Alert(ctx, utils.Alert.Style.DANGER,
+                title=error.original.title,
+                description=error.original.description)
         return True

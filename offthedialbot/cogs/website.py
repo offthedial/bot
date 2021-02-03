@@ -43,8 +43,7 @@ class Website(commands.Cog):
         header = self.get_header(self.list_headers(lines, minimal), section)
 
         if header is None:
-            await utils.Alert(ctx, utils.Alert.Style.DANGER, title="No section found.", description="Could not find a section that resembled what you entered, try rewording what you said.")
-            raise utils.exc.CommandCancel
+            raise utils.exc.CommandCancel(title="No section found.", description="Could not find a section that resembled what you entered, try rewording what you said.")
 
         name, section = self.get_section(lines, header[0])
         header_link = re.sub(r' ', "-", re.sub(r'[^A-Za-z0-9 ]', "", name)).lower()
@@ -71,10 +70,9 @@ class Website(commands.Cog):
     async def get_page(ctx, slug: str):
         async with utils.session.get(f"https://raw.githubusercontent.com/offthedial/site/master/src/pages/{slug}.md") as resp:
             if resp.status != 200:
-                await utils.Alert(ctx, utils.Alert.Style.DANGER,
+                raise utils.exc.CommandCancel(
                     title=f"Status Code - `{resp.status}`",
                     description="An error occurred while trying to retrieve website data from otd.ink, check the status code or try again later.")
-                raise utils.exc.CommandCancel
             return await resp.text()
 
     @staticmethod

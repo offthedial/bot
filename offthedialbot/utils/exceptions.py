@@ -4,8 +4,6 @@
 class CommandCancel(Exception):
     """Cancel a command."""
 
-    def __init__(self, status=None, ui=None, title=None, description=None):
-        self.status = status
-        self.ui = ui
+    def __init__(self, title=None, description=None):
         self.title = title
         self.description = description

@@ -31,14 +31,12 @@ async def graphql(type, query, variables={}, ctx=None):
     async with session.post(url, json=request, headers=headers) as resp:
         if ctx:
             if resp.status != 200:
-                await utils.Alert(ctx, utils.Alert.Style.DANGER,
+                raise utils.exc.CommandCancel(
                     title=f"Status Code - `{resp.status}`",
                     description=f"Unable to make a request for type '{type}', try again later.")
-                raise utils.exc.CommandCancel
             if errors := (await resp.json()).get("errors", None):
-                await utils.Alert(ctx, utils.Alert.Style.DANGER,
+                raise utils.exc.CommandCancel(
                     title=f"GraphQL Request Failed",
                     description=f"```json\n{errors}\n```")
-                raise utils.exc.CommandCancel
 
         return resp.status, await resp.json()
