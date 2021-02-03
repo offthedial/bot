@@ -166,18 +166,6 @@ class CommandUI:
         for alert in self.alerts:
             await alert.delete()
 
-    async def run_command(self, main, *args):
-        """Run an external command, from a command ui."""
-        await self.message.clear_reaction('❌')
-        try:
-            await main(self.ctx, *args)
-        except utils.exc.CommandCancel as e:
-            if e.ui and e.status is not None:
-                await e.ui.message.delete()
-            if not e.status:
-                await self.end(e.status, e.title, e.description)
-            return e
-
     async def end(self, status: Union[bool, None], title: str = None, description=discord.Embed.Empty) -> None:
         """End UI interaction and display status."""
         status_key: dict = {
@@ -203,7 +191,7 @@ class CommandUI:
         await self.delete_alerts()
 
         # Raise exception to cancel command
-        raise utils.exc.CommandCancel(status, ui=self, title=title, description=description)
+        raise utils.exc.CommandCancel
 
     async def create_cancel_task(self, value=True) -> asyncio.Task:
         """Create a task that checks if the user canceled the command."""
