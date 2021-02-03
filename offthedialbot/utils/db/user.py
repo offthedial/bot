@@ -1,4 +1,5 @@
 from offthedialbot import utils
+from firebase_admin import firestore
 from . import db, Tournament
 from .signup import Signup
 
@@ -25,8 +26,9 @@ class User:
         except LookupError:
             return None
 
-    def is_banned(self):
-        return None
+    def increment_ss(self, by: int):
+        """Increment signal strength by an amount."""
+        return self.ref.update({"meta.signal": firestore.Increment(by)})
 
     async def smashgg(self):
         """Get smash.gg data from the api with the user slug."""
