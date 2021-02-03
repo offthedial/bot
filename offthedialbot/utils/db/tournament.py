@@ -72,15 +72,41 @@ class Tournament:
         self.ref.update({"smashgg": smashgg})
         self.dict["smashgg"] = smashgg  # Optimistic update
 
-    @staticmethod
-    async def query_smashgg(slug):
-        """Query the smash.gg graphql api."""
-        query = """query($slug: String) {
-          tournament(slug: $slug){
-            name
-            registrationClosesAt
-            endAt
+    async def get_standings(self):
+        """Get standings."""
+        q = """
+          events {
+            numEntrants
+            standings(query: {perPage: 500}) {
+              nodes {
+                placement
+                entrant {
+                  name
+                }
+              }
+            }
           }
-        }"""
+        """
+        data = await self.query_smashgg(self.dict["slug"], q)
+        return data["events"][0]["numEntrants"], [
+            {
+                "placement": node["placement"],
+                "name": node["entrant"]["name"]
+            } for node in data["events"][0]["standings"]["nodes"]
+        ]
+
+    @staticmethod
+    async def query_smashgg(slug, q=None):
+        """Query the smash.gg graphql api."""
+        q = q if q else """
+
+        """
+        query = f"""query($slug: String) {{
+          tournament(slug: $slug) {{
+            {q}
+          }}
+        }}
+        """
+
         status, resp = await utils.graphql("smashgg", query, {"slug": slug})
         return resp["data"]["tournament"]
