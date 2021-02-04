@@ -99,7 +99,9 @@ class Tournament:
     async def query_smashgg(slug, q=None):
         """Query the smash.gg graphql api."""
         q = q if q else """
-
+            name
+            endAt
+            registrationClosesAt
         """
         query = f"""query($slug: String) {{
           tournament(slug: $slug) {{
