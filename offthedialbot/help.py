@@ -100,7 +100,7 @@ class HelpCommand(commands.DefaultHelpCommand):
 
     def short(self, command, doc=True):
         """List the command as a one-liner."""
-        sig = self.get_command_signature(command)
+        sig = self.get_command_signature(command) if not doc else f'{self.clean_prefix}{command}'
         return f'`{sig[:-1] if sig.endswith(" ") else sig}` {(command.short_doc if doc else "")}'
 
 
