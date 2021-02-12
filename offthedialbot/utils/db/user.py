@@ -1,3 +1,4 @@
+import discord
 from offthedialbot import utils
 from firebase_admin import firestore
 from . import db, Tournament
@@ -42,11 +43,14 @@ class User:
         status, data = await utils.graphql("smashgg", query, {"slug": self.dict["profile"]["smashgg"]})
         return data["data"]["user"]
 
-    async def discord(self, bot):
-        user = bot.get_user(self.id)
-        if not user:
-            user = await bot.fetch_user(self.id)
-        return user
+    async def discord(self, context):
+        if isinstance(context, discord.Client):
+            user = context.get_user(self.id)
+            if not user:
+                user = await context.fetch_user(self.id)
+            return user
+        if isinstance(context, discord.Guild):
+            return context.get_member(self.id)
 
     def get_elo(self):
         return sum([self.rank_to_power(rank) for rank in self.get_ranks()]) / 4
