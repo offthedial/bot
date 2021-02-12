@@ -45,12 +45,12 @@ class User:
 
     async def discord(self, context):
         if isinstance(context, discord.Client):
-            user = context.get_user(self.id)
+            user = context.get_user(int(self.id))
             if not user:
-                user = await context.fetch_user(self.id)
+                user = await context.fetch_user(int(self.id))
             return user
         if isinstance(context, discord.Guild):
-            return context.get_member(self.id)
+            return context.get_member(int(self.id))
 
     def get_elo(self):
         return sum([self.rank_to_power(rank) for rank in self.get_ranks()]) / 4
