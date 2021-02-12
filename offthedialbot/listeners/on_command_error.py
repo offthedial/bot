@@ -23,7 +23,7 @@ async def invalid_command(ctx, error):
         else:
             try:
                 int(ctx.message[1:])
-            except ValueError:
+            except TypeError:
                 pass
             else:
                 await utils.Alert(ctx, utils.Alert.Style.DANGER,
