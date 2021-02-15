@@ -25,7 +25,7 @@ class ToNew(utils.Command):
 
         ui.embed.description = "Adding tournament to database..."
         await ui.update()
-        await utils.Tournament.new_tournament(slug=tourney_slug, type=tourney_type)
+        await utils.Tournament.new_tourney(slug=tourney_slug, type=tourney_type)
         await ui.end(True)
 
     @classmethod
