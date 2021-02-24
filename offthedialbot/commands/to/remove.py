@@ -1,10 +1,10 @@
-"""$to sub"""
+"""$to remove"""
 import discord
 
 from offthedialbot import utils
 
 
-class ToSub(utils.Command):
+class ToRemove(utils.Command):
 
     @classmethod
     @utils.deco.require_role("Staff")
