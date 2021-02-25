@@ -18,7 +18,6 @@ class ToExport(utils.Command):
 
         async with ctx.typing():
             tourney = utils.Tournament()
-
             sgg_attendees = await cls.query_attendees(ctx, tourney)
 
             if collection != "subs":
@@ -31,12 +30,16 @@ class ToExport(utils.Command):
 
             await ctx.send(file=file)
             if collection != "subs":
-                await utils.CommandUI.create_ui(ctx, embed=discord.Embed(
-                    title="Signed up on smash.gg, but not otd.ink:",
-                    description=cls.display_invalid_attendees(sgg_attendees)))
-        await ui.end(True,
-            title=":incoming_envelope: *Exporting attendees complete!*",
-            description="Download the spreadsheet below. \U0001f4e5")
+                embed = discord.Embed(
+                    title=":incoming_envelope: *Exporting attendees complete!*",
+                    description="Download the spreadsheet below. \U0001f4e5")
+                embed.add_field(
+                    name="Invalid Attendees - Only on smash.gg:",
+                    value=cls.list_attendees(sgg_attendees.values()))
+                embed.add_field(
+                    name="Invalid Attendees - Not checked in:",
+                    value=cls.list_attendees([f"<@{s.id}>" for s in signups if s["checkedin"]]))
+        await ui.end(embed)
 
     @classmethod
     async def query_attendees(cls, ctx, tourney):
@@ -69,6 +72,8 @@ class ToExport(utils.Command):
             user = utils.User(doc.id)
             smashgg_tag = sgg_attendees.pop(user.dict["profile"]["smashgg"], None)
             discord_user = ctx.bot.get_user(int(doc.id))
+            roles = getattr(ctx.guild.get_member(int(doc.id)), "roles", [])
+
             cxp = int({
                 "This is my first tournament :0": 0,
                 "I've played in one or two tournaments.": 2,
@@ -92,7 +97,8 @@ class ToExport(utils.Command):
                     "obj-sla": user.dict["profile"]["stylepoints"]["slayer"],
                     "anc-mob": user.dict["profile"]["stylepoints"]["mobile"],
                     "fle-foc": user.dict["profile"]["stylepoints"]["focused"],
-                }
+                },
+                "checkedin": bool(discord.utils.get(roles, name="Checked In"))
             }
 
         return [per_doc(doc) for doc in signups]
@@ -122,6 +128,7 @@ class ToExport(utils.Command):
                 signup["meta"]["signal"],
                 signup["tzOffset"],
                 signup["confirmationCode"],
+                signup["checkedin"],
                 signup["smashgg"]["slug"] if signup["smashgg"] else None,
                 f'<@{signup["id"]}>'
             ])
@@ -144,6 +151,7 @@ class ToExport(utils.Command):
             "Signal Strength",
             "Timezone Offset (minutes)",
             "Confirmation Code",
+            "Checked In",
             "Smash.gg user slug",
             "Discord ID"
         ], []] + csv_profiles)
@@ -151,6 +159,6 @@ class ToExport(utils.Command):
         return discord.File(file, filename=f"{collection}.csv")
 
     @classmethod
-    def display_invalid_attendees(cls, sgg_attendees):
-        """Display invalid smash.gg attendees."""
-        return "\n".join(f"`-` {gamerTag}" for gamerTag in sgg_attendees.values())
+    def list_attendees(cls, attendees):
+        """Display in a list, all invalid attendees."""
+        return "\n".join(f"`-` {value}" for value in attendees)
