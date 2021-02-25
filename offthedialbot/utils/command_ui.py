@@ -166,7 +166,7 @@ class CommandUI:
         for alert in self.alerts:
             await alert.delete()
 
-    async def end(self, status: Union[bool, None], title: str = None, description=discord.Embed.Empty) -> None:
+    async def end(self, status: Union[discord.Embed, bool, None], title: str = None, description=discord.Embed.Empty) -> None:
         """End UI interaction and display status."""
         status_key: dict = {
             True: utils.Alert.create_embed(utils.Alert.Style.SUCCESS,
