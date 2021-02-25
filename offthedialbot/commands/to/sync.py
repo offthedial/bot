@@ -59,7 +59,7 @@ class ToSync(utils.Command):
         # Loop over users
         for user in users:
             user = utils.User(user.id)
-            discord = await user.discord(guild)
+            discord = user.discord(guild)
             signal = user.dict["meta"]["signal"]
             # Add roles depending on milestones
             if signal >= 1000:
