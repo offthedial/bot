@@ -48,7 +48,7 @@ class ToGet(utils.Command):
             color=utils.colors.COMPETING,
             title=signup.col.capitalize(),
             description="\n".join([
-                f"`Smash.gg reg tag: ` **`{await signup.smashgg(user)}`**",
+                f"`Smash.gg reg tag: ` **`{await signup.smashgg()}`**",
                 f"`Timezone offset:  ` **`{signup.dict['tzOffset']}`**",
                 f"`Confirmation code:` **`{signup.dict['confirmationCode']}`**",
             ]))

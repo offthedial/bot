@@ -23,7 +23,7 @@ class User:
             return None
 
         try:
-            return Signup(self.id)
+            return Signup(self.id, self, self.tourney)
         except LookupError:
             return None
 
