@@ -21,6 +21,7 @@ class ToRemove(utils.Command):
                 title="Reported player is invalid",
                 description=f"<@{reported.id}> was not found in `signups`.")
         await utils.Alert(ctx, utils.Alert.Style.INFO,
+            title="\u200b",
             description=f"Remove `{await reported_signup.smashgg()}` from {smashgg_link}")
 
         if sub:
