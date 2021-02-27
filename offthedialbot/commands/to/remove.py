@@ -24,19 +24,23 @@ class ToRemove(utils.Command):
             title="\u200b",
             description=f"Remove `{await reported_signup.smashgg()}` from {smashgg_link}")
 
+        # Get team role
+        team_role = discord.utils.find(lambda r: (
+                r.color == discord.Color(utils.colors.COMPETING) and
+                r.name != "Signed Up!"),
+            reported_member.roles)
+
+        # Get reported_sub, if necessary
         if sub:
-            # Get reported_sub, if necessary
             sub_member = ctx.guild.get_member(sub.id)
             sub_signup = utils.User(sub.id).signup()
             if not sub_signup or sub_signup.col != "subs":
                 raise utils.exc.CommandCancel(
                     title="Sub player is invalid",
                     description=f"<@{sub.id}> was not found in `subs`.")
-            team_role = discord.utils.find(lambda r: (
-                    r.color == discord.Color(utils.colors.COMPETING) and
-                    r.name != "Signed Up!"),
-                reported_member.roles)
-            await utils.Alert(ctx, utils.Alert.Style.INFO, description=f"Add `{await sub_signup.smashgg()}` to {smashgg_link} on team `{team_role.name}`.")
+            await utils.Alert(ctx, utils.Alert.Style.INFO,
+                title="\u200b",
+                description=f"Add `{await sub_signup.smashgg()}` to {smashgg_link} on team `{team_role.name}`.")
 
         # Start database operation
         batch = utils.db.batch()
