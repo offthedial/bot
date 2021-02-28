@@ -30,13 +30,16 @@ class ToSync(utils.Command):
     @staticmethod
     async def sync_competing(bot, tourney):
         """Sync competing roles."""
+        guild = bot.OTD
         if docs := tourney.signups():
             ids = [int(doc.id) for doc in docs]
         else:
+            checkin_role = discord.utils.get(guild.roles, name="Checked In")
+            if checkin_role:
+                await checkin_role.delete()
             ids = []
 
-        guild = bot.get_guild(374715620052172800)
-        role = guild.get_role(415767083691802624)
+        role = discord.utils.get(guild.roles, name="Signed Up!")
 
         for sign in role.members:
             if not sign.id in ids:
@@ -56,7 +59,7 @@ class ToSync(utils.Command):
         # Loop over users
         for user in users:
             user = utils.User(user.id)
-            discord = await user.discord(guild)
+            discord = user.discord(guild)
             signal = user.dict["meta"]["signal"]
             # Add roles depending on milestones
             if signal >= 1000:

@@ -43,14 +43,14 @@ class User:
         status, data = await utils.graphql("smashgg", query, {"slug": self.dict["profile"]["smashgg"]})
         return data["data"]["user"]
 
-    async def discord(self, context):
+    def discord(self, context):
         if isinstance(context, discord.Client):
-            user = context.get_user(int(self.id))
-            if not user:
-                user = await context.fetch_user(int(self.id))
-            return user
+            return context.get_user(int(self.id))
         if isinstance(context, discord.Guild):
             return context.get_member(int(self.id))
+
+    async def fetch_discord(self, client):
+        return await client.fetch_user(int(self.id))
 
     def get_elo(self):
         return sum([self.rank_to_power(rank) for rank in self.get_ranks()]) / 4

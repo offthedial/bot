@@ -20,9 +20,9 @@ class ToGet(utils.Command):
             await utils.Alert(ctx, utils.Alert.Style.DANGER, title="User doesn't have an account!")
         try:
             embed = discord.Embed(
-                title=(await user.discord(ctx.bot)).name,
+                title=user.discord(ctx.bot).name,
                 description="\n".join([
-                    f"`User mention:       ` {(await user.discord(ctx.bot)).mention}",
+                    f"`User mention:       ` {user.discord(ctx.bot).mention}",
                     f"`Smash.gg slug & tag:` **`{user.dict['profile']['smashgg']}`** & **`{(await user.smashgg())['player']['gamerTag']}`**",
                     f"`IGN:                ` **`{user.dict['profile']['ign']}`**",
                     f"`SW:                 ` **`{user.dict['profile']['sw']}`**",
@@ -36,7 +36,7 @@ class ToGet(utils.Command):
             await utils.CommandUI.create_ui(ctx, embed)
         except KeyError:
             await utils.CommandUI.create_ui(ctx, discord.Embed(
-                title=(await user.discord(ctx.bot)).name,
+                title=user.discord(ctx.bot).name,
                 description=f"```\n{user.dict}\n```"))
 
     @classmethod
