@@ -51,4 +51,4 @@ class ToSignal(utils.Command):
     @staticmethod
     def calculate_gain(total, placement):
         """Calculate the total signal strength to add based on the total teams and placement."""
-        return 100 + round(((total - (placement - 1)) * (100 / (total))), 3)
+        return round(100 + ((total - (placement - 1)) * (100 / (total))), 1)
