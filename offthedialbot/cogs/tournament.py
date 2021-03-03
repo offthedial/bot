@@ -11,6 +11,7 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
     """Cog holding tournament-related misc commands."""
     def __init__(self, bot):
         self.bot = bot
+        self.sync.start()
 
     @tasks.loop(hours=1)
     async def sync(self):
