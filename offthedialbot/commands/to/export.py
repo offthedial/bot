@@ -33,7 +33,7 @@ class ToExport(utils.Command):
 
             # Get list of invalid attendees
             invalid_sgg = cls.list_attendees(sgg_attendees.values())
-            invalid_checkin = cls.list_attendees([f"<@{s['id']}>" for s in signups if s["checked_in"]])
+            invalid_checkin = cls.list_attendees([f"<@{s['id']}>" for s in signups if not s["checked_in"]])
 
             # Create * send success embed
             if collection != "subs":
