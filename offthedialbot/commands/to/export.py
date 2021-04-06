@@ -33,7 +33,7 @@ class ToExport(utils.Command):
 
             # Get list of invalid attendees
             invalid_sgg = cls.list_attendees(sgg_attendees.values())
-            invalid_checkin = cls.list_attendees([f"<@{s.id}>" for s in signups if s["checkedin"]])
+            invalid_checkin = cls.list_attendees([f"<@{s['id']}>" for s in signups if s["checked_in"]])
 
             # Create * send success embed
             if collection != "subs":
@@ -56,7 +56,7 @@ class ToExport(utils.Command):
             signup = doc.to_dict()
             user = utils.User(doc.id)
             # Get discord and smash.gg
-            discord = user.discord(ctx.guild)
+            user_discord = user.discord(ctx.guild)
             smashgg = sgg_attendees.pop(user.dict["profile"]["smashgg"], None)
 
             # Calculate cxp
@@ -67,9 +67,9 @@ class ToExport(utils.Command):
                 "I've played in a lot of tournaments.": 10,
             }[user.dict["profile"]["cxp"]["amount"]] + (user.dict["profile"]["cxp"]["placement"]**(1/3)))
             # Calculate discord data
-            if discord:
-                discord_username = f"{discord.name}#{discord.discriminator}"
-                checked_in = bool(discord.utils.get(getattr(discord, "roles", []), name="Checked In"))
+            if user_discord:
+                discord_username = f"{user_discord.name}#{user_discord.discriminator}"
+                checked_in = bool(discord.utils.get(getattr(user_discord, "roles", []), name="Checked In"))
             else:
                 discord_username = "-"
                 checked_in = "N/A"
