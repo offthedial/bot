@@ -9,7 +9,7 @@ class ToMaplist(utils.Command):
 
     @classmethod
     @utils.deco.require_role("Staff")
-    async def main(cls, ctx, map_pools: str = ""):
+    async def main(cls, ctx, map_pools: str = "", tcwahoo: bool = False):
         """Generate tournament maplist."""
         brackets = await cls.query_brackets(ctx)
         if not map_pools.startswith("https://sendou.ink/maps"):
@@ -17,8 +17,11 @@ class ToMaplist(utils.Command):
         else:
             pools = cls.parse_sendou_link(map_pools)
         maplist = utils.Maplist(pools, brackets)
+        generated = maplist.generate()
+        if tcwahoo:
+            generated[-1][0] = ('tc', 'Wahoo World :tcwahoo:')
         async with ctx.typing():
-            await cls.display_maplist(ctx, brackets, maplist)
+            await cls.display_maplist(ctx, brackets, generated)
 
     @classmethod
     async def query_brackets(cls, ctx):
@@ -85,7 +88,7 @@ class ToMaplist(utils.Command):
         previous_phase = None
         phase_i = None
         # Loop over all phases
-        for (i, game), current_phase in zip(enumerate(maplist.generate()), phases):
+        for (i, game), current_phase in zip(enumerate(maplist), phases):
             phase_name = list(brackets.keys())[current_phase]
             # Display the phase title, if it's a new phase
             if previous_phase != current_phase:
