@@ -19,7 +19,7 @@ class ToMaplist(utils.Command):
         maplist = utils.Maplist(pools, brackets)
         generated = maplist.generate()
         if tcwahoo:
-            generated[-1][0] = ('tc', 'Wahoo World :tcwahoo:')
+            generated[-1][0] = ('tcwahoo', 'Wahoo World')
         async with ctx.typing():
             await cls.display_maplist(ctx, brackets, generated)
 
@@ -81,7 +81,8 @@ class ToMaplist(utils.Command):
             "sz": "<:sz:804107770328383558> `Splat Zones`",
             "tc": "<:tc:804107769242058783> `Tower Control`",
             "rm": "<:rm:804107768130306078> `Rainmaker`",
-            "cb": "<:cb:804107767601168394> `Clam Blitz`"
+            "cb": "<:cb:804107767601168394> `Clam Blitz`",
+            "tcwahoo": "<:tcwahoo:801923933661167646> `Tower Control`"
         }
         # Get phases
         phases = [i for i, games in enumerate(brackets.values()) for _ in range(len(games))]
