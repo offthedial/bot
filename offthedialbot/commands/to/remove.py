@@ -16,10 +16,10 @@ class ToRemove(utils.Command):
         # Get reported_signup
         reported_member = ctx.guild.get_member(reported.id)
         reported_signup = utils.User(reported.id).signup()
-        if not reported_signup or reported_signup.col != "signups":
+        if not reported_signup:
             raise utils.exc.CommandCancel(
                 title="Reported player is invalid",
-                description=f"<@{reported.id}> was not found in `signups`.")
+                description=f"<@{reported.id}> was not found.")
         await utils.Alert(ctx, utils.Alert.Style.INFO,
             title="\u200b",
             description=f"Remove `{await reported_signup.smashgg()}` from {smashgg_link}")
@@ -29,6 +29,10 @@ class ToRemove(utils.Command):
                 r.color == discord.Color(utils.colors.COMPETING) and
                 r.name != "Signed Up!"),
             reported_member.roles)
+        if sub and not team_role:
+            raise utils.exc.CommandCancel(
+                title="No team role",
+                description=f"<@{reported.id}> does not have a team role.")
 
         # Get reported_sub, if necessary
         if sub:
@@ -54,16 +58,20 @@ class ToRemove(utils.Command):
         batch.commit()
 
         # Bot moves team role from reported player to sub.
-        await reported_member.remove_roles(team_role)
+        if team_role:
+            await reported_member.remove_roles(team_role)
         if sub:
             await sub_member.add_roles(team_role)
-        await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
-            title="Player Removal Complete",
-            description="\n".join([
+            message = "\n".join([
                 f"Successfully removed <@{reported.id}>, replaced by <@{sub.id}>.",
                 "",
                 "Reply to the report with this message:",
                 "> ```",
                 f"> <@{reported.id}> > <@{sub.id}>",
                 "> ```"
-            ]) if sub else f"Successfully removed <@{reported.id}>.")
+            ])
+        else:
+            message = f"Successfully removed <@{reported.id}>."
+        await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
+            title="Player Removal Complete",
+            description=message)
