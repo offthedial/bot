@@ -31,7 +31,7 @@ class ToRemove(utils.Command):
         team_role = discord.utils.find(lambda r: (
                 r.color == discord.Color(utils.colors.COMPETING) and
                 r.name != "Signed Up!"),
-            reported_member.roles)
+            getattr(reported_member, "roles", []))
 
         # Get reported sub, if necessary
         if sub:
