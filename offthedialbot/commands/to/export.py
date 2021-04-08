@@ -42,10 +42,10 @@ class ToExport(utils.Command):
                     description="Download the spreadsheet below. \U0001f4e5")
                 embed.add_field(
                     name="Invalid Attendees - Only on smash.gg:",
-                    value=invalid_sgg)
+                    value=invalid_sgg if invalid_sgg else "✨ No invalid attendees!")
                 embed.add_field(
                     name="Invalid Attendees - Not checked in:",
-                    value=invalid_checkin)
+                    value=invalid_checkin if invalid_checkin else "✨ No invalid attendees!")
         await ui.end(embed)
 
     @staticmethod
