@@ -35,11 +35,6 @@ class ToRemove(utils.Command):
 
         # Get reported sub, if necessary
         if sub:
-            # Check if reported has a team role
-            if not team_role:
-                raise utils.exc.CommandCancel(
-                    title="No team role",
-                    description=f"<@{reported.id}> does not have a team role.")
             # Check if sub player is valid
             sub_member = ctx.guild.get_member(sub.id)
             sub_signup = utils.User(sub.id).signup()
@@ -47,13 +42,17 @@ class ToRemove(utils.Command):
                 raise utils.exc.CommandCancel(
                     title="Sub player is invalid",
                     description=f"<@{sub.id}> was not found in `subs`.")
-            # Bot moves team role from reported player to sub.
-            await reported_member.remove_roles(team_role)
-            await sub_member.add_roles(team_role)
+            if team_role:
+                # Bot moves team role from reported player to sub.
+                await reported_member.remove_roles(team_role)
+                await sub_member.add_roles(team_role)
+                team_name = team_role.name
+            else:
+                team_name = None
             # Alert smash.gg removal
             await utils.Alert(ctx, utils.Alert.Style.INFO,
                 title="\u200b",
-                description=f"Add `{await sub_signup.smashgg()}` to {smashgg_link} on team `{team_role.name}`.")
+                description=f"Add `{await sub_signup.smashgg()}` to {smashgg_link} on team `{team_name}`.")
             # Move sub_signup from subs collection to signups collection
             batch.delete(reported_signup.ref)
             batch.set(tourney.signups(col=True).document(sub_signup.id), sub_signup.dict)
