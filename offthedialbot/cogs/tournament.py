@@ -16,7 +16,6 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
     @tasks.loop(hours=1)
     async def sync(self):
         """Task loop that assigns roles."""
-        print("sync loop running...")
         await ToSync.sync(self.bot)
 
     @sync.before_loop
