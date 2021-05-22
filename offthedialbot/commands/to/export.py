@@ -43,9 +43,10 @@ class ToExport(utils.Command):
                 embed.add_field(
                     name="Invalid Attendees - Only on smash.gg:",
                     value=invalid_sgg if invalid_sgg else "✨ No invalid attendees!")
-                embed.add_field(
-                    name="Invalid Attendees - Not checked in:",
-                    value=invalid_checkin if invalid_checkin else "✨ No invalid attendees!")
+                if discord.utils.get(ctx.guild.roles, name="Checked In"):
+                    embed.add_field(
+                        name="Invalid Attendees - Not checked in:",
+                        value=invalid_checkin if invalid_checkin else "✨ No invalid attendees!")
         await ui.end(embed)
 
     @staticmethod
