@@ -71,6 +71,8 @@ class ToMaplist(utils.Command):
             "cb": [],
         }
         for key, value in params.items():
+            if key in ["count", "mode", "modes"]:
+                continue
             for mode in value.pop().split(","):
                 pools[mode.lower()].append(key)
         return pools
