@@ -55,24 +55,21 @@ class ToExport(utils.Command):
 
     @classmethod
     async def overlays(cls, ctx):
-        tourney = utils.Tournament()
-        _, teams = await tourney.get_standings()
-
+        # Build teams list
+        team_roles = []
+        for role in ctx.guild.roles:
+            if role.color == utils.colors.COMPETING and role.name != "Signed Up!":
+                team_roles.append(role)
         # Build export dictionary
-        async def igns(team_name):
-            role = discord.utils.get(ctx.guild.roles, name=team_name)
-            if not role:
-                raise utils.exc.CommandCancel(
-                    title=f"Unable to get role for team: `{team_name}`",
-                    description=f"Make sure the team name and role name match")
+        async def igns(role):
             igns = []
             for member in role.members:
                 user = utils.User(member.id)
                 igns.append(user.dict["ign"])
             return igns
         export = {
-            team["name"]: await igns(team["name"])
-            for team in teams
+            team_role.name: await igns(team_role)
+            for team_role in team_roles
         }
         # Send file
         file = StringIO()
