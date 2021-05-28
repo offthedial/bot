@@ -58,7 +58,7 @@ class ToExport(utils.Command):
         # Build teams list
         team_roles = []
         for role in ctx.guild.roles:
-            if role.color == utils.colors.COMPETING and role.name != "Signed Up!":
+            if role.color == discord.Color(utils.colors.COMPETING) and role.name != "Signed Up!":
                 team_roles.append(role)
         # Build export dictionary
         async def igns(role):
