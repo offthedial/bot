@@ -56,7 +56,7 @@ class ToExport(utils.Command):
     @classmethod
     async def overlays(cls, ctx):
         tourney = utils.Tournament()
-        teams = await tourney.get_standings()
+        _, teams = await tourney.get_standings()
 
         # Build export dictionary
         async def igns(team_name):
