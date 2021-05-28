@@ -65,7 +65,7 @@ class ToExport(utils.Command):
             igns = []
             for member in role.members:
                 user = utils.User(member.id)
-                igns.append(user.dict["ign"])
+                igns.append(user.dict["profile"]["ign"])
             return igns
         export = {
             team_role.name: await igns(team_role)
