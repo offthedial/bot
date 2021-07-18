@@ -73,7 +73,7 @@ class ToExport(utils.Command):
         }
         # Send file
         file = StringIO()
-        json.dump({"teamlist": export}, file)
+        json.dump({"teams": export}, file)
         file.seek(0)
         await ctx.send(file=discord.File(file, filename=f"loadedData.json"))
 
