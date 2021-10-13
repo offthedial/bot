@@ -1,4 +1,5 @@
 """$to export"""
+import json
 import csv
 from io import StringIO
 
@@ -19,34 +20,67 @@ class ToExport(utils.Command):
         async with ctx.typing():
             # Get tourney signups and smash.gg signups
             tourney = utils.Tournament()
-            if collection != "subs":
-                stream = tourney.signups(ignore_ended=True)
-            else:
-                stream = tourney.subs(ignore_ended=True)
-            sgg_attendees = await cls.query_attendees(ctx, tourney)
+            if collection in ["signups", "subs"]:
+                if collection == "signups":
+                    stream = tourney.signups(ignore_ended=True)
+                elif collection == "subs":
+                    stream = tourney.subs(ignore_ended=True)
+                sgg_attendees = await cls.query_attendees(ctx, tourney)
 
-            # Create exportable signups list
-            signups = cls.list_signups(ctx, stream, sgg_attendees)
-            # Create & send file from signups list
-            file = cls.create_file(signups, collection)
-            await ctx.send(file=file)
+                # Create exportable signups list
+                signups = cls.list_signups(ctx, stream, sgg_attendees)
+                # Create & send file from signups list
+                file = cls.create_file(signups, collection)
+                await ctx.send(file=file)
 
-            # Get list of invalid attendees
-            invalid_sgg = cls.list_attendees(sgg_attendees.values())
-            invalid_checkin = cls.list_attendees([f"<@{s.id}>" for s in signups if s["checkedin"]])
+                # Get list of invalid attendees
+                invalid_sgg = cls.list_attendees(sgg_attendees.values())
+                invalid_checkin = cls.list_attendees([f"<@{s['id']}>" for s in signups if not s["checked_in"]])
 
-            # Create * send success embed
-            if collection != "subs":
-                embed = discord.Embed(
-                    title=":incoming_envelope: *Exporting attendees complete!*",
-                    description="Download the spreadsheet below. \U0001f4e5")
-                embed.add_field(
-                    name="Invalid Attendees - Only on smash.gg:",
-                    value=invalid_sgg)
-                embed.add_field(
-                    name="Invalid Attendees - Not checked in:",
-                    value=invalid_checkin)
+                # Create * send success embed
+                if collection != "subs":
+                    embed = discord.Embed(
+                        title=":incoming_envelope: *Exporting attendees complete!*",
+                        description="Download the spreadsheet below. \U0001f4e5")
+                    embed.add_field(
+                        name="Invalid Attendees - Only on smash.gg:",
+                        value=invalid_sgg if invalid_sgg else "✨ No invalid attendees!")
+                    if discord.utils.get(ctx.guild.roles, name="Checked In"):
+                        embed.add_field(
+                            name="Invalid Attendees - Not checked in:",
+                            value=invalid_checkin if invalid_checkin else "✨ No invalid attendees!")
+            elif collection == "overlays":
+                embed = await cls.overlays(ctx)
         await ui.end(embed)
+
+    @classmethod
+    async def overlays(cls, ctx):
+        # Build teams list
+        team_roles = []
+        for role in ctx.guild.roles:
+            if role.color == discord.Color(utils.colors.COMPETING) and role.name != "Signed Up!":
+                team_roles.append(role)
+        # Build export dictionary
+        async def igns(role):
+            igns = []
+            for member in role.members:
+                user = utils.User(member.id)
+                igns.append(user.dict["profile"]["ign"])
+            return igns
+        export = {
+            team_role.name: await igns(team_role)
+            for team_role in team_roles
+        }
+        # Send file
+        file = StringIO()
+        json.dump({"teams": export}, file)
+        file.seek(0)
+        await ctx.send(file=discord.File(file, filename=f"loadedData.json"))
+
+        # Return export
+        return discord.Embed(
+            title=":incoming_envelope: *Exporting overlays data complete!*",
+            description="Download the json file. \U0001f4e5")
 
     @staticmethod
     def list_signups(ctx, signups, sgg_attendees):
@@ -56,7 +90,7 @@ class ToExport(utils.Command):
             signup = doc.to_dict()
             user = utils.User(doc.id)
             # Get discord and smash.gg
-            discord = user.discord(ctx.guild)
+            user_discord = user.discord(ctx.guild)
             smashgg = sgg_attendees.pop(user.dict["profile"]["smashgg"], None)
 
             # Calculate cxp
@@ -67,9 +101,9 @@ class ToExport(utils.Command):
                 "I've played in a lot of tournaments.": 10,
             }[user.dict["profile"]["cxp"]["amount"]] + (user.dict["profile"]["cxp"]["placement"]**(1/3)))
             # Calculate discord data
-            if discord:
-                discord_username = f"{discord.name}#{discord.discriminator}"
-                checked_in = bool(discord.utils.get(getattr(discord, "roles", []), name="Checked In"))
+            if user_discord:
+                discord_username = f"{user_discord.name}#{user_discord.discriminator}"
+                checked_in = bool(discord.utils.get(getattr(user_discord, "roles", []), name="Checked In"))
             else:
                 discord_username = "-"
                 checked_in = "N/A"

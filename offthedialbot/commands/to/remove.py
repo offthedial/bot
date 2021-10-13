@@ -13,53 +13,72 @@ class ToRemove(utils.Command):
         tourney = utils.Tournament()
         smashgg_link = f"[smash.gg](https://smash.gg/tournament/{tourney.dict['slug']})"
 
-        # Get reported_signup
+        # Start database operation
+        batch = utils.db.batch()
+
+        # Get reported player
         reported_member = ctx.guild.get_member(reported.id)
         reported_signup = utils.User(reported.id).signup()
-        if not reported_signup or reported_signup.col != "signups":
+        if not reported_signup:
             raise utils.exc.CommandCancel(
                 title="Reported player is invalid",
-                description=f"<@{reported.id}> was not found in `signups`.")
+                description=f"<@{reported.id}> was not found.")
         await utils.Alert(ctx, utils.Alert.Style.INFO,
             title="\u200b",
             description=f"Remove `{await reported_signup.smashgg()}` from {smashgg_link}")
 
+        # Get team role
+        team_role = discord.utils.find(lambda r: (
+                r.color == discord.Color(utils.colors.COMPETING) and
+                r.name != "Signed Up!"),
+            getattr(reported_member, "roles", []))
+
+        # Get reported sub, if necessary
         if sub:
-            # Get reported_sub, if necessary
+            # Check if sub player is valid
             sub_member = ctx.guild.get_member(sub.id)
             sub_signup = utils.User(sub.id).signup()
             if not sub_signup or sub_signup.col != "subs":
                 raise utils.exc.CommandCancel(
                     title="Sub player is invalid",
                     description=f"<@{sub.id}> was not found in `subs`.")
-            team_role = discord.utils.find(lambda r: (
-                    r.color == discord.Color(utils.colors.COMPETING) and
-                    r.name != "Signed Up!"),
-                reported_member.roles)
-            await utils.Alert(ctx, utils.Alert.Style.INFO, description=f"Add `{await sub_signup.smashgg()}` to {smashgg_link} on team `{team_role.name}`.")
-
-        # Start database operation
-        batch = utils.db.batch()
-        # Delete reported_signup
-        batch.delete(reported_signup.ref)
-        if sub:
-            # Move sub_sigunp from subs collection to signups collection
+            if team_role:
+                # Bot moves team role from reported player to sub.
+                await reported_member.remove_roles(team_role)
+                await sub_member.add_roles(team_role)
+                team_name = team_role.name
+            else:
+                team_name = None
+            # Alert smash.gg removal
+            await utils.Alert(ctx, utils.Alert.Style.INFO,
+                title="\u200b",
+                description=f"Add `{await sub_signup.smashgg()}` to {smashgg_link} on team `{team_name}`.")
+            # Move sub_signup from subs collection to signups collection
+            batch.delete(reported_signup.ref)
             batch.set(tourney.signups(col=True).document(sub_signup.id), sub_signup.dict)
             batch.delete(sub_signup.ref)
-        # Commit database operation. Firebase functions automatically handle signup role
-        batch.commit()
-
-        # Bot moves team role from reported player to sub.
-        await reported_member.remove_roles(team_role)
-        if sub:
-            await sub_member.add_roles(team_role)
-        await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
-            title="Player Removal Complete",
-            description="\n".join([
+            # Set success message
+            message = "\n".join([
                 f"Successfully removed <@{reported.id}>, replaced by <@{sub.id}>.",
                 "",
                 "Reply to the report with this message:",
                 "> ```",
                 f"> <@{reported.id}> > <@{sub.id}>",
                 "> ```"
-            ]) if sub else f"Successfully removed <@{reported.id}>.")
+            ])
+
+        else:
+            # Check if reported has a team role
+            if team_role:
+                await reported_member.remove_roles(team_role)
+            # Delete reported_signup
+            batch.delete(reported_signup.ref)
+            # Set success message
+            message = f"Successfully removed <@{reported.id}>."
+
+        # Commit database operation. Firebase functions automatically handle signup role
+        batch.commit()
+        # Success message
+        await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
+            title="Player Removal Complete",
+            description=message)

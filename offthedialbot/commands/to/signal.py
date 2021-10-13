@@ -1,5 +1,7 @@
 """$to signal"""
+import math
 import discord
+import numpy as np
 
 from offthedialbot import utils
 
@@ -21,9 +23,13 @@ class ToSignal(utils.Command):
             # Parse into member_ss and distribute
             member_ss = cls.get_member_ss(ctx, team_ss)
             cls.distribute_ss(member_ss)
+            members_list = cls.list_members(member_ss)
         await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
             title="Signal strength has been distributed:",
-            description="\n".join([f"<@{id}>: `+{signal}`" for id, signal in member_ss]))
+            description="\n".join(members_list[0]))
+        if len(members_list) > 1:
+            for chunk in members_list[1:]:
+                await ctx.send(embed=discord.Embed(description="\n".join(chunk), color=utils.Alert.Style.SUCCESS))
 
     @classmethod
     def get_member_ss(cls, ctx, team_ss):
@@ -38,17 +44,31 @@ class ToSignal(utils.Command):
                     description=f"Make sure the team name and role name match")
             # Append (member, signal) for each member in the team role
             for member in role.members:
-                member_ss.append((member.id, signal))
+                member_ss.append((member, signal))
 
         return member_ss
 
     @classmethod
     def distribute_ss(cls, member_ss):
-        for id, signal in member_ss:
-            user = utils.User(id)
+        for member, signal in member_ss:
+            user = utils.User(member.id)
             user.increment_ss(signal)
 
     @staticmethod
     def calculate_gain(total, placement):
         """Calculate the total signal strength to add based on the total teams and placement."""
-        return 100 + round(((total - (placement - 1)) * (100 / (total))), 3)
+        return round(100 + ((total - (placement - 1)) * (100 / (total))), 1)
+
+    @classmethod
+    def list_members(cls, member_ss):
+        """Return a list of chunks of members."""
+        full_members_list = "".join(cls.format_members(member_ss))
+        chunks = math.ceil(len(full_members_list) / 2000)
+        return [
+            cls.format_members(chunk)
+            for chunk in np.array_split(member_ss, chunks)
+        ]
+
+    @staticmethod
+    def format_members(member_ss):
+        return [f"{member.mention}: `+{signal}`" for member, signal in member_ss]
