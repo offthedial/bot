@@ -5,9 +5,3 @@ services:
   otdb:
     build: .
     restart: unless-stopped
-
-  mongo:
-    image: mongo
-    restart: unless-stopped
-    volumes:
-      - ./var/mongo/data/db:/data/db
