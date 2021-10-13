@@ -24,7 +24,9 @@ This bot was created to help organize Off The Dial's tournaments easier and fast
    smashgg: 7e5073d2c...f61fbea
    debug (optional): true
    ```
-2. Run `docker-compose up --build` in the repository root.
+3. Go to a Firebase > Project settings > Service accounts > Generate new private key.
+   - Rename the file to `service_account.json` and move it into the repository root directory.
+5. Run `docker-compose up --build` in the repository root.
 
 ---
 
