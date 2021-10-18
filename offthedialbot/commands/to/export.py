@@ -51,15 +51,28 @@ class ToExport(utils.Command):
                             value=invalid_checkin if invalid_checkin else "✨ No invalid attendees!")
             elif collection == "overlays":
                 embed = await cls.overlays(ctx)
+            else:
+                await ui.end(utils.Alert.create_embed(utils.Alert.Style.DANGER,
+                    title="Unknown export option",
+                    description="Option must be either `signups`, `subs`, or `overlays`"))
         await ui.end(embed)
 
     @classmethod
     async def overlays(cls, ctx):
         # Build teams list
         team_roles = []
+        signed_up_role = None
         for role in ctx.guild.roles:
-            if role.color == discord.Color(utils.colors.COMPETING) and role.name != "Signed Up!":
-                team_roles.append(role)
+            if role.color == discord.Color(utils.colors.COMPETING):
+                if role.name != "Signed Up!":
+                    team_roles.append(role)
+                else:
+                    signed_up_role = role
+        # Raise error if there are no team roles
+        if len(team_roles) <= 0:
+            return utils.Alert.create_embed(utils.Alert.Style.DANGER,
+                title="No team roles detected",
+                description=f"Check that you have given players their team roles, and that the roles are the exact same color as <@&{signed_up_role.id}>.")
         # Build export dictionary
         async def igns(role):
             igns = []
