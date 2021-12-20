@@ -22,16 +22,15 @@ class ToGet(utils.Command):
             embed = discord.Embed(
                 title=user.discord(ctx.bot).name,
                 description="\n".join([
-                    f"`User mention:       ` {user.discord(ctx.bot).mention}",
-                    f"`Smash.gg slug & tag:` **`{user.dict['profile']['smashgg']}`** & **`{(await user.smashgg())['player']['gamerTag']}`**",
-                    f"`IGN:                ` **`{user.dict['profile']['ign']}`**",
-                    f"`SW:                 ` **`{user.dict['profile']['sw']}`**",
-                    f"`Ranks (SZ/TC/RM/CB):` **`{' / '.join(user.get_ranks())}`**",
-                    f"`ELO:                ` **`{user.get_elo()}`**",
-                    f"`Playstyle (A/S/M/F):` **`{' / '.join([str(p) for p in user.get_playstyles()[::2]])}`**",
-                    f"`Amount of tourneys: ` **`{user.dict['profile']['cxp']['amount']}`**",
-                    f"`Highest placement:  ` **`{user.dict['profile']['cxp']['placement']}`**",
-                    f"`Signal Strength:    ` **`{user.dict['meta']['signal']}`**",
+                    f"`User Mention:   ` {user.discord(ctx.bot).mention}",
+                    f"`IGN:            ` **`{user.dict['profile']['ign']}`**",
+                    f"`SW:             ` **`{user.dict['profile']['sw']}`**",
+                    f"`Peak Rank:      ` **`{user.dict['profile']['rank']}`**",
+                    f"`Weapons:        ` **`{user.dict['profile']['weapons']}`**",
+                    f"`Competitive Exp:` **`{user.dict['profile']['cxp']}`**",
+                    f"`Smash.gg Info:  ` **`{(await user.smashgg())['player']['gamerTag']}`** **(`{user.dict['profile']['smashgg'][-8:]}`)**",
+                    f"`ELO:            ` **`{user.get_elo()}`**",
+                    f"`Signal Strength:` **`{user.dict['meta']['signal']}`**",
                 ]))
             await utils.CommandUI.create_ui(ctx, embed)
         except KeyError:
@@ -48,8 +47,8 @@ class ToGet(utils.Command):
             color=utils.colors.COMPETING,
             title=signup.col.capitalize(),
             description="\n".join([
-                f"`Smash.gg reg tag: ` **`{await signup.smashgg()}`**",
-                f"`Timezone offset:  ` **`{signup.dict['tzOffset']}`**",
-                f"`Confirmation code:` **`{signup.dict['confirmationCode']}`**",
+                f"`Signup Date:  ` **`{await signup.dict['signupDate']}`**",
+                f"`Modified Date:` **`{await signup.dict['modifiedDate']}`**",
+                f"`Timezone:     ` **`{signup.dict['timezone']}`**",
             ]))
         await utils.CommandUI.create_ui(ctx, embed)

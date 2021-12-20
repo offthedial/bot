@@ -48,5 +48,5 @@ class Signup:
         }"""
         status, data = await utils.graphql("smashgg", query, {"slug": self.tourney.dict["slug"]})
         for participant in data["data"]["tournament"]["participants"]["nodes"]:
-            if participant["user"]["slug"][5:] == self.user.dict["profile"]["smashgg"]:
+            if participant["user"]["slug"][5:] == self.user.dict["profile"]["smashgg"][-8:]:
                 return participant["gamerTag"]

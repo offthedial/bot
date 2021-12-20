@@ -104,15 +104,8 @@ class ToExport(utils.Command):
             user = utils.User(doc.id)
             # Get discord and smash.gg
             user_discord = user.discord(ctx.guild)
-            smashgg = sgg_attendees.pop(user.dict["profile"]["smashgg"], None)
+            smashgg = sgg_attendees.pop(user.dict["profile"]["smashgg"][-8:], None)
 
-            # Calculate cxp
-            cxp = int({
-                "This is my first tournament :0": 0,
-                "I've played in one or two tournaments.": 2,
-                "I've played in some tournaments.": 5,
-                "I've played in a lot of tournaments.": 10,
-            }[user.dict["profile"]["cxp"]["amount"]] + (user.dict["profile"]["cxp"]["placement"]**(1/3)))
             # Calculate discord data
             if user_discord:
                 discord_username = f"{user_discord.name}#{user_discord.discriminator}"
@@ -123,24 +116,14 @@ class ToExport(utils.Command):
 
             # Return final exportable dict
             return {
-                **user.dict,
-                **signup,
+                "user": user.dict,
+                "signup": signup,
                 "id": doc.id,
                 "mention": f'<@{doc.id}>',
                 "discord_username": discord_username,
-                "smashgg": {
-                    "gamerTag": smashgg,
-                    "slug": user.dict["profile"]["smashgg"]
-                },
-                "stylepoints": {
-                    "sup-agg": user.dict["profile"]["stylepoints"]["aggressive"],
-                    "obj-sla": user.dict["profile"]["stylepoints"]["slayer"],
-                    "anc-mob": user.dict["profile"]["stylepoints"]["mobile"],
-                    "fle-foc": user.dict["profile"]["stylepoints"]["focused"],
-                },
+                "gamerTag": smashgg,
+                "userSlug": user.dict["profile"]["smashgg"][-8:],
                 "elo": user.get_elo(),
-                "tzOffset": signup["tzOffset"] / 60,
-                "cxp": cxp,
                 "checked_in": checked_in
             }
 
@@ -150,26 +133,21 @@ class ToExport(utils.Command):
     def create_file(cls, signups, collection="signups"):
         # Create fields
         fields = {
-            "Discord Mention":          lambda s: s["discord_username"],
-            "Smash.gg gamerTag":        lambda s: s["smashgg"]["gamerTag"],
-            "IGN":                      lambda s: s["profile"]["ign"],
-            "SW":                       lambda s: s["profile"]["sw"],
-            "Cumulative ELO":           lambda s: s["elo"],
-            "SZ":                       lambda s: s["profile"]["ranks"]["sz"],
-            "TC":                       lambda s: s["profile"]["ranks"]["tc"],
-            "RM":                       lambda s: s["profile"]["ranks"]["rm"],
-            "CB":                       lambda s: s["profile"]["ranks"]["cb"],
-            "support < aggressive":     lambda s: s["stylepoints"]["sup-agg"],
-            "objective < slayer":       lambda s: s["stylepoints"]["obj-sla"],
-            "anchor < mobile":          lambda s: s["stylepoints"]["anc-mob"],
-            "flex < focused":           lambda s: s["stylepoints"]["fle-foc"],
-            "Competitive Experience":   lambda s: s["cxp"],
-            "Signal Strength":          lambda s: s["meta"]["signal"],
-            "Timezone Offset (hours)":  lambda s: s["tzOffset"],
-            "Confirmation Code":        lambda s: s["confirmationCode"],
-            "Checked In":               lambda s: s["checked_in"],
-            "Smash.gg user slug":       lambda s: s["smashgg"]["slug"],
-            "Discord ID":               lambda s: s["mention"]
+            "Discord Mention":   lambda s: s["discord_username"],
+            "IGN":               lambda s: s["user"]["profile"]["ign"],
+            "SW":                lambda s: s["user"]["profile"]["sw"],
+            "Peak Rank":         lambda s: s["user"]["profile"]["rank"],
+            "Weapon Pool":       lambda s: s["user"]["profile"]["weapons"],
+            "Competitive Exp":   lambda s: s["user"]["profile"]["cxp"],
+            "Signal Strength":   lambda s: s["user"]["meta"]["signal"],
+            "Smash.gg userSlug": lambda s: s["userSlug"],
+            "Smash.gg gamerTag": lambda s: s["gamerTag"],
+            "Signup Date":       lambda s: s["signup"]["signupDate"],
+            "Modified Date":     lambda s: s["signup"]["modifiedDate"],
+            "Timezone":          lambda s: s["signup"]["timezone"],
+            "Rank ELO":          lambda s: s["elo"],
+            "Checked In":        lambda s: s["checked_in"],
+            "Discord ID":        lambda s: s["mention"]
         }
         field_keys = list(fields.keys())
         field_values = list(fields.values())
@@ -178,7 +156,7 @@ class ToExport(utils.Command):
         signup_rows = []
         for signup in signups:
             signup_rows.append([func(signup) for func in field_values])
-        signup_rows.sort(key=lambda row: row[field_keys.index("Confirmation Code")])
+        signup_rows.sort(key=lambda row: row[field_keys.index("Signup Date")])
 
         # Write file
         file = StringIO()

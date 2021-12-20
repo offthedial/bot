@@ -40,7 +40,7 @@ class User:
             }
           }
         }"""
-        status, data = await utils.graphql("smashgg", query, {"slug": self.dict["profile"]["smashgg"]})
+        status, data = await utils.graphql("smashgg", query, {"slug": self.dict["profile"]["smashgg"][-8:]})
         return data["data"]["user"]
 
     def discord(self, context):
@@ -53,36 +53,7 @@ class User:
         return await client.fetch_user(int(self.id))
 
     def get_elo(self):
-        return sum([self.rank_to_power(rank) for rank in self.get_ranks()]) / 4
-
-    def get_playstyles(self, type=None):
-        try:
-            if type:
-                return self.dict["profile"]["stylepoints"][type]
-            else:
-                return [
-                    self.dict["profile"]["stylepoints"]["support"],
-                    self.dict["profile"]["stylepoints"]["aggressive"],
-                    self.dict["profile"]["stylepoints"]["objective"],
-                    self.dict["profile"]["stylepoints"]["slayer"],
-                    self.dict["profile"]["stylepoints"]["anchor"],
-                    self.dict["profile"]["stylepoints"]["mobile"],
-                    self.dict["profile"]["stylepoints"]["flex"],
-                    self.dict["profile"]["stylepoints"]["focused"],
-                ]
-        except KeyError:
-            return None
-
-    def get_ranks(self):
-        try:
-            return [
-                self.dict["profile"]["ranks"]["sz"],
-                self.dict["profile"]["ranks"]["tc"],
-                self.dict["profile"]["ranks"]["rm"],
-                self.dict["profile"]["ranks"]["cb"],
-            ]
-        except KeyError:
-            return None
+        return self.rank_to_power(self.dict["profile"]["rank"])
 
     @staticmethod
     def rank_to_power(rank):
