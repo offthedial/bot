@@ -5,7 +5,7 @@ from offthedialbot import utils
 class ToTemp(utils.Command):
     @classmethod
     @utils.deco.require_role("Staff")
-    async def main(cls, ctx, confirm=False):
+    async def main(cls, ctx, commit=False):
         """Replace each document in the collection."""
         docs = utils.db.collection("users").stream()
         batch = utils.db.batch()
@@ -36,3 +36,17 @@ class ToTemp(utils.Command):
             batch.update(doc.reference, {"profile": profile})
 
             print(profile)
+
+        if commit:
+            batch.commit()
+            await ctx.send(
+                embed=utils.Alert.create_embed(
+                    style=utils.Alert.Style.SUCCESS, title="Committed changes"
+                )
+            )
+        else:
+            await ctx.send(
+                embed=utils.Alert.create_embed(
+                    style=utils.Alert.Style.SUCCESS, title="Changes not committed"
+                )
+            )
