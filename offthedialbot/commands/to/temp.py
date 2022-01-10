@@ -58,27 +58,11 @@ class ToTemp(utils.Command):
         for doc in docs:
             profile_data = doc.to_dict()["profile"]
 
-            # find rank with the highest power and return rank
-            rank = (
-                max(
-                    profile_data["ranks"].values(),
-                    key=lambda x: utils.User.rank_to_power(x),
-                )
-                if profile_data.get("ranks")
-                else None
-            )
-
             # create new profile object
-            profile = {
-                "ign": profile_data.get("ign"),
-                "sw": profile_data.get("sw"),
-                "rank": rank,
-                "weapons": None,
-                "cxp": None,
-                "smashgg": None
-                if not profile_data.get("smashgg")
-                else f"smash.gg/user/{profile_data['smashgg']}",
-            }
+            profile = { **profile_data }
+            if smashgg_data := profile_data.get("smashgg"):
+                profile["smashgg"] = smashgg_data[-22:]
+            
             batch.update(doc.reference, {"profile": profile})
 
             print(profile)
