@@ -101,6 +101,7 @@ class Tournament:
         q = q if q else """
             name
             endAt
+            startAt
             registrationClosesAt
         """
         query = f"""query($slug: String) {{
