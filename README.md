@@ -28,6 +28,10 @@ This bot was created to help organize Off The Dial's tournaments easier and fast
    - Rename the file to `service_account.json` and move it into the repository root directory.
 5. Run `docker-compose up --build` in the repository root.
 
+## Support the Project
+This service is partly run using Digital Ocean. If you're planning to use Digital Ocean in the future, we would greatly appricate if you could use our referal button as it will support us with the finacial cost of running the bot. Thank you so much!
+[![DigitalOcean Referral Badge](https://web-platforms.sfo2.digitaloceanspaces.com/WWW/Badge%203.svg)](https://www.digitalocean.com/?refcode=39ab0c6c6e47&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
+
 ---
 
 Contact me · [**@LeptoFlare**](https://github.com/LeptoFlare) · [lepto.tech](https://lepto.tech)
