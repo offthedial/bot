@@ -14,20 +14,23 @@ class ToSignal(utils.Command):
         """Distribute signal strength for all of the teams of the tournament."""
         async with ctx.typing():
             tourney = utils.Tournament()
-            # Create a :list: of tuples of (<Team Name>, <Signal Strength>)
-            total, teams = await tourney.get_standings()
-            team_ss = [
-                (team["name"], cls.calculate_gain(total, team["placement"]))
-                for team in teams
-            ]
-            # Parse into member_ss and distribute
-            member_ss = cls.get_member_ss(ctx, team_ss)
-            cls.distribute_ss(member_ss)
-            members_list = cls.list_members(member_ss)
+            members_list = []
+            # Create a :list: of brackets (:list:) of tuples (<Team Name>, <Signal Strength>)
+            all_standings = await tourney.get_standings()
+            for total, teams in all_standings:
+                # Loop over each bracket individually
+                team_ss = [
+                    (team["name"], cls.calculate_gain(total, team["placement"]))
+                    for team in teams
+                ]
+                # Parse into member_ss and distribute
+                member_ss = cls.get_member_ss(ctx, team_ss)
+                cls.distribute_ss(member_ss)
+                members_list.extend(cls.list_members(member_ss))
         await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
             title="Signal strength has been distributed:",
             description="\n".join(members_list[0]))
-        if len(members_list) > 1:
+    if len(members_list) > 1:
             for chunk in members_list[1:]:
                 await ctx.send(embed=discord.Embed(description="\n".join(chunk), color=utils.Alert.Style.SUCCESS))
 

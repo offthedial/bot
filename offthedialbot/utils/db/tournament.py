@@ -88,12 +88,15 @@ class Tournament:
           }
         """
         data = await self.query_smashgg(self.dict["slug"], q)
-        return data["events"][0]["numEntrants"], [
-            {
-                "placement": node["placement"],
-                "name": node["entrant"]["name"]
-            } for node in data["events"][0]["standings"]["nodes"]
-        ]
+        out = []
+        for event in data["events"]:
+            out.append((event["numEntrants"], [
+                {
+                    "placement": node["placement"],
+                    "name": node["entrant"]["name"]
+                } for node in event["standings"]["nodes"]
+            ]))
+        return out
 
     @staticmethod
     async def query_smashgg(slug, q=None):
