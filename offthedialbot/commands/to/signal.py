@@ -30,9 +30,9 @@ class ToSignal(utils.Command):
         await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
             title="Signal strength has been distributed:",
             description="\n".join(members_list[0]))
-    if len(members_list) > 1:
-            for chunk in members_list[1:]:
-                await ctx.send(embed=discord.Embed(description="\n".join(chunk), color=utils.Alert.Style.SUCCESS))
+        if len(members_list) > 1:
+                for chunk in members_list[1:]:
+                    await ctx.send(embed=discord.Embed(description="\n".join(chunk), color=utils.Alert.Style.SUCCESS))
 
     @classmethod
     def get_member_ss(cls, ctx, team_ss):
