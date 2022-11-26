@@ -1,6 +1,7 @@
 """cogs.Website"""
 
 import re
+import asyncio
 from rapidfuzz import fuzz, process
 
 import discord
@@ -23,10 +24,16 @@ class Website(commands.Cog):
         await self.send_embedded_section(ctx, "faq", section, 4)
 
     @commands.group(aliases=["d", "docs"], invoke_without_command=True)
-    async def rules(self, ctx, *, section):
+    async def rules(self, ctx, *, section: str = None):
         """Send an embedded section of a rules page."""
         tourney = utils.Tournament()
-        await self.send_embedded_section(ctx, f"{tourney.dict['type']}/rules", section)
+        if section:
+            await self.send_embedded_section(ctx, f"{tourney.dict['type']}/rules", section)
+        else:
+            lines = (await self.get_page(ctx, f"{tourney.dict['type']}/rules")).splitlines()
+            for header in self.list_headers(lines, 2):
+                await send_embedded(ctx, lines, header, f"{tourney.dict['type']}/rules")
+                await asyncio.sleep(0.2)
 
     @rules.command()
     async def idtga(self, ctx, *, section):
@@ -45,7 +52,10 @@ class Website(commands.Cog):
         if header is None:
             raise utils.exc.CommandCancel(title="No section found.", description="Could not find a section that resembled what you entered, try rewording what you said.")
 
-        name, section = self.get_section(lines, header[0])
+        await self.send_embedded(ctx, lines, header[0], page)
+
+    async def send_embedded(self, ctx, lines, header, page):
+        name, section = self.get_section(lines, header)
         header_link = re.sub(r' ', "-", re.sub(r'[^A-Za-z0-9 ]', "", name)).lower()
         await self.display_section(ctx, name, section[None], f"https://otd.ink/{page}#{header_link}")
         for key, value in section.items():
