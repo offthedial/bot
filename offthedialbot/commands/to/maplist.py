@@ -17,10 +17,7 @@ class ToMaplist(utils.Command):
     ):
         """Generate tournament maplist."""
         brackets = await cls.query_brackets(ctx)
-        if not map_pools.startswith("https://sendou.ink/maps"):
-            pools = await cls.query_pool(ctx, map_pools)
-        else:
-            pools = cls.parse_map_pool_link(map_pools)
+        pools = cls.parse_map_pool_link(map_pools)
         maplist = utils.Maplist(pools, brackets)
         generated = maplist.generate()
         async with ctx.typing():
@@ -54,15 +51,18 @@ class ToMaplist(utils.Command):
             }
           }
         }"""
-        status, result = await utils.graphql(
-            "smashgg", query, {"slug": tourney.dict["slug"]}, ctx=ctx
-        )
-        return {
-            phase["name"]: [
-                node["bestOf"] for node in phase["phaseGroups"]["nodes"][0]["rounds"]
-            ]
-            for phase in result["data"]["tournament"]["events"][0]["phases"]
-        }
+        try:
+            status, result = await utils.graphql(
+                "smashgg", query, {"slug": tourney.dict["slug"]}, ctx=ctx
+            )
+            return {
+                phase["name"]: [
+                    node["bestOf"] for node in phase["phaseGroups"]["nodes"][0]["rounds"]
+                ]
+                for phase in result["data"]["tournament"]["events"][0]["phases"]
+            }
+        except Exception:
+            raise utils.exc.CommandCancel(title="Start.gg Error", description="There was an error fetching the brackets from start.gg")
 
     @classmethod
     async def query_pool(cls, ctx, name=None):
