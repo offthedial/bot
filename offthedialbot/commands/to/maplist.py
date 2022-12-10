@@ -13,18 +13,16 @@ class ToMaplist(utils.Command):
     @classmethod
     @utils.deco.require_role("Staff")
     async def main(
-        cls, ctx, map_pools: str = "", tcwahoo: bool = False, overlays: bool = False
+        cls, ctx, map_pools: str = "", overlays: bool = False
     ):
         """Generate tournament maplist."""
         brackets = await cls.query_brackets(ctx)
         if not map_pools.startswith("https://sendou.ink/maps"):
             pools = await cls.query_pool(ctx, map_pools)
         else:
-            pools = cls.parse_sendou_link(map_pools)
+            pools = cls.parse_map_pool_link(map_pools)
         maplist = utils.Maplist(pools, brackets)
         generated = maplist.generate()
-        if tcwahoo:
-            generated[-1][0] = ("tcwahoo", "Wahoo World")
         async with ctx.typing():
             await cls.display_maplist(ctx, brackets, generated)
         if overlays:
@@ -79,21 +77,41 @@ class ToMaplist(utils.Command):
         return resp["data"]["maplists"][0]
 
     @classmethod
-    def parse_sendou_link(cls, sendou_link):
-        """Parse sendou.ink map pool share link."""
+    def parse_map_pool_link(cls, sendou_link):
+        """Parse map pool share link from sendou.ink or maps.iplabs.ink."""
+        all_maps = [
+            "Scorch Gorge",
+            "Eeltail Alley",
+            "Hagglefish Market",
+            "Undertow Spillway",
+            "Mincemeat Metalworks",
+            "Hammerhead Bridge",
+            "Museum d'Alfonsino",
+            "Mahi-Mahi Resort",
+            "Inkblot Art Academy",
+            "Sturgeon Shipyard",
+            "MakoMart",
+            "Wahoo World",
+            "Flounder Heights",
+            "Brinewater Springs"
+        ]
         params = parse_qs(urlparse(sendou_link).query)
-        pools = {
-            "sz": [],
-            "tc": [],
-            "rm": [],
-            "cb": [],
+        # Convert url query parameter to dictionary
+        pool = {
+            value.split(":")[0]: value.split(":")[1]
+            for value in params["pool"][0].split(";")
         }
-        for key, value in params.items():
-            if key in ["count", "mode", "modes"]:
-                continue
-            for mode in value.pop().split(","):
-                pools[mode.lower()].append(key)
-        return pools
+        # Replace each value with a list of each map
+        for key, value in pool.items():
+            # Convert hex to binary string (cut off leading 0b1)
+            binary = str(bin(int(value, 16)))[3:]
+            # Build map pool by looping over each digit
+            maps = []
+            for i in range(len(binary)):
+                if binary[i] == "1":
+                    maps.append(all_maps[i])
+            # Replace pool value with map pool
+            pool[key] = maps
 
     @classmethod
     async def display_maplist(cls, ctx, brackets, maplist):
@@ -102,7 +120,6 @@ class ToMaplist(utils.Command):
             "tc": "<:tc:804107769242058783> `Tower Control`",
             "rm": "<:rm:804107768130306078> `Rainmaker`",
             "cb": "<:cb:804107767601168394> `Clam Blitz`",
-            "tcwahoo": "<:tcwahoo:801923933661167646> `Tower Control`",
         }
         # Get phases
         phases = [
@@ -134,7 +151,6 @@ class ToMaplist(utils.Command):
             "tc": "Tower Control",
             "rm": "Rainmaker",
             "cb": "Clam Blitz",
-            "tcwahoo": "Tower Control",
         }
         export = {}
         # Get phases
