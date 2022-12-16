@@ -26,13 +26,15 @@ class Website(commands.Cog):
     @commands.group(aliases=["d", "docs"], invoke_without_command=True)
     async def rules(self, ctx, *, section: str = None):
         """Send an embedded section of a rules page."""
+        if not discord.utils.get(ctx.author.roles, name="Staff"):
+            raise utils.exc.CommandCancel(title="Permission Denied", description=f"If you're looking for the rules, please use https://otd.ink/idtga/rules")
         tourney = utils.Tournament()
         if section:
             await self.send_embedded_section(ctx, f"{tourney.dict['type']}/rules", section)
         else:
             lines = (await self.get_page(ctx, f"{tourney.dict['type']}/rules")).splitlines()
-            for header in self.list_headers(lines, 2):
-                await send_embedded(ctx, lines, header, f"{tourney.dict['type']}/rules")
+            for header in self.list_headers(lines, 2, strict=True):
+                await self.send_embedded(ctx, lines, header, f"{tourney.dict['type']}/rules")
                 await asyncio.sleep(0.2)
 
     @rules.command()
@@ -50,7 +52,7 @@ class Website(commands.Cog):
         header = self.get_header(self.list_headers(lines, minimal), section)
 
         if header is None:
-            raise utils.exc.CommandCancel(title="No section found.", description="Could not find a section that resembled what you entered, try rewording what you said.")
+            raise utils.exc.CommandCancel(title="No section found", description="Could not find a section that resembled what you entered, try rewording what you said.")
 
         await self.send_embedded(ctx, lines, header[0], page)
 
@@ -109,8 +111,11 @@ class Website(commands.Cog):
         return " ".join(name[1:]), section
 
     @staticmethod
-    def list_headers(lines, minimal):
-        return [line for line in lines if line.startswith("#"*minimal)]
+    def list_headers(lines, minimal, strict = False):
+        prefix = '#'*minimal
+        if strict:
+            prefix += " "
+        return [line for line in lines if line.startswith(prefix)]
 
     @staticmethod
     def get_header(headers, choice):

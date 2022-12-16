@@ -22,7 +22,7 @@ def require_role(role: str):
             else:
                 await utils.Alert(ctx, utils.Alert.Style.DANGER,
                     title="Permission Denied",
-                    description=f"You do not have have the {role} role.")
+                    description=f"You do not have the {role} role.")
 
         return _
 
