@@ -1,6 +1,7 @@
 """$to export"""
 import json
 import csv
+import asyncio
 from io import StringIO
 
 import discord
@@ -28,7 +29,7 @@ class ToExport(utils.Command):
                 sgg_attendees = await cls.query_attendees(ctx, tourney)
 
                 # Create exportable signups list
-                signups = cls.list_signups(ctx, stream, sgg_attendees)
+                signups = await cls.list_signups(ctx, ui, stream, sgg_attendees)
                 # Create & send file from signups list
                 file = cls.create_file(signups, collection)
                 await ctx.send(file=file)
@@ -38,23 +39,22 @@ class ToExport(utils.Command):
                 invalid_checkin = cls.list_attendees([f"<@{s['id']}>" for s in signups if not s["checked_in"]])
 
                 # Create * send success embed
-                if collection != "subs":
-                    embed = discord.Embed(
-                        title=":incoming_envelope: *Exporting attendees complete!*",
-                        description="Download the spreadsheet below. \U0001f4e5")
+                embed = discord.Embed(
+                    title=":incoming_envelope: *Exporting attendees complete!*",
+                    description="Download the spreadsheet below. \U0001f4e5")
+                embed.add_field(
+                    name="Invalid Attendees - Only on smash.gg:",
+                    value=invalid_sgg if invalid_sgg else "✨ No invalid attendees!")
+                if discord.utils.get(ctx.guild.roles, name="Checked In"):
                     embed.add_field(
-                        name="Invalid Attendees - Only on smash.gg:",
-                        value=invalid_sgg if invalid_sgg else "✨ No invalid attendees!")
-                    if discord.utils.get(ctx.guild.roles, name="Checked In"):
-                        embed.add_field(
-                            name="Invalid Attendees - Not checked in:",
-                            value=invalid_checkin if invalid_checkin else "✨ No invalid attendees!")
+                        name="Invalid Attendees - Not checked in:",
+                        value=invalid_checkin if invalid_checkin else "✨ No invalid attendees!")
             elif collection == "overlays":
                 embed = await cls.overlays(ctx)
             else:
-                await ui.end(utils.Alert.create_embed(utils.Alert.Style.DANGER,
+                raise utils.exc.CommandCancel(
                     title="Unknown export option",
-                    description="Option must be either `signups`, `subs`, or `overlays`"))
+                    description="Option must be either `signups`, `subs`, or `overlays`")
         await ui.end(embed)
 
     @classmethod
@@ -96,9 +96,9 @@ class ToExport(utils.Command):
             description="Download the json file. \U0001f4e5")
 
     @staticmethod
-    def list_signups(ctx, signups, sgg_attendees):
+    async def list_signups(ctx, ui, signups, sgg_attendees):
         """Return a list with parsed signups."""
-        def per_doc(doc):
+        async def per_doc(i, doc):
             # Get base data
             try:
                 signup = doc.to_dict()
@@ -112,6 +112,16 @@ class ToExport(utils.Command):
                 else:
                     discord_username = "?"
                     checked_in = "N/A"
+
+                # Give export a preview
+                if i % 10 == 0:
+                    if user_discord:
+                        mention = user_discord.mention
+                    else:
+                        mention = f"`{doc.id}`"
+                    ui.embed.clear_fields()
+                    ui.embed.add_field(name="Currently exporting:", value=f"> {mention}")
+                    await ui.update()
 
                 # get smash.gg
                 smashgg = sgg_attendees.pop(user.dict["profile"]["smashgg"][-8:], None)
@@ -131,11 +141,12 @@ class ToExport(utils.Command):
             except:
                 raise utils.exc.CommandCancel("Faulty signup", "\n".join([
                     f"Something went wrong while processing one of the signups",
-                    f"> `Username:` **`{discord_username}`**",
-                    f"> `      ID:` **`{str(doc.id)}`**",
+                    f"> `  Mention:` **<@{str(doc.id)}>**",
+                    f"> `       ID:` **`{str(doc.id)}`**",
+                    f"> ` Username:` **`{discord_username}`**",
                 ]))
 
-        return [per_doc(doc) for doc in signups]
+        return [await per_doc(i, doc) for i, doc in enumerate(signups)]
 
     @classmethod
     def create_file(cls, signups, collection="signups"):
