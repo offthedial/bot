@@ -22,7 +22,7 @@ class ToGet(utils.Command):
             embed = discord.Embed(
                 title=user.discord(ctx.bot).name,
                 description="\n".join([
-                    f"`User Mention:   ` {user.discord(ctx.bot).mention}",
+                    f"`User Mention:   ` **{user.discord(ctx.bot).mention}**",
                     f"`IGN:            ` **`{user.dict['profile']['ign']}`**",
                     f"`SW:             ` **`{user.dict['profile']['sw']}`**",
                     f"`Peak Rank:      ` **`{user.dict['profile']['rank']}`**",
@@ -47,8 +47,8 @@ class ToGet(utils.Command):
             color=utils.colors.COMPETING,
             title=signup.col.capitalize(),
             description="\n".join([
-                f"`Signup Date:  ` **`{await signup.dict['signupDate']}`**",
-                f"`Modified Date:` **`{await signup.dict['modifiedDate']}`**",
+                f"`Signup Date:  ` **`{signup.dict['signupDate']}`**",
+                f"`Modified Date:` **`{signup.dict['modifiedDate']}`**",
                 f"`Timezone:     ` **`{signup.dict['timezone']}`**",
             ]))
         await utils.CommandUI.create_ui(ctx, embed)

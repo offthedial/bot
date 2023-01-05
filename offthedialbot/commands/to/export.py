@@ -100,32 +100,40 @@ class ToExport(utils.Command):
         """Return a list with parsed signups."""
         def per_doc(doc):
             # Get base data
-            signup = doc.to_dict()
-            user = utils.User(doc.id)
-            # Get discord and smash.gg
-            user_discord = user.discord(ctx.guild)
-            smashgg = sgg_attendees.pop(user.dict["profile"]["smashgg"][-8:], None)
+            try:
+                signup = doc.to_dict()
+                user = utils.User(doc.id)
 
-            # Calculate discord data
-            if user_discord:
-                discord_username = f"{user_discord.name}#{user_discord.discriminator}"
-                checked_in = bool(discord.utils.get(getattr(user_discord, "roles", []), name="Checked In"))
-            else:
-                discord_username = "-"
-                checked_in = "N/A"
+                # Get discord data
+                user_discord = user.discord(ctx.guild)
+                if user_discord:
+                    discord_username = f"{user_discord.name}#{user_discord.discriminator}"
+                    checked_in = bool(discord.utils.get(getattr(user_discord, "roles", []), name="Checked In"))
+                else:
+                    discord_username = "?"
+                    checked_in = "N/A"
 
-            # Return final exportable dict
-            return {
-                "user": user.dict,
-                "signup": signup,
-                "id": doc.id,
-                "mention": f'<@{doc.id}>',
-                "discord_username": discord_username,
-                "gamerTag": smashgg,
-                "userSlug": user.dict["profile"]["smashgg"][-8:],
-                "elo": user.get_elo(),
-                "checked_in": checked_in
-            }
+                # get smash.gg
+                smashgg = sgg_attendees.pop(user.dict["profile"]["smashgg"][-8:], None)
+
+                # Return final exportable dict
+                return {
+                    "user": user.dict,
+                    "signup": signup,
+                    "id": doc.id,
+                    "mention": f'<@{doc.id}>',
+                    "discord_username": discord_username,
+                    "gamerTag": smashgg,
+                    "userSlug": user.dict["profile"]["smashgg"][-8:],
+                    "elo": user.get_elo(),
+                    "checked_in": checked_in
+                }
+            except:
+                raise utils.exc.CommandCancel("Faulty signup", "\n".join([
+                    f"Something went wrong while processing one of the signups",
+                    f"> `Username:` **`{discord_username}`**",
+                    f"> `      ID:` **`{str(doc.id)}`**",
+                ]))
 
         return [per_doc(doc) for doc in signups]
 

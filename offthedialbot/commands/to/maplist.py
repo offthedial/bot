@@ -95,23 +95,27 @@ class ToMaplist(utils.Command):
             "Flounder Heights",
             "Brinewater Springs"
         ]
-        params = parse_qs(urlparse(sendou_link).query)
-        # Convert url query parameter to dictionary
-        pool = {
-            value.split(":")[0]: value.split(":")[1]
-            for value in params["pool"][0].split(";")
-        }
-        # Replace each value with a list of each map
-        for key, value in pool.items():
-            # Convert hex to binary string (cut off leading 0b1)
-            binary = str(bin(int(value, 16)))[3:]
-            # Build map pool by looping over each digit
-            maps = []
-            for i in range(len(binary)):
-                if binary[i] == "1":
-                    maps.append(all_maps[i])
-            # Replace pool value with map pool
-            pool[key] = maps
+        try:
+            params = parse_qs(urlparse(sendou_link).query)
+            # Convert url query parameter to dictionary
+            pool = {
+                value.split(":")[0]: value.split(":")[1]
+                for value in params["pool"][0].split(";")
+            }
+            # Replace each value with a list of each map
+            for key, value in pool.items():
+                # Convert hex to binary string (cut off leading 0b1)
+                binary = str(bin(int(value, 16)))[3:]
+                # Build map pool by looping over each digit
+                maps = []
+                for i in range(len(binary)):
+                    if binary[i] == "1":
+                        maps.append(all_maps[i])
+                # Replace pool value with map pool
+                pool[key] = maps
+            return pool
+        except:
+            raise utils.exc.CommandCancel(title="Map pool error", description="Map pool link was badly formed, double-check that it follows the [IPL map pool specification](https://github.com/IPLSplatoon/IPLMapGen2/blob/splat3/url-serialization-docs.md).")
 
     @classmethod
     async def display_maplist(cls, ctx, brackets, maplist):
