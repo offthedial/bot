@@ -25,8 +25,14 @@ class ToNew(utils.Command):
 
         ui.embed.description = "Adding tournament to database..."
         await ui.update()
-        await utils.Tournament.new_tourney(slug=tourney_slug, type=tourney_type)
-        await ui.end(True)
+        tourney = await utils.Tournament.new_tourney(slug=tourney_slug, type=tourney_type)
+        await ui.end(utils.Alert.create_embed(utils.Alert.Style.SUCCESS,
+            title="Tournament Created",
+            description="\n".join([
+                f"Name: `{tourney.dict['smashgg']['name']}`",
+                f"Start.gg Slug: `{tourney_slug}`",
+                f"Tournament Type: `{tourney_type}` {'**[🪪 Whitelisted Only]**' if tourney_type.startswith('invite') else ''}"
+            ])))
 
     @classmethod
     async def get_tourney_slug(cls, ui):
@@ -39,9 +45,7 @@ class ToNew(utils.Command):
     @classmethod
     async def get_tourney_type(cls, ui):
         """Create a new tournament."""
-        directions = f"Enter the tournament type (`idtga`, `wl`)"
+        directions = f"Enter the tournament type (`idtga`, `wl`)\nTo create an invite only tournament, make sure the type starts with `invite`."
         ui.embed.description = directions
-        reply = await ui.get_valid_message(
-            lambda r: r.content.lower() in ["idtga", "wl"],
-            {'title': 'Invalid Tournament Type', 'description': directions})
+        reply = await ui.get_reply()
         return reply.content.lower()
