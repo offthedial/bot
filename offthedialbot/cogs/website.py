@@ -28,13 +28,12 @@ class Website(commands.Cog):
         """Send an embedded section of a rules page."""
         if not discord.utils.get(ctx.author.roles, name="Staff"):
             raise utils.exc.CommandCancel(title="Permission Denied", description=f"If you're looking for the rules, please use https://otd.ink/idtga/rules")
-        tourney = utils.Tournament()
         if section:
-            await self.send_embedded_section(ctx, f"{tourney.dict['type']}/rules", section)
+            await self.send_embedded_section(ctx, "idtga/rules", section)
         else:
-            lines = (await self.get_page(ctx, f"{tourney.dict['type']}/rules")).splitlines()
+            lines = (await self.get_page(ctx, "idtga/rules")).splitlines()
             for header in self.list_headers(lines, 2, strict=True):
-                await self.send_embedded(ctx, lines, header, f"{tourney.dict['type']}/rules")
+                await self.send_embedded(ctx, lines, header, "idtga/rules")
                 await asyncio.sleep(0.2)
 
     @rules.command()
