@@ -19,23 +19,28 @@ class ToGet(utils.Command):
         if not user.doc.exists:
             await utils.Alert(ctx, utils.Alert.Style.DANGER, title="User doesn't have an account!")
         try:
+            d = user.discord(ctx.bot)
+            if d:
+                name, mention = d.name, d.mention
+            else:
+                name, mention = user.id, "N/A"
+
             embed = discord.Embed(
-                title=user.discord(ctx.bot).name,
+                title=name,
                 description="\n".join([
-                    f"`User Mention:   ` **{user.discord(ctx.bot).mention}**",
-                    f"`IGN:            ` **`{user.dict['profile']['ign']}`**",
+                    f"`User Mention:   ` **{mention}**",
+                    f"`SplashTag:      ` **`{user.dict['profile']['splashtag']}`**",
                     f"`SW:             ` **`{user.dict['profile']['sw']}`**",
-                    f"`Peak Rank:      ` **`{user.dict['profile']['rank']}`**",
-                    f"`Weapons:        ` **`{user.dict['profile']['weapons']}`**",
-                    f"`Competitive Exp:` **`{user.dict['profile']['cxp']}`**",
-                    f"`Smash.gg Info:  ` **`{(await user.smashgg())['player']['gamerTag']}`** **(`{user.dict['profile']['smashgg'][-8:]}`)**",
-                    f"`ELO:            ` **`{user.get_elo()}`**",
+                    f"`Rank:           ` **`{user.get_rank()}`**",
+                    f"`Weapons:        ` \n> {user.get_weapons()}",
+                    f"`Competitive Exp:` \n> {user.dict['profile']['cxp']}",
+                    f"`Smash.gg Info:  ` **`{(await user.smashgg())['player']['gamerTag']}`** **(`{user.dict['profile']['slug']}`)**",
                     f"`Signal Strength:` **`{user.dict['meta']['signal']}`**",
                 ]))
             await utils.CommandUI.create_ui(ctx, embed)
         except KeyError:
             await utils.CommandUI.create_ui(ctx, discord.Embed(
-                title=user.discord(ctx.bot).name,
+                title=name,
                 description=f"```\n{user.dict}\n```"))
 
     @classmethod

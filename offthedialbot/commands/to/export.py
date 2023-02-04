@@ -74,14 +74,17 @@ class ToExport(utils.Command):
                 title="No team roles detected",
                 description=f"Check that you have given players their team roles, and that the roles are the exact same color as <@&{signed_up_role.id}>.")
         # Build export dictionary
-        async def igns(role):
-            igns = []
+        def build_team_data(role):
+            members = []
             for member in role.members:
                 user = utils.User(member.id)
-                igns.append(user.dict["profile"]["ign"])
-            return igns
+                members.append({
+                    "splashtag": user.dict["profile"]["splashtag"],
+                    "weapons": user.dict["profile"]["weapons"]
+                })
+            return members
         export = {
-            team_role.name: await igns(team_role)
+            team_role.name: build_team_data(team_role)
             for team_role in team_roles
         }
         # Send file

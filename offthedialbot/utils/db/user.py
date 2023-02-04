@@ -37,7 +37,7 @@ class User:
             }
           }
         }"""
-        status, data = await utils.graphql("smashgg", query, {"slug": self.dict["profile"]["smashgg"][-8:]})
+        status, data = await utils.graphql("smashgg", query, {"slug": self.dict["profile"]["slug"]})
         return data["data"]["user"]
 
     def discord(self, context):
