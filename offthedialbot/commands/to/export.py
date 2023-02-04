@@ -1,7 +1,7 @@
 """$to export"""
 import json
 import csv
-import asyncio
+import datetime, pytz
 from io import StringIO
 
 import discord
@@ -124,18 +124,23 @@ class ToExport(utils.Command):
                     await ui.update()
 
                 # get smash.gg
-                smashgg = sgg_attendees.pop(user.dict["profile"]["smashgg"][-8:], None)
+                smashgg = sgg_attendees.pop(user.dict["profile"]["slug"], None)
+
+                # get timezone
+                timezone = f"UTC{datetime.datetime.now(pytz.timezone(signup['timezone'])).strftime('%z')} ({signup['timezone']})"
 
                 # Return final exportable dict
                 return {
                     "user": user.dict,
                     "signup": signup,
+                    "rank": user.get_rank(),
+                    "rank_sort": user.get_sortable_rank(),
+                    "weapons": user.get_weapons(),
+                    "timezone": timezone,
                     "id": doc.id,
                     "mention": f'<@{doc.id}>',
-                    "discord_username": discord_username,
                     "gamerTag": smashgg,
-                    "userSlug": user.dict["profile"]["smashgg"][-8:],
-                    "elo": user.get_elo(),
+                    "discord": discord_username,
                     "checked_in": checked_in
                 }
             except:
@@ -152,19 +157,19 @@ class ToExport(utils.Command):
     def create_file(cls, signups, collection="signups"):
         # Create fields
         fields = {
-            "Discord Mention":   lambda s: s["discord_username"],
-            "IGN":               lambda s: s["user"]["profile"]["ign"],
+            "Discord Mention":   lambda s: s["discord"],
+            "SplashTag":         lambda s: s["user"]["profile"]["splashtag"],
             "SW":                lambda s: s["user"]["profile"]["sw"],
-            "Peak Rank":         lambda s: s["user"]["profile"]["rank"],
-            "Weapon Pool":       lambda s: s["user"]["profile"]["weapons"],
+            "Parsed Rank":       lambda s: s["rank"],
+            "Sortable Rank":     lambda s: s["rank_sort"],
+            "Weapon Pool":       lambda s: s["weapons"],
             "Competitive Exp":   lambda s: s["user"]["profile"]["cxp"],
             "Signal Strength":   lambda s: s["user"]["meta"]["signal"],
-            "Smash.gg userSlug": lambda s: s["userSlug"],
-            "Smash.gg gamerTag": lambda s: s["gamerTag"],
+            "Start.gg userSlug": lambda s: s["user"]["profile"]["slug"],
+            "Start.gg gamerTag": lambda s: s["gamerTag"],
+            "Timezone":          lambda s: s["timezone"],
             "Signup Date":       lambda s: s["signup"]["signupDate"],
             "Modified Date":     lambda s: s["signup"]["modifiedDate"],
-            "Timezone":          lambda s: s["signup"]["timezone"],
-            "Rank ELO":          lambda s: s["elo"],
             "Checked In":        lambda s: s["checked_in"],
             "Discord ID":        lambda s: s["mention"]
         }
