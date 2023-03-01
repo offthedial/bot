@@ -47,12 +47,13 @@ class To(utils.Command, hidden=True):
     @classmethod
     def update_embed(cls, ctx, embed, tourney):
         embed.description="\n".join([
-            f"**`name:     `** `{tourney.dict['smashgg']['name']}`",
-            f"**`slug:     `** `{tourney.dict['slug']}`",
-            f"**`type:     `** `{tourney.dict['type']}`",
-            f"**`date:     `** `{tourney.date()}`",
-            f"**`reg close:`** `{tourney.reg_closes_at()}`",
-            f"**`end date: `** `{tourney.ends_at()}`",
+            f"Name: `{tourney.dict['smashgg']['name']}`",
+            f"Slug: `{tourney.dict['slug']}`",
+            f"Type: `{tourney.dict['type']}`",
+            f"Start Date: `{tourney.date()}`",
+            f"Close Date: `{tourney.reg_closes_at()}`",
+            f"End Date: `{tourney.ends_at()}`",
+            *([f"🔒 Whitelist: `{str(len(tourney.dict['whitelist']))} Players`"] if tourney.dict.get("whitelist") else [])
         ])
         embed.clear_fields()
         embed.add_field(name="`Current Status:`", value=f"{tourney.status()}")

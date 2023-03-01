@@ -31,7 +31,7 @@ class ToNew(utils.Command):
             description="\n".join([
                 f"Name: `{tourney.dict['smashgg']['name']}`",
                 f"Start.gg Slug: `{tourney_slug}`",
-                f"Tournament Type: `{tourney_type}` {'**[🪪 Whitelisted Only]**' if tourney_type.startswith('invite') else ''}"
+                f"Tournament Type: `{tourney_type}`"
             ])))
 
     @classmethod
@@ -45,7 +45,7 @@ class ToNew(utils.Command):
     @classmethod
     async def get_tourney_type(cls, ui):
         """Create a new tournament."""
-        directions = f"Enter the tournament type (`idtga`, `wl`)\nTo create an invite only tournament, make sure the type starts with `invite`."
+        directions = f"Enter the tournament type (`idtga`, `wl`)"
         ui.embed.description = directions
         reply = await ui.get_reply()
         return reply.content.lower()
