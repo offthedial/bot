@@ -47,11 +47,11 @@ class ToNew(utils.Command):
         """Create a new tournament."""
         directions = "\n".join([
             f"Enter the tournament type (`idtga`, `wl`, `https://fabl.otd.ink`).",
-            "This will be used in the link on the website.",
+            "This will be the link for the 'Learn More' button on the otd.ink hero page.",
             "If you want to link to a different site other than otd.ink, enter the full url, for example:",
-            " - `idtga` -> `otd.ink/idtga`",
-            " - `wl` -> `otd.ink/wl`",
-            " - `https://fabl.otd.ink` -> `fabl.otd.ink`"
+            " - `idtga` - links to -> `otd.ink/idtga`",
+            " - `wl` - links to -> `otd.ink/wl`",
+            " - `https://fabl.otd.ink` - links to -> `fabl.otd.ink`"
         ])
         ui.embed.description = directions
         reply = await ui.get_reply()
