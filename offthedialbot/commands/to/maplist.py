@@ -78,7 +78,10 @@ class ToMaplist(utils.Command):
 
     @classmethod
     def parse_map_pool_link(cls, sendou_link):
-        """Parse map pool share link from sendou.ink or maps.iplabs.ink."""
+        """Parse map pool share link from sendou.ink or maps.iplabs.ink.
+
+        Follow the order here: https://github.com/Sendouc/sendou.ink/blob/rewrite/app/modules/in-game-lists/stage-ids.ts
+        """
         all_maps = [
             "Scorch Gorge",
             "Eeltail Alley",
