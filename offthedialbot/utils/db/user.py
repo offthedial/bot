@@ -57,8 +57,8 @@ class User:
             for rank in ["sz", "tc", "rm", "cb"]:
                 if p := self.dict["profile"]["rank"].get(rank, False):
                     powers.append(float(p))
-            elo = statistics.fmean(powers)
-            return f"X {str(elo)}"
+            elo = round(statistics.fmean(powers), 1)
+            return f"X {str(elo)} (max: {str(max(powers))})"
         return f"{self.dict['profile']['rank']['letter']} {self.dict['profile']['rank']['points']}"
 
     def get_sortable_rank(self):
