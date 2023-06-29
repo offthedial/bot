@@ -28,6 +28,10 @@ This bot was created to help organize Off The Dial's tournaments easier and fast
    - Rename the file to `service_account.json` and move it into the repository root directory.
 5. Run `docker-compose up --build` in the repository root.
 
+### Adding new maps
+1. Go to https://github.com/offthedial/bot/blob/master/offthedialbot/commands/to/maplist.py#L80
+2. Add the new map names to the list, in the correct order
+
 ## Support the Project
 This service is partly run using Digital Ocean. If you're planning to use Digital Ocean in the future, we would greatly appricate if you could use our referal button as it will support us with the finacial cost of running the bot. Thank you so much!
 
