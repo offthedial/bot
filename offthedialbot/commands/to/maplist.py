@@ -98,7 +98,9 @@ class ToMaplist(utils.Command):
             "Flounder Heights",
             "Brinewater Springs",
             "Manta Maria",
-            "Um'ami Ruins"
+            "Um'ami Ruins",
+            "Humpback Pump Track",
+            "Barnacle & Dime"
         ]
         try:
             params = parse_qs(urlparse(sendou_link).query)
