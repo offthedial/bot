@@ -214,6 +214,7 @@ class ToExport(utils.Command):
         return {
             node["user"]["slug"][5:]: node["gamerTag"]
             for node in data["data"]["tournament"]["participants"]["nodes"]
+            if node.get("user")
         }
 
     @classmethod
