@@ -56,13 +56,17 @@ class ToSync(utils.Command):
         users = utils.db.collection(u'users').where(u'meta.signal', u'>', 999).stream()
         role_1k = guild.get_role(809674067380666400)
         role_5k = guild.get_role(809674415867428936)
+
         # Loop over users
         for user in users:
             user = utils.User(user.id)
-            discord = user.discord(guild)
-            signal = user.dict["meta"]["signal"]
+            user_discord = user.discord(guild)
+            if not user_discord:
+                continue
+
             # Add roles depending on milestones
+            signal = user.dict["meta"]["signal"]
             if signal >= 1000:
-                await discord.add_roles(role_1k)
+                await user_discord.add_roles(role_1k)
             if signal >= 5000:
-                await discord.add_roles(role_5k)
+                await user_discord.add_roles(role_5k)

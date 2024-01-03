@@ -25,6 +25,7 @@ class Tournament:
         self.doc = next(iter(self.col.order_by(u"date", direction=Query.DESCENDING).limit(1).stream()))
         self.ref = self.doc.reference
         self.dict = self.doc.to_dict()
+        self.sgg_link = f"[smash.gg](https://smash.gg/tournament/{self.dict['slug']})"
 
     def signups(self, col=False, ignore_ended=False):
         """Return a stream of tournament signups."""

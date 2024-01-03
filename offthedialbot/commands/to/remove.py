@@ -11,7 +11,6 @@ class ToRemove(utils.Command):
     async def main(cls, ctx, reported: discord.User, sub: discord.User = None):
         """Automatically handle removing a reported player and optionally replacing them with a sub."""
         tourney = utils.Tournament()
-        smashgg_link = f"[smash.gg](https://smash.gg/tournament/{tourney.dict['slug']})"
 
         # Start database operation
         batch = utils.db.batch()
@@ -25,7 +24,7 @@ class ToRemove(utils.Command):
                 description=f"<@{reported.id}> was not found.")
         await utils.Alert(ctx, utils.Alert.Style.INFO,
             title="\u200b",
-            description=f"Remove `{await reported_signup.smashgg()}` from {smashgg_link}")
+            description=f"Remove `{await reported_signup.sgg_gamertag()}` from {tourney.sgg_link}")
 
         # Get team role
         team_role = discord.utils.find(lambda r: (
@@ -52,7 +51,7 @@ class ToRemove(utils.Command):
             # Alert smash.gg removal
             await utils.Alert(ctx, utils.Alert.Style.INFO,
                 title="\u200b",
-                description=f"Add `{await sub_signup.smashgg()}` to {smashgg_link} on team `{team_name}`.")
+                description=f"Add `{await sub_signup.sgg_gamertag()}` to {smashgg_link} on team `{team_name}`.")
             # Move sub_signup from subs collection to signups collection
             batch.delete(reported_signup.ref)
             batch.set(tourney.signups(col=True).document(sub_signup.id), sub_signup.dict)
