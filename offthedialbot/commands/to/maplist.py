@@ -103,6 +103,8 @@ class ToMaplist(utils.Command):
             "Barnacle & Dime",
             "Crableg Capital",
             "Shipshape Cargo Co."
+            "Bluefin Depot",
+            "Robo ROM-en"
         ]
         try:
             params = parse_qs(urlparse(sendou_link).query)
