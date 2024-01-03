@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.8
 
 WORKDIR /usr/src/app
 
@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD [ "python", "-u", "run.py"]
+CMD [ "python", "./run.py" ]
