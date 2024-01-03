@@ -3,7 +3,7 @@
 from offthedialbot import utils
 
 
-class playing(utils.Command):
+class Playing(utils.Command):
     """Command to toggle the LF: role."""
 
     @classmethod
