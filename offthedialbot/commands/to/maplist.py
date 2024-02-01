@@ -6,7 +6,7 @@ from io import StringIO
 
 import discord
 
-from offthedialbot import utils
+from offthedialbot import utils, logger
 
 
 class ToMaplist(utils.Command):
@@ -102,7 +102,7 @@ class ToMaplist(utils.Command):
             "Humpback Pump Track",
             "Barnacle & Dime",
             "Crableg Capital",
-            "Shipshape Cargo Co."
+            "Shipshape Cargo Co.",
             "Bluefin Depot",
             "Robo ROM-en"
         ]
@@ -125,7 +125,8 @@ class ToMaplist(utils.Command):
                 # Replace pool value with map pool
                 pool[key] = maps
             return pool
-        except:
+        except Exception as e:
+            logger.error(e)
             raise utils.exc.CommandCancel(title="Map pool error", description="Map pool link was badly formed, double-check that it follows the [IPL map pool specification](https://github.com/IPLSplatoon/IPLMapGen2/blob/splat3/url-serialization-docs.md).")
 
     @classmethod
