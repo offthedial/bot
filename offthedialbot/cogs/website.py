@@ -119,5 +119,5 @@ class Website(commands.Cog):
     @staticmethod
     def get_header(headers, choice):
         """Fuzzy search header."""
-        partial_filter = process.extract(choice, headers, fuzz.partial_ratio, score_cutoff=75)
-        return process.extractOne(choice, [result[0] for result in partial_filter], fuzz.ratio)
+        partial_filter = process.extract(choice, headers, scorer=fuzz.partial_ratio, score_cutoff=75)
+        return process.extractOne(choice, [result[0] for result in partial_filter])
