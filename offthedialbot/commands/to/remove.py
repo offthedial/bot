@@ -51,7 +51,7 @@ class ToRemove(utils.Command):
             # Alert smash.gg removal
             await utils.Alert(ctx, utils.Alert.Style.INFO,
                 title="\u200b",
-                description=f"Add `{await sub_signup.sgg_gamertag()}` to {smashgg_link} on team `{team_name}`.")
+                description=f"Add `{await sub_signup.sgg_gamertag()}` to {tourney.sgg_link} on team `{team_name}`.")
             # Move sub_signup from subs collection to signups collection
             batch.delete(reported_signup.ref)
             batch.set(tourney.signups(col=True).document(sub_signup.id), sub_signup.dict)
