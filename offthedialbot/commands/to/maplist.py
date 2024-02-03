@@ -10,6 +10,32 @@ from offthedialbot import utils, logger
 
 
 class ToMaplist(utils.Command):
+
+    all_maps = [  # Follow the order here: https://github.com/Sendouc/sendou.ink/blob/rewrite/app/modules/in-game-lists/stage-ids.ts
+        "Scorch Gorge",
+        "Eeltail Alley",
+        "Hagglefish Market",
+        "Undertow Spillway",
+        "Mincemeat Metalworks",
+        "Hammerhead Bridge",
+        "Museum d'Alfonsino",
+        "Mahi-Mahi Resort",
+        "Inkblot Art Academy",
+        "Sturgeon Shipyard",
+        "MakoMart",
+        "Wahoo World",
+        "Flounder Heights",
+        "Brinewater Springs",
+        "Manta Maria",
+        "Um'ami Ruins",
+        "Humpback Pump Track",
+        "Barnacle & Dime",
+        "Crableg Capital",
+        "Shipshape Cargo Co.",
+        "Bluefin Depot",
+        "Robo ROM-en"
+    ]
+
     @classmethod
     @utils.deco.require_role("Staff")
     async def main(
@@ -78,34 +104,8 @@ class ToMaplist(utils.Command):
 
     @classmethod
     def parse_map_pool_link(cls, sendou_link):
-        """Parse map pool share link from sendou.ink or maps.iplabs.ink.
+        """Parse map pool share link from sendou.ink or maps.iplabs.ink."""
 
-        Follow the order here: https://github.com/Sendouc/sendou.ink/blob/rewrite/app/modules/in-game-lists/stage-ids.ts
-        """
-        all_maps = [
-            "Scorch Gorge",
-            "Eeltail Alley",
-            "Hagglefish Market",
-            "Undertow Spillway",
-            "Mincemeat Metalworks",
-            "Hammerhead Bridge",
-            "Museum d'Alfonsino",
-            "Mahi-Mahi Resort",
-            "Inkblot Art Academy",
-            "Sturgeon Shipyard",
-            "MakoMart",
-            "Wahoo World",
-            "Flounder Heights",
-            "Brinewater Springs",
-            "Manta Maria",
-            "Um'ami Ruins",
-            "Humpback Pump Track",
-            "Barnacle & Dime",
-            "Crableg Capital",
-            "Shipshape Cargo Co.",
-            "Bluefin Depot",
-            "Robo ROM-en"
-        ]
         try:
             params = parse_qs(urlparse(sendou_link).query)
             # Convert url query parameter to dictionary
@@ -121,7 +121,7 @@ class ToMaplist(utils.Command):
                 maps = []
                 for i in range(len(binary)):
                     if binary[i] == "1":
-                        maps.append(all_maps[i])
+                        maps.append(cls.all_maps[i])
                 # Replace pool value with map pool
                 pool[key] = maps
             return pool
@@ -188,6 +188,6 @@ class ToMaplist(utils.Command):
             ]
         # Send file
         file = StringIO()
-        json.dump({"rounds": export}, file)
+        json.dump({"rounds": export, "maps": ['(counterpick)', *cls.all_maps]}, file)
         file.seek(0)
         return discord.File(file, filename=f"loadedData.json")
