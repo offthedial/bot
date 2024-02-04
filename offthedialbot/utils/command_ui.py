@@ -135,7 +135,6 @@ class CommandUI:
             if event.startswith('reaction'):
                 reply = reply[0]
         else:
-            print(task)
             await self.end(False, None if task else "Command Timeout")
 
         return reply
