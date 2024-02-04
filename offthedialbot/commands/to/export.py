@@ -220,4 +220,7 @@ class ToExport(utils.Command):
     @classmethod
     def list_attendees(cls, attendees):
         """Display in a list, all invalid attendees."""
-        return "\n".join(f"`-` {value}" for value in attendees)
+        content = "\n".join(f"`-` {value}" for value in attendees)
+        if len(content) > 2000:
+            return f"🚫 Too many!! ({len(attendees)})"
+        return content
