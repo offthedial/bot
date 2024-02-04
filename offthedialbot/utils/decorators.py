@@ -17,7 +17,7 @@ def require_role(role: str):
         @wraps(command)
         async def _(*args):
             ctx = get_ctx(_, args)
-            if ctx.guild and discord.utils.get(ctx.author.roles, name=role):
+            if ctx.guild and (discord.utils.get(ctx.author.roles, name=role) or ctx.channel.permissions_for(ctx.author).administrator):
                 await command(*args)
             else:
                 await utils.Alert(ctx, utils.Alert.Style.DANGER,
