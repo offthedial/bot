@@ -33,7 +33,8 @@ class ToMaplist(utils.Command):
         "Crableg Capital",
         "Shipshape Cargo Co.",
         "Bluefin Depot",
-        "Robo ROM-en"
+        "Robo ROM-en",
+        "Marlin Airport"
     ]
 
     @classmethod
