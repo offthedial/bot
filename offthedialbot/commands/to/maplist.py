@@ -34,7 +34,8 @@ class ToMaplist(utils.Command):
         "Shipshape Cargo Co.",
         "Bluefin Depot",
         "Robo ROM-en",
-        "Marlin Airport"
+        "Marlin Airport",
+        "Lemuria Hub"
     ]
 
     @classmethod
