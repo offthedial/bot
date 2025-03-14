@@ -10,7 +10,7 @@ class ToSync(utils.Command):
     @classmethod
     @utils.deco.require_role("Staff")
     async def main(cls, ctx):
-        """Synchronize smash.gg tournament data and competing roles."""
+        """Synchronize start.gg tournament data and competing roles."""
         await cls.sync(ctx.bot)
         await ctx.message.add_reaction('♻️')
 

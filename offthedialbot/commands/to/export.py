@@ -19,7 +19,7 @@ class ToExport(utils.Command):
             discord.Embed(title="Exporting attendees...", color=utils.colors.COMPETING))
 
         async with ctx.typing():
-            # Get tourney signups and smash.gg signups
+            # Get tourney signups and start.gg signups
             tourney = utils.Tournament()
             if collection in ["signups", "subs"]:
                 if collection == "signups":
@@ -43,7 +43,7 @@ class ToExport(utils.Command):
                     title=":incoming_envelope: *Exporting attendees complete!*",
                     description="Download the spreadsheet below. \U0001f4e5")
                 embed.add_field(
-                    name="Invalid Attendees - Only on smash.gg:",
+                    name="Invalid Attendees - Only on start.gg:",
                     value=invalid_sgg if invalid_sgg else "✨ No invalid attendees!")
                 if discord.utils.get(ctx.guild.roles, name="Checked In"):
                     embed.add_field(
@@ -126,7 +126,7 @@ class ToExport(utils.Command):
                     ui.embed.add_field(name="Currently exporting:", value=f"> {mention}")
                     await ui.update()
 
-                # get smash.gg
+                # get start.gg
                 smashgg = sgg_attendees.pop(user.dict["profile"]["slug"], None)
 
                 # get timezone
@@ -195,7 +195,7 @@ class ToExport(utils.Command):
 
     @classmethod
     async def query_attendees(cls, ctx, tourney):
-        """Query attendees from smash.gg, return an object containing their gamerTag and user slug."""
+        """Query attendees from start.gg, return an object containing their gamerTag and user slug."""
         query = """
             query getAllParticipants($slug: String) {
                 tournament(slug: $slug) {

@@ -61,7 +61,7 @@ class ToMaplist(utils.Command):
 
     @classmethod
     async def query_brackets(cls, ctx):
-        """Call the smash.gg api on the tournament slug to retrieve the brackets needed."""
+        """Call the start.gg api on the tournament slug to retrieve the brackets needed."""
         tourney = utils.Tournament()
         query = """query($slug: String) {
           tournament(slug: $slug) {

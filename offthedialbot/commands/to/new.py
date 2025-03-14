@@ -12,7 +12,7 @@ class ToNew(utils.Command):
         """ Open registration for a new tournament!
 
         Steps:
-        - Get smash.gg full slug.
+        - Get start.gg full slug.
         - Get tournament type.
         - Add tournament data to database.
         """

@@ -12,7 +12,7 @@ def use_type(type):
     """Use graphql query type."""
     if type == "smashgg":
         ver = 'alpha'
-        url = 'https://api.smash.gg/gql/' + ver
+        url = 'https://api.start.gg/gql/' + ver
         headers = {"Authorization": f"Bearer {env['smashgg']}"}
         return url, headers
 
@@ -22,7 +22,7 @@ def use_type(type):
 
 
 async def graphql(type, query, variables={}, ctx=None):
-    """Send a post request to the smash.gg gql api."""
+    """Send a post request to the start.gg gql api."""
     request = {
         "query": query,
         "variables": variables

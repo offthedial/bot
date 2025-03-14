@@ -25,7 +25,7 @@ class Tournament:
         self.doc = next(iter(self.col.order_by(u"date", direction=Query.DESCENDING).limit(1).stream()))
         self.ref = self.doc.reference
         self.dict = self.doc.to_dict()
-        self.sgg_link = f"[smash.gg](https://smash.gg/tournament/{self.dict['slug']})"
+        self.sgg_link = f"[start.gg](https://start.gg/tournament/{self.dict['slug']})"
 
     def signups(self, col=False, ignore_ended=False):
         """Return a stream of tournament signups."""
@@ -75,7 +75,7 @@ class Tournament:
 
     @staticmethod
     async def query_smashgg(slug, q=None):
-        """Query the smash.gg graphql api."""
+        """Query the start.gg graphql api."""
         q = q if q else """
             name
             endAt

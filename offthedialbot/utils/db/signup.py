@@ -33,7 +33,7 @@ class Signup:
         self.dict = self.doc.to_dict()
 
     async def sgg_gamertag(self):
-        """Query smash.gg data from the api, find first based on slug, return gamerTag used for registration."""
+        """Query start.gg data from the api, find first based on slug, return gamerTag used for registration."""
         query = """query($slug: String) {
           tournament(slug: $slug) {
             participants(query: {perPage: 500}) {

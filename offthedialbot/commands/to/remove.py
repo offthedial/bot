@@ -48,7 +48,7 @@ class ToRemove(utils.Command):
                 team_name = team_role.name
             else:
                 team_name = None
-            # Alert smash.gg removal
+            # Alert start.gg removal
             await utils.Alert(ctx, utils.Alert.Style.INFO,
                 title="\u200b",
                 description=f"Add `{await sub_signup.sgg_gamertag()}` to {tourney.sgg_link} on team `{team_name}`.")

@@ -34,7 +34,7 @@ class ToGet(utils.Command):
                     f"`Rank:           ` **`{user.get_rank()}`**",
                     f"`Weapons:        ` \n> {user.get_weapons()}",
                     f"`Competitive Exp:` \n> {user.dict['profile']['cxp']}",
-                    f"`Smash.gg Info:  ` **`{(await user.smashgg())['player']['gamerTag']}`** **(`{user.dict['profile']['slug']}`)**",
+                    f"`Start.gg Info:  ` **`{(await user.smashgg())['player']['gamerTag']}`** **(`{user.dict['profile']['slug']}`)**",
                     f"`Signal Strength:` **`{user.dict['meta']['signal']}`**",
                 ]))
             await utils.CommandUI.create_ui(ctx, embed)

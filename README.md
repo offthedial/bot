@@ -6,8 +6,8 @@
 ![CI][ci-shield]
 # ![Banner](https://assets.otd.ink/bot/banner.png)
 
-This bot was created to help organize Off The Dial's tournaments easier and faster. It includes many commands that automate previously manual tasks. Another reason was the lack of a tournament managing discord bot in general. This bot also gets realtime data from smash.gg's API.
-- Realtime data using smash.gg's GraphQL API!
+This bot was created to help organize Off The Dial's tournaments easier and faster. It includes many commands that automate previously manual tasks. Another reason was the lack of a tournament managing discord bot in general. This bot also gets realtime data from start.gg's API.
+- Realtime data using start.gg's GraphQL API!
 - Unique, polished UI for discord commands!
 
 ## Usage

@@ -29,7 +29,7 @@ class User:
             return None
 
     async def smashgg(self):
-        """Get smash.gg data from the api with the user slug."""
+        """Get start.gg data from the api with the user slug."""
         query = """query($slug: String) {
           user(slug: $slug) {
             player {
