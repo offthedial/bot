@@ -72,8 +72,8 @@ class ToSignal(utils.Command):
 
     @staticmethod
     def calculate_gain(total, placement):
-        """Calculate the total signal strength to add based on the total teams and placement."""
-        return round(100 + ((total - (placement - 1)) * (100 / (total))), 1)
+        """Calculate the total signal strength to add based on the total teams and placement. Final multiplier is the additional signal strength multiplier. For regular season, set to 1"""
+        return round((100 + ((total - (placement - 1)) * (100 / (total))))*0.1, 1)
 
     @classmethod
     def get_team_members(cls, ctx, team):
