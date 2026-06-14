@@ -70,11 +70,9 @@ class ToSignal(utils.Command):
                 for chunk in formatted[1:]:
                     await ctx.send(embed=discord.Embed(description="\n".join(chunk), color=utils.Alert.Style.SUCCESS))
 
-
-    # Calculation Formula, final multiplier is the additional signal strength multiplier. For regular season, set to 1"
     @staticmethod
     def calculate_gain(total, placement):
-        """Calculate the total signal strength to add based on the total teams and placement.""
+        """Calculate the total signal strength to add based on the total teams and placement. Final multiplier is the additional signal strength multiplier. For regular season, set to 1"""
         return round((100 + ((total - (placement - 1)) * (100 / (total))))*0.1, 1)
 
     @classmethod
