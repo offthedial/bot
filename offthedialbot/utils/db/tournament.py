@@ -57,21 +57,17 @@ class Tournament:
 
     def has_ended(self):
         """Returns whether the tournament has ended."""
-        starts = datetime.utcfromtimestamp(self.dict["sendou"]["startAt"])
-        return starts + TOURNAMENT_LASTS < datetime.utcnow()
+        return self.dict["sendou"]["endAt"] < datetime.utcnow().timestamp()
 
     def has_reg_closed(self):
         """Returns whether the tournament registration is closed."""
-        starts = datetime.utcfromtimestamp(self.dict["sendou"]["startAt"])
-        return starts - REGISTRATION_CLOSES_BEFORE < datetime.utcnow()
+        return self.dict["sendou"]["registrationClosesAt"] < datetime.utcnow().timestamp()
 
     def ends_at(self):
-        starts = datetime.utcfromtimestamp(self.dict["sendou"]["startAt"])
-        return (starts + TOURNAMENT_LASTS).strftime('%a, %b %d at %I:%M %p UTC')
+        return datetime.utcfromtimestamp(self.dict["sendou"]["endAt"]).strftime('%a, %b %d at %I:%M %p UTC')
 
     def reg_closes_at(self):
-        starts = datetime.utcfromtimestamp(self.dict["sendou"]["startAt"])
-        return (starts - REGISTRATION_CLOSES_BEFORE).strftime('%a, %b %d at %I:%M %p UTC')
+        return datetime.utcfromtimestamp(self.dict["sendou"]["registrationClosesAt"]).strftime('%a, %b %d at %I:%M %p UTC')
 
     def starts_at(self):
         return datetime.utcfromtimestamp(self.dict["sendou"]["startAt"]).strftime('%a, %b %d at %I:%M %p UTC')
@@ -90,14 +86,15 @@ class Tournament:
 
     @staticmethod
     async def query_sendou(id, ctx=None):
-        """Query the sendou.ink api, flattened into the shape stored in firestore."""
         data = await utils.sendou.tournament(id, ctx=ctx)
+        starts = datetime.fromisoformat(data["startTime"].replace("Z", "+00:00"))
         return {
             "name": data["name"],
             "url": data["url"],
             "logoUrl": data["logoUrl"],
-            "startAt": int(datetime.fromisoformat(
-                data["startTime"].replace("Z", "+00:00")).timestamp()),
+            "startAt": int(starts.timestamp()),
+            "registrationClosesAt": int((starts - REGISTRATION_CLOSES_BEFORE).timestamp()),
+            "endAt": int((starts + TOURNAMENT_LASTS).timestamp()),
             "registeredCount": data["teams"]["registeredCount"],
             "checkedInCount": data["teams"]["checkedInCount"],
             "brackets": data["brackets"],
