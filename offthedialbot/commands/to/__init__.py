@@ -31,7 +31,7 @@ class To(utils.Command, hidden=True):
         while True:
             reply = await ui.get_valid_reaction(list(options.values()), cancel=False)
             await cls.operator(ui, reply.emoji, options)
-            await tourney.sync_smashgg()
+            await tourney.sync_sendou()
             cls.update_embed(ui.ctx, embed, tourney)
             await ui.update()
 
@@ -41,16 +41,16 @@ class To(utils.Command, hidden=True):
         if option == options['done']:
             await ui.end(True)
         elif option == options['sync']:
-            await ToSync.sync(ui.ctx.bot, smashgg=False)
+            await ToSync.sync(ui.ctx.bot, sendou=False)
 
 
     @classmethod
-    def update_embed(cls, ctx, embed, tourney):
+    def update_embed(cls, ctx, embed, tourney: utils.Tournament):
         embed.description="\n".join([
-            f"Name: `{tourney.dict['smashgg']['name']}`",
-            f"Slug: `{tourney.dict['slug']}`",
+            f"Name: `{tourney.dict['sendou']['name']}`",
+            f"Sendou ID: `{tourney.dict['sendouId']}`",
             f"Type: `{tourney.dict['type']}`",
-            f"Start Date: `{tourney.date()}`",
+            f"Start Date: `{tourney.starts_at()}`",
             f"Close Date: `{tourney.reg_closes_at()}`",
             f"End Date: `{tourney.ends_at()}`",
             *([f"🔒 Whitelist: `{str(len(tourney.dict['whitelist']))} Players`"] if tourney.dict.get("whitelist") else [])

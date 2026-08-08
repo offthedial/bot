@@ -15,5 +15,5 @@ logger = logging.getLogger("__name__")
 
 if not env.get('token'):
     logger.warning("Cannot find 'token' key in config.yml")
-if not env.get('smashgg'):
-    logger.warning("Cannot find 'smashgg' key in config.yml")
+if not env.get('sendou'):
+    logger.warning("Cannot find 'sendou' key in config.yml")

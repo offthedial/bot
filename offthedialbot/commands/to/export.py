@@ -19,32 +19,36 @@ class ToExport(utils.Command):
             discord.Embed(title="Exporting attendees...", color=utils.colors.COMPETING))
 
         async with ctx.typing():
-            # Get tourney signups and start.gg signups
+            # Get tourney signups
             tourney = utils.Tournament()
             if collection in ["signups", "subs"]:
                 if collection == "signups":
                     stream = tourney.signups(ignore_ended=True)
                 elif collection == "subs":
                     stream = tourney.subs(ignore_ended=True)
-                sgg_attendees = await cls.query_attendees(ctx, tourney)
 
                 # Create exportable signups list
-                signups = await cls.list_signups(ctx, ui, stream, sgg_attendees)
+                signups = await cls.list_signups(ctx, ui, stream)
                 # Create & send file from signups list
                 file = cls.create_file(signups, collection)
                 await ctx.send(file=file)
 
                 # Get list of invalid attendees
-                invalid_sgg = cls.list_attendees(sgg_attendees.values())
                 invalid_checkin = cls.list_attendees([f"<@{s['id']}>" for s in signups if not s["checked_in"]])
+                diff = await cls.diff_players(ctx, tourney, signups) if collection == "signups" else None
 
                 # Create * send success embed
                 embed = discord.Embed(
                     title=":incoming_envelope: *Exporting attendees complete!*",
                     description="Download the spreadsheet below. \U0001f4e5")
-                embed.add_field(
-                    name="Invalid Attendees - Only on start.gg:",
-                    value=invalid_sgg if invalid_sgg else "✨ No invalid attendees!")
+                if diff:
+                    for name, ids in zip(
+                        ["On sendou.ink only", "Not on sendou.ink", "No sendou.ink account"], diff
+                    ):
+                        invalid = cls.list_attendees([f"<@{id}>" for id in ids])
+                        embed.add_field(
+                            name=f"Invalid Attendees - {name}:",
+                            value=invalid if invalid else "✨ No invalid attendees!")
                 if discord.utils.get(ctx.guild.roles, name="Checked In"):
                     embed.add_field(
                         name="Invalid Attendees - Not checked in:",
@@ -59,33 +63,29 @@ class ToExport(utils.Command):
 
     @classmethod
     async def overlays(cls, ctx):
-        # Build teams list
-        team_roles = []
-        signed_up_role = None
-        for role in ctx.guild.roles:
-            if role.color == discord.Color(utils.colors.COMPETING):
-                if role.name != "Signed Up!":
-                    team_roles.append(role)
-                else:
-                    signed_up_role = role
-        # Raise error if there are no team roles
-        if len(team_roles) <= 0:
+        # Build teams list from sendou, rather than from the discord team roles
+        # that are themselves derived from it
+        tourney = utils.Tournament()
+        teams = await utils.sendou.teams(tourney.dict["sendouId"], ctx=ctx)
+        if not teams:
             return utils.Alert.create_embed(utils.Alert.Style.DANGER,
-                title="No team roles detected",
-                description=f"Check that you have given players their team roles, and that the roles are the exact same color as <@&{signed_up_role.id}>.")
+                title="No teams detected",
+                description=f"No teams are registered on {tourney.sendou_link} yet.")
         # Build export dictionary
-        def build_team_data(role):
+        def build_team_data(team):
             members = []
-            for member in role.members:
-                user = utils.User(member.id)
+            for m in team["members"]:
+                # A player can be on a sendou team without an otd.ink profile,
+                # so fall back to the names sendou already gave us
+                profile = (utils.User(m["discordId"]).dict or {}).get("profile", {})
                 members.append({
-                    "splashtag": user.dict["profile"]["splashtag"],
-                    "weapons": user.dict["profile"]["weapons"]
+                    "splashtag": profile.get("splashtag") or m["inGameName"] or m["name"],
+                    "weapons": profile.get("weapons", [])
                 })
             return members
         export = {
-            team_role.name: build_team_data(team_role)
-            for team_role in team_roles
+            team["name"]: build_team_data(team)
+            for team in teams
         }
         # Send file
         file = StringIO()
@@ -99,7 +99,7 @@ class ToExport(utils.Command):
             description="Download the json file. \U0001f4e5")
 
     @staticmethod
-    async def list_signups(ctx, ui, signups, sgg_attendees):
+    async def list_signups(ctx, ui, signups):
         """Return a list with parsed signups."""
         async def per_doc(i, doc):
             # Get base data
@@ -126,9 +126,6 @@ class ToExport(utils.Command):
                     ui.embed.add_field(name="Currently exporting:", value=f"> {mention}")
                     await ui.update()
 
-                # get start.gg
-                smashgg = sgg_attendees.pop(user.dict["profile"]["slug"], None)
-
                 # get timezone
                 timezone = f"UTC{datetime.datetime.now(pytz.timezone(signup['timezone'])).strftime('%z')} ({signup['timezone']})"
 
@@ -142,7 +139,6 @@ class ToExport(utils.Command):
                     "timezone": timezone,
                     "id": doc.id,
                     "mention": f'<@{doc.id}>',
-                    "gamerTag": smashgg,
                     "discord": discord_username,
                     "checked_in": checked_in
                 }
@@ -157,6 +153,21 @@ class ToExport(utils.Command):
         return [await per_doc(i, doc) for i, doc in enumerate(signups)]
 
     @classmethod
+    async def diff_players(cls, ctx, tourney, signups):
+        teams = await utils.sendou.teams(tourney.dict["sendouId"], ctx=ctx)
+        if not teams:
+            return None
+
+        theirs = {m["discordId"] for team in teams for m in team["members"]}
+        ours = {s["id"] for s in signups}
+
+        unmatched, no_account = [], []
+        for id in sorted(ours - theirs):
+            (unmatched if await utils.sendou.user_id(id) else no_account).append(id)
+
+        return sorted(theirs - ours), unmatched, no_account
+
+    @classmethod
     def create_file(cls, signups, collection="signups"):
         # Create fields
         fields = {
@@ -168,8 +179,6 @@ class ToExport(utils.Command):
             "Weapon Pool":       lambda s: s["weapons"],
             "Competitive Exp":   lambda s: s["user"]["profile"]["cxp"],
             "Signal Strength":   lambda s: s["user"]["meta"]["signal"],
-            "Start.gg userSlug": lambda s: s["user"]["profile"]["slug"],
-            "Start.gg gamerTag": lambda s: s["gamerTag"],
             "Timezone":          lambda s: s["timezone"],
             "Signup Date":       lambda s: s["signup"]["signupDate"],
             "Modified Date":     lambda s: s["signup"]["modifiedDate"],
@@ -192,30 +201,6 @@ class ToExport(utils.Command):
         file.seek(0)
         # Create discord attachment
         return discord.File(file, filename=f"{collection}.csv")
-
-    @classmethod
-    async def query_attendees(cls, ctx, tourney):
-        """Query attendees from start.gg, return an object containing their gamerTag and user slug."""
-        query = """
-            query getAllParticipants($slug: String) {
-                tournament(slug: $slug) {
-                    participants(query:{perPage:500}) {
-                        nodes {
-                            gamerTag
-                            user {
-                                slug
-                            }
-                        }
-                    }
-                }
-            }
-        """
-        status, data = await utils.graphql("smashgg", query, {"slug": tourney.dict["slug"]}, ctx)
-        return {
-            node["user"]["slug"][5:]: node["gamerTag"]
-            for node in data["data"]["tournament"]["participants"]["nodes"]
-            if node.get("user", {}).get("slug")
-        }
 
     @classmethod
     def list_attendees(cls, attendees):

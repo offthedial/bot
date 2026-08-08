@@ -1,4 +1,3 @@
-from offthedialbot import utils
 from . import Tournament
 
 
@@ -32,24 +31,6 @@ class Signup:
         self.col = self.ref.parent.id
         self.dict = self.doc.to_dict()
 
-    async def sgg_gamertag(self):
-        """Query start.gg data from the api, find first based on slug, return gamerTag used for registration."""
-        query = """query($slug: String) {
-          tournament(slug: $slug) {
-            participants(query: {perPage: 500}) {
-              nodes {
-                gamerTag
-                user {
-                  slug
-                }
-              }
-            }
-          }
-        }"""
-        try:
-            status, data = await utils.graphql("smashgg", query, {"slug": self.tourney.dict["slug"]})
-            for participant in data["data"]["tournament"]["participants"]["nodes"]:
-                if participant["user"]["slug"][5:] == self.user.dict["profile"]["slug"]:
-                    return participant["gamerTag"]
-        except:
-            return None
+    def splashtag(self):
+        """Return the splash tag this player registered with."""
+        return self.user.dict["profile"]["splashtag"]

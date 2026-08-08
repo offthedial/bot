@@ -10,22 +10,54 @@ class ToSync(utils.Command):
     @classmethod
     @utils.deco.require_role("Staff")
     async def main(cls, ctx):
-        """Synchronize start.gg tournament data and competing roles."""
+        """Synchronize sendou.ink tournament data and competing roles."""
         await cls.sync(ctx.bot)
         await ctx.message.add_reaction('♻️')
 
     @classmethod
-    async def sync(cls, bot, smashgg=True):
-        tourney = await cls.sync_tournament(smashgg)
+    async def sync(cls, bot, sendou=True):
+        tourney = await cls.sync_tournament(sendou)
         guild = await cls.sync_competing(bot, tourney)
+        await cls.sync_teams(guild, tourney)
         await cls.sync_signal_strength(guild)
 
     @staticmethod
-    async def sync_tournament(smashgg):
+    async def sync_tournament(sendou):
         tourney = utils.Tournament()
-        if smashgg:
-            await tourney.sync_smashgg()
+        if sendou:
+            await tourney.sync_sendou()
         return tourney
+
+    @staticmethod
+    async def sync_teams(guild, tourney):
+        teams = await utils.sendou.teams(tourney.dict["sendouId"])
+        if not teams:
+            # No teams registered yet. Don't read that as "delete every role".
+            return
+
+        color = discord.Color(utils.colors.COMPETING)
+        stale = {
+            role.name: role for role in guild.roles
+            if role.color == color and role.name != "Signed Up!"
+        }
+
+        for team in teams:
+            role = stale.pop(team["name"], None)
+            if role is None:
+                role = await guild.create_role(name=team["name"], color=color)
+
+            wanted = {
+                member for m in team["members"]
+                if (member := guild.get_member(int(m["discordId"])))
+            }
+            for member in set(role.members) - wanted:
+                await member.remove_roles(role)
+            for member in wanted - set(role.members):
+                await member.add_roles(role)
+
+        # Whatever is left has no matching team on sendou anymore
+        for role in stale.values():
+            await role.delete()
 
     @staticmethod
     async def sync_competing(bot, tourney):

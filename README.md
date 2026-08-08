@@ -6,8 +6,8 @@
 ![CI][ci-shield]
 # ![Banner](https://assets.otd.ink/bot/banner.png)
 
-This bot was created to help organize Off The Dial's tournaments easier and faster. It includes many commands that automate previously manual tasks. Another reason was the lack of a tournament managing discord bot in general. This bot also gets realtime data from start.gg's API.
-- Realtime data using start.gg's GraphQL API!
+This bot was created to help organize Off The Dial's tournaments easier and faster. It includes many commands that automate previously manual tasks. Another reason was the lack of a tournament managing discord bot in general. This bot also gets realtime data from sendou.ink's API.
+- Realtime data using sendou.ink's public API!
 - Unique, polished UI for discord commands!
 
 ## Usage
@@ -21,7 +21,7 @@ This bot was created to help organize Off The Dial's tournaments easier and fast
 1. Create a `config.yml` in the repository root:
    ```
    token: XlcL5cwQ...haJQLQ5G
-   smashgg: 7e5073d2c...f61fbea
+   sendou: 7e5073d2c...f61fbea
    debug (optional): true
    ```
 3. Go to a Firebase > Project settings > Service accounts > Generate new private key.

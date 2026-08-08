@@ -1,6 +1,5 @@
 import statistics
 import discord
-from offthedialbot import utils
 from firebase_admin import firestore
 from . import db, Tournament
 from .signup import Signup
@@ -27,18 +26,6 @@ class User:
             return Signup(self.id, self, self.tourney)
         except LookupError:
             return None
-
-    async def smashgg(self):
-        """Get start.gg data from the api with the user slug."""
-        query = """query($slug: String) {
-          user(slug: $slug) {
-            player {
-              gamerTag
-            }
-          }
-        }"""
-        status, data = await utils.graphql("smashgg", query, {"slug": self.dict["profile"]["slug"]})
-        return data["data"]["user"]
 
     def discord(self, context):
         if isinstance(context, discord.Client):

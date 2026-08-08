@@ -22,7 +22,10 @@ class Maplist:
         """
         self.pool = pool
         self.popularity = None
-        self.BACKLOG = min([len(subpool) for subpool in self.pool])
+        # Don't repeat a stage within the last BACKLOG picks. Held one short of
+        # the smallest mode pool, since N stages can only dodge repeats N-1 picks
+        # in a row, and never 0 - map_history[-0:] would be the whole history.
+        self.BACKLOG = max(1, min(len(stages) for stages in self.pool.values()) - 1)
         self.sets = [s for g in brackets.values() for s in g]
 
     def generate(self) -> list:

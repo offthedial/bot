@@ -3,7 +3,7 @@
 import discord
 from discord.ext import tasks, commands
 
-from offthedialbot import utils
+from offthedialbot import utils, logger
 from offthedialbot.commands.to.sync import ToSync
 
 
@@ -13,10 +13,12 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
         self.bot = bot
         self.sync.start()
 
-    @tasks.loop(hours=1)
+    @tasks.loop(hours=12)
     async def sync(self):
-        """Task loop that assigns roles."""
-        await ToSync.sync(self.bot)
+        try:
+            await ToSync.sync(self.bot)
+        except Exception as e:
+            logger.warning(f"Skipped sync: {e}")
 
     @sync.before_loop
     async def before_loop(self):

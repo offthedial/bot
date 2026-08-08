@@ -8,59 +8,51 @@ from offthedialbot import utils
 
 class ToSignal(utils.Command):
 
+    # Flat bonus on top of the swiss score, by top cut placement
+    TOP_CUT = {1: 100, 2: 50, 3: 25}
+
     @classmethod
     @utils.deco.require_role("Staff")
-    async def main(cls, ctx, event_name: str = None):
+    async def main(cls, ctx):
         """Distribute signal strength for all of the teams of the tournament."""
         async with ctx.typing():
             tourney = utils.Tournament()
+            sendou_id = tourney.dict["sendouId"]
 
-            # Create a :list: of brackets (:list:) of tuples (<Team Name>, <Signal Strength>)
-            q = """
-            events {
-              name
-              numEntrants
-              standings(query: {perPage: 500}) {
-                nodes {
-                  placement
-                  entrant {
-                    name
-                  }
-                }
-              }
+            teams = {
+                team["id"]: team
+                for team in await utils.sendou.teams(sendou_id, ctx=ctx)
             }
-            """
-            data = await tourney.query_smashgg(tourney.dict["slug"], q)
-            events = [{
-                "event": event["name"],
-                "total": event["numEntrants"],
-                "standings": [{
-                    "team": node["entrant"]["name"],
-                    "placement": node["placement"],
-                } for node in event["standings"]["nodes"]]
-            } for event in data["events"]]
 
-            # If event if specified, filter to event
-            if event_name:
-                selected = list(filter(lambda s: s["event"] == event_name, events))
-                if not len(selected):
-                    raise utils.exc.CommandCancel(
-                        title="Invalid event name",
-                        description=
-                            "Make sure the event name matches exactly. If it has spaces, make sure that you wrap the name in quotations.\n\n" +
-                            "**Events:**\n" +
-                            "\n".join(list(map(lambda e: f'> - `"{e["event"]}"`', events))))
-                events = selected
+            # Total each team's gain across their division's brackets.
+            gains: dict[int, float] = {}
+            for idx, bracket in enumerate(tourney.brackets()):
+                result = await utils.sendou.standings(sendou_id, idx, ctx=ctx)
+                total = len(result["standings"])
+                for standing in result["standings"]:
+                    gain = (
+                        cls.calculate_gain(total=total, placement=standing["placement"])
+                        if bracket["type"] == "swiss"
+                        else cls.TOP_CUT.get(standing["placement"], 0))
+                    gains[standing["tournamentTeamId"]] = gains.get(standing["tournamentTeamId"], 0) + gain
 
-            # Distribute signal strength for each standing
+            # Distribute signal strength for each team
             members_list: list[tuple] = []
-            for event in events:
-                for standing in event["standings"]:
-                    gain = cls.calculate_gain(total=event["total"], placement=standing["placement"])
-                    members = cls.get_team_members(ctx, standing["team"])
-                    for member in members:
-                        members_list.append((member, gain))
+            missing: list[str] = []
+            for team_id, gain in gains.items():
+                if not (team := teams.get(team_id)):
+                    continue
+                for member, name in cls.get_team_members(ctx, team):
+                    if member is None:
+                        missing.append(f'`{name}` ({team["name"]})')
+                        continue
+                    members_list.append((member, round(gain, 1)))
             cls.distribute_ss(members_list)
+
+        if not members_list:
+            raise utils.exc.CommandCancel(
+                title="No signal strength to distribute",
+                description="No standings were found, or none of the placed players are in the server.")
 
         formatted = cls.format_members(members_list)
         await utils.Alert(ctx, utils.Alert.Style.SUCCESS,
@@ -69,6 +61,10 @@ class ToSignal(utils.Command):
         if len(formatted) > 1:
                 for chunk in formatted[1:]:
                     await ctx.send(embed=discord.Embed(description="\n".join(chunk), color=utils.Alert.Style.SUCCESS))
+        if missing:
+            await utils.Alert(ctx, utils.Alert.Style.WARNING,
+                title="Skipped - not in the server:",
+                description="\n".join(f"`-` {entry}" for entry in missing))
 
     @staticmethod
     def calculate_gain(total, placement):
@@ -77,13 +73,10 @@ class ToSignal(utils.Command):
 
     @classmethod
     def get_team_members(cls, ctx, team):
-        """Return a list of members for a team."""
-        team_role = discord.utils.get(ctx.guild.roles, name=team)
-        if not team_role:
-            raise utils.exc.CommandCancel(
-                title=f"Unable to get role for team: `{team}`",
-                description=f"Make sure the team name and role name match")
-        return team_role.members
+        return [
+            (ctx.guild.get_member(int(member["discordId"])), member["name"])
+            for member in team["members"]
+        ]
 
     @classmethod
     def distribute_ss(cls, members_list):

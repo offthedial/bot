@@ -1,8 +1,12 @@
 from firebase_admin.firestore import Query
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from offthedialbot import utils
 from . import db
+
+
+REGISTRATION_CLOSES_BEFORE = timedelta(hours=72)
+TOURNAMENT_LASTS = timedelta(hours=24)
 
 
 class Tournament:
@@ -11,12 +15,12 @@ class Tournament:
     col = db.collection(u'tournaments')
 
     @classmethod
-    async def new_tourney(cls, *, type, slug):
+    async def new_tourney(cls, *, type, sendou_id):
         tourney = {
             "date": datetime.utcnow(),
             "type": type,
-            "slug": slug,
-            "smashgg": await cls.query_smashgg(slug)
+            "sendouId": sendou_id,
+            "sendou": await cls.query_sendou(sendou_id)
         }
         cls.col.add(tourney)
         return cls()
@@ -25,7 +29,7 @@ class Tournament:
         self.doc = next(iter(self.col.order_by(u"date", direction=Query.DESCENDING).limit(1).stream()))
         self.ref = self.doc.reference
         self.dict = self.doc.to_dict()
-        self.sgg_link = f"[start.gg](https://start.gg/tournament/{self.dict['slug']})"
+        self.sendou_link = f"[sendou.ink]({self.dict['sendou']['url']})"
 
     def signups(self, col=False, ignore_ended=False):
         """Return a stream of tournament signups."""
@@ -53,41 +57,49 @@ class Tournament:
 
     def has_ended(self):
         """Returns whether the tournament has ended."""
-        return self.dict["smashgg"]["endAt"] < datetime.utcnow().timestamp()
+        starts = datetime.utcfromtimestamp(self.dict["sendou"]["startAt"])
+        return starts + TOURNAMENT_LASTS < datetime.utcnow()
 
     def has_reg_closed(self):
-        """Returns whether the tournament registration is open."""
-        return self.dict["smashgg"]["registrationClosesAt"] < datetime.utcnow().timestamp()
+        """Returns whether the tournament registration is closed."""
+        starts = datetime.utcfromtimestamp(self.dict["sendou"]["startAt"])
+        return starts - REGISTRATION_CLOSES_BEFORE < datetime.utcnow()
 
     def ends_at(self):
-        return datetime.utcfromtimestamp(self.dict["smashgg"]["endAt"]).strftime('%a, %b %d at %I:%M %p UTC')
+        starts = datetime.utcfromtimestamp(self.dict["sendou"]["startAt"])
+        return (starts + TOURNAMENT_LASTS).strftime('%a, %b %d at %I:%M %p UTC')
 
     def reg_closes_at(self):
-        return datetime.utcfromtimestamp(self.dict["smashgg"]["registrationClosesAt"]).strftime('%a, %b %d at %I:%M %p UTC')
+        starts = datetime.utcfromtimestamp(self.dict["sendou"]["startAt"])
+        return (starts - REGISTRATION_CLOSES_BEFORE).strftime('%a, %b %d at %I:%M %p UTC')
+
+    def starts_at(self):
+        return datetime.utcfromtimestamp(self.dict["sendou"]["startAt"]).strftime('%a, %b %d at %I:%M %p UTC')
 
     def date(self):
         return self.dict["date"].strftime('%a, %b %d at %I:%M %p UTC')
 
-    async def sync_smashgg(self):
-        smashgg = await self.query_smashgg(self.dict["slug"])
-        self.ref.update({"smashgg": smashgg})
-        self.dict["smashgg"] = smashgg  # Optimistic update
+    def brackets(self):
+        """Return the tournament's brackets, in the order sendou.ink indexes them."""
+        return self.dict["sendou"]["brackets"]
+
+    async def sync_sendou(self):
+        sendou = await self.query_sendou(self.dict["sendouId"])
+        self.ref.update({"sendou": sendou})
+        self.dict["sendou"] = sendou  # Optimistic update
 
     @staticmethod
-    async def query_smashgg(slug, q=None):
-        """Query the start.gg graphql api."""
-        q = q if q else """
-            name
-            endAt
-            startAt
-            registrationClosesAt
-        """
-        query = f"""query($slug: String) {{
-          tournament(slug: $slug) {{
-            {q}
-          }}
-        }}
-        """
-
-        status, resp = await utils.graphql("smashgg", query, {"slug": slug})
-        return resp["data"]["tournament"]
+    async def query_sendou(id, ctx=None):
+        """Query the sendou.ink api, flattened into the shape stored in firestore."""
+        data = await utils.sendou.tournament(id, ctx=ctx)
+        return {
+            "name": data["name"],
+            "url": data["url"],
+            "logoUrl": data["logoUrl"],
+            "startAt": int(datetime.fromisoformat(
+                data["startTime"].replace("Z", "+00:00")).timestamp()),
+            "registeredCount": data["teams"]["registeredCount"],
+            "checkedInCount": data["teams"]["checkedInCount"],
+            "brackets": data["brackets"],
+            "isFinalized": data["isFinalized"],
+        }

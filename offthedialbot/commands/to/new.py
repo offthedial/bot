@@ -6,53 +6,46 @@ from offthedialbot import utils
 
 class ToNew(utils.Command):
 
+    TYPE = "idtga"
+
     @classmethod
     @utils.deco.require_role("Staff")
     async def main(cls, ctx):
         """ Open registration for a new tournament!
 
         Steps:
-        - Get start.gg full slug.
-        - Get tournament type.
+        - Get sendou.ink tournament id.
         - Add tournament data to database.
         """
         ui: utils.CommandUI = await utils.CommandUI(ctx,
             discord.Embed(title="Opening registration for a new tournament...", color=utils.colors.COMPETING))
 
         # Steps
-        tourney_slug = await cls.get_tourney_slug(ui)
-        tourney_type = await cls.get_tourney_type(ui)
+        sendou_id = await cls.get_sendou_id(ui)
 
         ui.embed.description = "Adding tournament to database..."
         await ui.update()
-        tourney = await utils.Tournament.new_tourney(slug=tourney_slug, type=tourney_type)
+        tourney = await utils.Tournament.new_tourney(sendou_id=sendou_id, type=cls.TYPE)
         await ui.end(utils.Alert.create_embed(utils.Alert.Style.SUCCESS,
             title="Tournament Created",
             description="\n".join([
-                f"Name: `{tourney.dict['smashgg']['name']}`",
-                f"Start.gg Slug: `{tourney_slug}`",
-                f"Tournament Type: `{tourney_type}`"
+                f"Name: `{tourney.dict['sendou']['name']}`",
+                f"Sendou.ink ID: `{sendou_id}`",
+                f"Tournament Type: `{cls.TYPE}`",
+                f"Registration Closes: `{tourney.reg_closes_at()}`"
             ])))
 
     @classmethod
-    async def get_tourney_slug(cls, ui):
-        """Create a new tournament."""
-        directions = f"Enter the full tournament slug (`it-s-dangerous-to-go-alone-month-20XX`)"
-        ui.embed.description = directions
-        reply = await ui.get_reply()
-        return reply.content
-
-    @classmethod
-    async def get_tourney_type(cls, ui):
+    async def get_sendou_id(cls, ui):
         """Create a new tournament."""
         directions = "\n".join([
-            f"Enter the tournament type (`idtga`, `wl`, `https://fabl.otd.ink`).",
-            "This will be the link for the 'Learn More' button on the otd.ink hero page.",
-            "If you want to link to a different site other than otd.ink, enter the full url, for example:",
-            " - `idtga` - links to -> `otd.ink/idtga`",
-            " - `wl` - links to -> `otd.ink/wl`",
-            " - `https://fabl.otd.ink` - links to -> `fabl.otd.ink`"
+            "Enter the sendou.ink tournament id (`1234`).",
+            "It's the number in the tournament url: `sendou.ink/to/1234`."
         ])
         ui.embed.description = directions
         reply = await ui.get_reply()
-        return reply.content.lower()
+        if not reply.content.strip().isdigit():
+            raise utils.exc.CommandCancel(
+                title="Invalid tournament id",
+                description="The id must be a number, taken from the `sendou.ink/to/<id>` url.")
+        return int(reply.content.strip())

@@ -62,48 +62,21 @@ class ToMaplist(utils.Command):
 
     @classmethod
     async def query_brackets(cls, ctx):
-        """Call the start.gg api on the tournament slug to retrieve the brackets needed."""
         tourney = utils.Tournament()
-        query = """query($slug: String) {
-          tournament(slug: $slug) {
-            events {
-              phases {
-                name
-                phaseGroups {
-                  nodes {
-                    rounds {
-                      bestOf
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }"""
         try:
-            status, result = await utils.graphql(
-                "smashgg", query, {"slug": tourney.dict["slug"]}, ctx=ctx
+            rounds = await utils.sendou.rounds(
+                tourney.dict["sendouId"], tourney.brackets(), ctx=ctx
             )
-            return {
-                phase["name"]: [
-                    node["bestOf"] for node in phase["phaseGroups"]["nodes"][0]["rounds"]
-                ]
-                for phase in result["data"]["tournament"]["events"][0]["phases"]
-            }
+        except utils.exc.CommandCancel:
+            raise
         except Exception:
-            raise utils.exc.CommandCancel(title="Start.gg Error", description="There was an error fetching the brackets from start.gg")
+            raise utils.exc.CommandCancel(title="Sendou.ink Error", description="There was an error fetching the brackets from sendou.ink")
 
-    @classmethod
-    async def query_pool(cls, ctx, name=None):
-        """Send a post request to get the maplist pool from the sendou.ink gql api."""
-        query = f'query {{\nmaplists(name: "{name if name else "LUTI Season X"}") {{\nsz\ntc\nrm\ncb\n}}\n}}'
-        status, resp = await utils.graphql("sendou", query, ctx=ctx)
-        if not resp["data"]["maplists"]:
-            raise utils.exc.CommandCancel(
-                title="Invalid maplist name",
-                description="Check to make sure you didn't make any typos, or that the maplist doesn't exist.",
-            )
-        return resp["data"]["maplists"][0]
+        longest = {}
+        for bracket, (name, counts) in zip(tourney.brackets(), rounds):
+            if len(counts) > len(longest.get(bracket["type"], (None, []))[1]):
+                longest[bracket["type"]] = (name, counts)
+        return dict(longest.values())
 
     @classmethod
     def parse_map_pool_link(cls, sendou_link):

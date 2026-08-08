@@ -1,6 +1,7 @@
 """Import common utilites used by all commands of the bot."""
 
-from .session import session, graphql
+from .session import session
+from . import sendou
 from . import channels
 from . import checks
 from . import colors

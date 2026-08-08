@@ -25,6 +25,10 @@ class ToGet(utils.Command):
             else:
                 name, mention = user.id, "N/A"
 
+            # Resolved from their discord id, never stored on the profile
+            sendou_id = await utils.sendou.user_id(user.id)
+            sendou = f"https://sendou.ink/u/{sendou_id}" if sendou_id else "`No account linked`"
+
             embed = discord.Embed(
                 title=name,
                 description="\n".join([
@@ -34,7 +38,7 @@ class ToGet(utils.Command):
                     f"`Rank:           ` **`{user.get_rank()}`**",
                     f"`Weapons:        ` \n> {user.get_weapons()}",
                     f"`Competitive Exp:` \n> {user.dict['profile']['cxp']}",
-                    f"`Start.gg Info:  ` **`{(await user.smashgg())['player']['gamerTag']}`** **(`{user.dict['profile']['slug']}`)**",
+                    f"`Sendou.ink:     ` **{sendou}**",
                     f"`Signal Strength:` **`{user.dict['meta']['signal']}`**",
                 ]))
             await utils.CommandUI.create_ui(ctx, embed)
