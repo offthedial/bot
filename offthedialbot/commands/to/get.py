@@ -25,9 +25,7 @@ class ToGet(utils.Command):
             else:
                 name, mention = user.id, "N/A"
 
-            # Resolved from their discord id, never stored on the profile
-            sendou_id = await utils.sendou.user_id(user.id)
-            sendou = f"https://sendou.ink/u/{sendou_id}" if sendou_id else "`No account linked`"
+            sendou = await user.sendou_link() or "`No account linked`"
 
             embed = discord.Embed(
                 title=name,

@@ -102,10 +102,12 @@ class ToExport(utils.Command):
     async def list_signups(ctx, ui, signups):
         """Return a list with parsed signups."""
         async def per_doc(i, doc):
+            user = utils.User(doc.id)
+            sendou_link = await user.sendou_link()
+
             # Get base data
             try:
                 signup = doc.to_dict()
-                user = utils.User(doc.id)
 
                 # Get discord data
                 user_discord = user.discord(ctx.guild)
@@ -137,6 +139,7 @@ class ToExport(utils.Command):
                     "rank_sort": user.get_sortable_rank(),
                     "weapons": user.get_weapons(),
                     "timezone": timezone,
+                    "sendou": sendou_link or "",
                     "id": doc.id,
                     "mention": f'<@{doc.id}>',
                     "discord": discord_username,
@@ -160,10 +163,11 @@ class ToExport(utils.Command):
 
         theirs = {m["discordId"] for team in teams for m in team["members"]}
         ours = {s["id"] for s in signups}
+        linked = {s["id"] for s in signups if s["sendou"]}
 
         unmatched, no_account = [], []
         for id in sorted(ours - theirs):
-            (unmatched if await utils.sendou.user_id(id) else no_account).append(id)
+            (unmatched if id in linked else no_account).append(id)
 
         return sorted(theirs - ours), unmatched, no_account
 
@@ -173,6 +177,7 @@ class ToExport(utils.Command):
         fields = {
             "Discord Mention":   lambda s: s["discord"],
             "SplashTag":         lambda s: s["user"]["profile"]["splashtag"],
+            "Sendou.ink":        lambda s: s["sendou"],
             "SW":                lambda s: s["user"]["profile"]["sw"],
             "Parsed Rank":       lambda s: s["rank"],
             "Sortable Rank":     lambda s: s["rank_sort"],

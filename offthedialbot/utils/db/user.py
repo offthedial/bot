@@ -1,6 +1,7 @@
 import statistics
 import discord
 from firebase_admin import firestore
+from .. import sendou
 from . import db, Tournament
 from .signup import Signup
 
@@ -32,6 +33,10 @@ class User:
             return context.get_user(int(self.id))
         if isinstance(context, discord.Guild):
             return context.get_member(int(self.id))
+
+    async def sendou_link(self):
+        id = await sendou.user_id(self.id)
+        return f"https://sendou.ink/u/{id}" if id else None
 
     def increment_ss(self, by: int):
         """Increment signal strength by an amount."""
