@@ -26,12 +26,15 @@ class ToRosters(utils.Command):
 
     @staticmethod
     def roster(ctx, team):
-        """Build the `@team - @player @player` message for a single team."""
+        """Build the `@team - @captain 👑, @player` message for a single team."""
         color = discord.Color(utils.colors.COMPETING)
         role = discord.utils.find(
             lambda r: r.name == team["name"] and r.color == color, ctx.guild.roles)
-        members = " ".join(
-            member.mention for m in team["members"]
+        # Sendou lists the captain first, so crown by position rather than by
+        # where they land once players outside the server are dropped
+        members = ", ".join(
+            f"{member.mention} 👑" if i == 0 else member.mention
+            for i, m in enumerate(team["members"])
             if (member := ctx.guild.get_member(int(m["discordId"])))
         )
         return f"{role.mention if role else ''} - {members}"
