@@ -17,8 +17,8 @@ class Tournament(commands.Cog, command_attrs={'hidden': True}):
     async def sync(self):
         try:
             await ToSync.sync(self.bot)
-        except Exception as e:
-            logger.warning(f"Skipped sync: {e}")
+        except Exception:
+            logger.warning("Skipped sync", exc_info=True)
 
     @sync.before_loop
     async def before_loop(self):
